@@ -15,7 +15,9 @@ In chronological order:
  1. Tokio (Scrambled Formation)
  2. Bubble Bobble
 
-Note that Tokio hangs up after a life is lost if the RBF is compiled without sound.
+Some of the MRA files provided may not work as there is some variation in Bubble Bobble bootleg hardware which is not implemented. Official Tokio MRA file will not work because the MCU hardware is not yet implemented in the core. Only the bootleg MRA for Tokio works.
+
+Note for developers: Tokio hangs up after a life is lost if the RBF is compiled without sound.
 
 ## Test Screen
 
