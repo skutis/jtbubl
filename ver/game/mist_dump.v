@@ -54,13 +54,18 @@ module mist_dump(
             $shm_probe(UUT.u_game,"A");
             //$shm_probe(UUT.u_game.u_dwnld,"A");
             $shm_probe(UUT.u_game.u_main,"A");
+            $shm_probe(UUT.u_game.u_main.u_subwait,"AS");
+            $shm_probe(UUT.u_game.u_main.u_mainwait,"AS");
+            $shm_probe(UUT.u_game.u_main.u_mcu,"A");
             `ifndef NOSOUND
                 $shm_probe(UUT.u_game.u_sound,"A");
+                $shm_probe(UUT.u_game.u_sound.u_cpu,"AS");
                 //$shm_probe(UUT.u_game.u_sound.u_2203,"AS");
-                $shm_probe(UUT.u_game.u_sound.u_opl,"AS");
+                //$shm_probe(UUT.u_game.u_sound.u_opl,"AS");
             `endif
             //$shm_probe(UUT.u_game.u_video,"A");
             //$shm_probe(UUT.u_game.u_main.u_mcu,"A");
+            //$shm_probe(UUT.u_game.u_main.u_mcu.u_gatecen,"A");
             //$shm_probe(UUT.u_game.u_video.u_colmix.col_addr);
             //$shm_probe(UUT.u_game.u_main.u_maincpu,"A");
             //$shm_probe(UUT.u_game.u_main.u_subcpu,"A");

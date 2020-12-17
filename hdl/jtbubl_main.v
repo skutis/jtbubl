@@ -22,6 +22,7 @@ module jtbubl_main(
     input               cen12,
     input               cen6,
     input               cen4,
+    input               cpu_start,
 
     // game selection
     input               tokio,
@@ -77,8 +78,7 @@ module jtbubl_main(
 );
 
 reg  [ 7:0] main_din, sub_din;
-wire [ 7:0] ram2main, ram2sub, main_dout, sub_dout,
-            rammcu2main, rammcu2mcu,
+wire [ 7:0] ram2sub, main_dout, sub_dout, comm2main, comm2mcu,
             p1_in,
             p1_out, p2_out, p3_out, p4_out;
 reg  [ 7:0] p3_in, rammcu_din;
@@ -87,7 +87,7 @@ reg         h1;
 wire [11:0] mcu_bus;
 wire [15:0] main_addr, sub_addr, mcu_addr;
 wire        main_mreq_n, main_iorq_n, main_rdn, main_wrn, main_rfsh_n;
-wire        sub_mreq_n,  sub_iorq_n,  sub_rd_n,  sub_wrn;
+wire        sub_mreq_n,  sub_iorq_n,  sub_rd_n,  sub_wrn, sub_halt_n;
 reg         rammcu_we, rammcu_cs;
 reg         main_work_cs, mcram_cs, // shared memories
             tres_cs,  // watchdog reset
@@ -102,17 +102,8 @@ reg         main_rst_n, sub_rst_n, mcu_rst;
 reg  [ 7:0] wdog_cnt, int_vector;
 reg         last_VBL;
 
-reg  [ 7:0] work_din;
-reg  [12:0] work_addr;
-reg         work_we;
-wire [ 7:0] work_dout;
+wire [ 7:0] work2main_dout, work2sub_dout;
 
-reg  [ 7:0] comm_din, comm2main, comm2mcu;
-reg  [ 9:0] comm_addr;
-reg         comm_we;
-wire [ 7:0] comm_dout;
-
-wire        lrom_wait_n, srom_wait_n;
 reg         lwaitn, swaitn;
 wire        main_halt_n;
 reg         main_wait_n, sub_wait_n;
@@ -169,6 +160,7 @@ always @(*) begin
         main2sub_nmi= !main_mreq_n && main_addr[15: 8]==8'hFB && main_addr[7:6]==2'b00 && !main_wrn;
         tres_cs     = !main_mreq_n && main_addr[15: 8]==8'hFA && main_addr[7];
         mcram_cs    = !main_mreq_n && main_addr[15:10]==6'b1111_11; // FC
+        cabinet_cs  = 0;
     end
 end
 
@@ -178,7 +170,7 @@ always @(posedge clk24) begin
         main_rom_cs ? main_rom_data : (
         vram_cs     ? vram_dout     : (
         pal_cs      ? pal_dout      : (
-        main_work_cs? work_dout     : (
+        main_work_cs? work2main_dout: (
         mcram_cs    ? (tokio ? 8'hbf : comm2main ) : (
         !main_iorq_n? int_vector    : (
         sound_cs    ? (
@@ -252,23 +244,28 @@ end
 // Sub CPU input mux
 always @(posedge clk24) begin
     sub_din <= sub_rom_cs  ? sub_rom_data : (
-               sub_work_cs ? work_dout : 8'hff );
+               sub_work_cs ? work2sub_dout : 8'hff );
 end
-
+/*
 always @(*) begin
     work_din = lde ? main_dout : sub_dout;
     work_we  = lde ? ~main_wrn : ~sub_wrn;
     work_addr= lde ? main_addr[12:0] : sub_addr[12:0];
 end
-
+*/
 // Time shared
-jtframe_ram #(.aw(13)) u_work(
-    .clk    ( clk24           ),
-    .cen    ( 1'b1            ),
-    .data   ( work_din        ),
-    .addr   ( work_addr       ),
-    .we     ( work_we         ),
-    .q      ( work_dout       )
+jtframe_dual_ram #(.aw(13)) u_work(
+    .clk0   ( clk24           ),
+    .clk1   ( clk24           ),
+    .data0  ( main_dout       ),
+    .addr0  ( main_addr[12:0] ),
+    .we0    ( ~main_wrn & lde      ),
+    .q0     ( work2main_dout  ),
+    // Sub CPU
+    .data1  ( sub_dout        ),
+    .addr1  ( sub_addr[12:0]  ),
+    .we1    ( ~sub_wrn & sub_work_cs       ),
+    .q1     ( work2sub_dout   )
 );
 
 /////////////////////////////////////////
@@ -288,8 +285,8 @@ end
 always @(*) begin
     lwaitn = ~( sde & main_work_cs );
     swaitn = ~( lde & sub_work_cs  );
-    main_wait_n = lwaitn & lrom_wait_n & ~(vram_cs&h1);
-    sub_wait_n  = swaitn & srom_wait_n;
+    main_wait_n = lwaitn;
+    sub_wait_n  = swaitn;
 end
 
 always @(posedge clk24, negedge main_rst_n) begin
@@ -310,11 +307,13 @@ always @(posedge clk24, negedge sub_rst_n) begin
     end
 end
 
+wire cen_main;
+
 jtframe_z80 u_maincpu(
     .rst_n    ( main_rst_n     ),
     .clk      ( clk24          ),
-    .cen      ( cen6           ),
-    .wait_n   ( main_wait_n    ),
+    .cen      ( cen_main       ),
+    .wait_n   ( 1'b1           ),
     .int_n    ( main_int_n     ),
     .nmi_n    ( 1'b1           ),
     .busrq_n  ( 1'b1           ),
@@ -331,12 +330,18 @@ jtframe_z80 u_maincpu(
     .dout     ( main_dout      )
 );
 
-jtframe_rom_wait u_mainwait(
+jtframe_z80wait #(.devcnt(2)) u_mainwait(
     .rst_n    ( main_rst_n      ),
     .clk      ( clk24           ),
-    .cen_in   (                 ),
-    .cen_out  (                 ),
-    .gate     ( lrom_wait_n     ),
+    .start    ( cpu_start       ),
+    .cen_in   ( cen6            ),
+    .cen_out  ( cen_main        ),
+    .gate     (                 ),
+    // cycle recovery
+    .mreq_n   ( main_mreq_n     ),
+    .iorq_n   ( main_iorq_n     ),
+    .busak_n  ( 1'b1            ),
+    .dev_busy ( { vram_cs & h1, sde & main_work_cs }    ),
     // manage access to ROM data from SDRAM
     .rom_cs   ( main_rom_cs     ),
     .rom_ok   ( main_rom_ok     )
@@ -345,11 +350,13 @@ jtframe_rom_wait u_mainwait(
 /////////////////////////////////////////
 // Sub CPU
 
+wire cen_sub;
+
 jtframe_z80 u_subcpu(
     .rst_n    ( sub_rst_n      ),
     .clk      ( clk24          ),
-    .cen      ( cen6           ),
-    .wait_n   ( sub_wait_n     ),
+    .cen      ( cen_sub        ),
+    .wait_n   ( 1'b1           ),
     .int_n    ( sub_int_n      ),
     .nmi_n    ( ~main2sub_nmi  ),
     .busrq_n  ( 1'b1           ),
@@ -359,19 +366,25 @@ jtframe_z80 u_subcpu(
     .rd_n     ( sub_rd_n       ),
     .wr_n     ( sub_wrn        ),
     .rfsh_n   (                ),
-    .halt_n   (                ),
+    .halt_n   ( sub_halt_n     ),
     .busak_n  (                ),
     .A        ( sub_addr       ),
     .din      ( sub_din        ),
     .dout     ( sub_dout       )
 );
 
-jtframe_rom_wait u_subwait(
+jtframe_z80wait #(.devcnt(1)) u_subwait(
     .rst_n    ( sub_rst_n       ),
     .clk      ( clk24           ),
-    .cen_in   (                 ),
-    .cen_out  (                 ),
-    .gate     ( srom_wait_n     ),
+    .start    ( cpu_start       ),
+    .cen_in   ( cen6            ),
+    .cen_out  ( cen_sub         ),
+    .gate     (                 ),
+    // cycle recovery
+    .mreq_n   ( sub_mreq_n      ),
+    .iorq_n   ( sub_iorq_n      ),
+    .busak_n  ( 1'b1            ),
+    .dev_busy ( (main_work_cs & ~sde) & sub_work_cs ),
     // manage access to ROM data from SDRAM
     .rom_cs   ( sub_rom_cs      ),
     .rom_ok   ( sub_rom_ok      )
@@ -405,7 +418,7 @@ jtframe_ff u_mcu2main (
     // it can come from P1[6] or from VBL
     .sigedge( tokio ? VBL_gated : p1_out[6] )
 );
-
+/*
 always @(posedge clk24) begin
     if( cen12 ) begin
         if(cen6) begin
@@ -421,15 +434,21 @@ always @(posedge clk24) begin
         end
     end
 end
-
+*/
 // Time shared
-jtframe_ram #(.aw(10)) u_comm(
-    .clk    ( clk24            ),
-    .cen    ( 1'b1             ),
-    .data   ( comm_din         ),
-    .addr   ( comm_addr        ),
-    .we     ( comm_we          ),
-    .q      ( comm_dout        )
+jtframe_dual_ram #(.aw(10)) u_comm(
+    .clk0   ( clk24              ),
+    .clk1   ( clk24              ),
+    // Main CPU
+    .addr0  ( main_addr[9:0]     ),
+    .data0  ( main_dout          ),
+    .we0    ( mcram_we           ),
+    .q0     ( comm2main          ),
+    // MCU
+    .addr1  ( mcu_bus[9:0]       ),
+    .data1  ( rammcu_din         ),
+    .we1    ( rammcu_we          ),
+    .q1     ( comm2mcu           )
 );
 
 // Bubble Bobble handles the input ports via the MCU
@@ -458,11 +477,12 @@ always @(posedge clk24) begin
     endcase
 end
 
-reg [3:0] clrcnt;
+reg [5:0] clrcnt;
 reg       last_sub_int_n;
 reg       mcuirq;
 
 wire      cen_mcu = cen4;
+wire      cen_mcu_eff;      // effective MCU gated clock after ROM CS blind time
 
 always @(posedge clk24) begin
     if( mcu_rst ) begin
@@ -475,7 +495,7 @@ always @(posedge clk24) begin
             clrcnt <= 4'd0;
             mcuirq <= 1;
         end else if(mcuirq) begin
-            clrcnt<=clrcnt+4'd1;
+            clrcnt<=clrcnt+1'd1;
             if(&clrcnt) mcuirq<=0;
         end
     end
@@ -515,7 +535,9 @@ jtframe_6801mcu #(.MAXPORT(7)) u_mcu (
     .rst        ( mcu_rst       ),
     //.rst( rst ), // for quick sims
     .clk        ( clk24         ),
-    .cen        ( cen_mcu       ),  // this should be cen4, but let's start easy
+    .cen        ( cen_mcu       ),
+    .wait_cen   ( cen_mcu_eff   ),
+    .start      ( cpu_start     ),
     .wrn        (               ),
     .vma        ( mcu_vma       ),
     .addr       ( mcu_addr      ),
