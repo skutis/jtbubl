@@ -333,7 +333,6 @@ jtframe_z80 u_maincpu(
 jtframe_z80wait #(.devcnt(2)) u_mainwait(
     .rst_n    ( main_rst_n      ),
     .clk      ( clk24           ),
-    .start    ( cpu_start       ),
     .cen_in   ( cen6            ),
     .cen_out  ( cen_main        ),
     .gate     (                 ),
@@ -376,7 +375,6 @@ jtframe_z80 u_subcpu(
 jtframe_z80wait #(.devcnt(1)) u_subwait(
     .rst_n    ( sub_rst_n       ),
     .clk      ( clk24           ),
-    .start    ( cpu_start       ),
     .cen_in   ( cen6            ),
     .cen_out  ( cen_sub         ),
     .gate     (                 ),
@@ -537,7 +535,6 @@ jtframe_6801mcu #(.MAXPORT(7)) u_mcu (
     .clk        ( clk24         ),
     .cen        ( cen_mcu       ),
     .wait_cen   ( cen_mcu_eff   ),
-    .start      ( cpu_start     ),
     .wrn        (               ),
     .vma        ( mcu_vma       ),
     .addr       ( mcu_addr      ),

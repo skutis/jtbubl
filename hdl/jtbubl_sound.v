@@ -138,7 +138,6 @@ jtframe_ff u_flag(
 jtframe_sysz80 #(.RAM_AW(13)) u_cpu(
     .rst_n      ( snd_rstn    ),
     .clk        ( clk         ),
-    .start      ( start       ),
     .cen        ( cen3        ),
     .cpu_cen    (             ),
     .int_n      ( int_n       ),
