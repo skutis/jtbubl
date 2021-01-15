@@ -23,6 +23,7 @@ module jtbubl_sound(
     input             cen3,   //  3   MHz
     input             start,
 
+    input      [ 1:0] fx_level,
     input             tokio,
     // Interface with main CPU
     input      [ 7:0] snd_latch,
@@ -39,7 +40,8 @@ module jtbubl_sound(
 
     // Sound output
     output signed [15:0] snd,
-    output            sample
+    output            sample,
+    output            peak
 );
 
 wire        [15:0] A;
@@ -171,21 +173,44 @@ jt49_dcrm2 #(.sw(10)) u_dcrm (
 // Both FM chips have the same gain according to the schematics
 // YM2203 to YM3526 ratio = 8:1
 
-wire [7:0] fm0_gain = tokio ? 8'hC0 : 8'h80;
-wire [7:0] psg_gain = tokio ? 8'hFF : 8'h20;
+reg  [7:0] fm0_gain, psg_gain;
 
-jt12_mixer #(.w0(16),.w1(16),.w2(11),.w3(8),.wout(16)) u_mixer(
+wire [7:0] fm1_gain = tokio ? 8'h40 : 8'h04; // YM3526
+
+always @(posedge clk) begin
+    if( tokio ) begin
+        case( fx_level )
+            2'd0: psg_gain <= 8'h01;
+            2'd1: psg_gain <= 8'h02;
+            2'd2: psg_gain <= 8'h04;
+            2'd3: psg_gain <= 8'h08;
+        endcase
+        fm0_gain <= fm1_gain;
+    end else begin
+        case( fx_level )
+            2'd0: fm0_gain <= 8'h08;
+            2'd1: fm0_gain <= 8'h10;
+            2'd2: fm0_gain <= 8'h20;
+            2'd3: fm0_gain <= 8'h40;
+        endcase
+        psg_gain <= fm0_gain;
+    end
+end
+
+jtframe_mixer #(.W2(10),.W3(8)) u_mixer(
+    .rst    ( rst          ),
     .clk    ( clk          ),
     .cen    ( cen3         ),
     .ch0    ( fm0_snd      ),
     .ch1    ( fm1_snd      ),
-    .ch2    ( {psg2x,1'b0} ),
+    .ch2    ( psg2x        ),
     .ch3    ( 8'd0         ),
     .gain0  ( fm0_gain     ), // YM2203 - Fx
-    .gain1  ( 8'h18        ), // YM3526 - Music
+    .gain1  ( fm1_gain     ), // YM3526 - Music
     .gain2  ( psg_gain     ), // PSG - Unused in Bubble Bobble - Used in Tokio
     .gain3  ( 8'd0         ),
-    .mixed  ( snd          )
+    .mixed  ( snd          ),
+    .peak   ( peak         )
 );
 
 jt03 u_2203(

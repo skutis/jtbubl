@@ -63,6 +63,7 @@ module jtbubl_game(
     // Sound output
     output  signed [15:0] snd,
     output          sample,
+    output          game_led,
     input           enable_psg,
     input           enable_fm,
     // Debug
@@ -275,6 +276,7 @@ jtbubl_sound u_sound(
     .rstn       ( 1'b1          ),
     .cen3       ( cen3          ),
     .start      ( cpu_start     ),
+    .fx_level   ( dip_fxlevel   ),
 
     .tokio      ( tokio         ),
     // communication with main CPU
@@ -292,7 +294,8 @@ jtbubl_sound u_sound(
 
     // Sound output
     .snd        ( snd           ),
-    .sample     ( sample        )
+    .sample     ( sample        ),
+    .peak       ( game_led      )
 );
 `else
 assign snd_cs   = 0;
