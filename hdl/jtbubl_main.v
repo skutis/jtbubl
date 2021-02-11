@@ -73,6 +73,7 @@ module jtbubl_main(
 
     // DIP switches
     input               dip_pause,
+    input               service,
     input      [ 7:0]   dipsw_a,
     input      [ 7:0]   dipsw_b
 );
@@ -121,7 +122,7 @@ assign      cpu_dout     = main_dout;
 assign      cpu_rnw      = main_wrn;
 assign      p1_in[7:4]   = 4'hf;
 assign      p1_in[3:2]   = ~coin_input;
-assign      p1_in[1:0]   = 2'b11;
+assign      p1_in[1:0]   = { service, 1'b1 };
 assign      mcu_bus      = { p2_out[3:0], p4_out };
 
 // Watchdog and main CPU reset
@@ -468,7 +469,7 @@ always @(posedge clk24) begin
     case( main_addr[2:0] )
         3'd3: cab_dout <= dipsw_a;
         3'd4: cab_dout <= dipsw_b;
-        3'd5: cab_dout <= {2'b11, 2'b11 /* MCU related */, coin_input, 2'b11 };
+        3'd5: cab_dout <= {2'b11, 2'b11 /* MCU related */, coin_input, service, 1'b1 };
         3'd6: cab_dout <= {1'b1, start_button[0], joystick1[4], joystick1[5], joystick1[3:2], joystick1[0], joystick1[1] };
         3'd7: cab_dout <= {1'b1, start_button[1], joystick2[4], joystick2[5], joystick2[3:2], joystick2[0], joystick2[1] };
         default: cab_dout <= 8'hff;
