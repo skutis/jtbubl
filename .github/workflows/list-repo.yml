@@ -1,0 +1,28 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+
+  make_list:
+  
+    runs-on: ubuntu-latest
+    
+    container:
+      image: jotego/jtdock
+      credentials:
+        username: jotego
+        password: ${{ secrets.DOCKER_LOGIN }}
+    
+    steps:
+      - name: check out
+        uses: actions/checkout@v2
+        with:
+          repository: jotego/jtbubil
+      - name: list repo
+        run: find .
+  
