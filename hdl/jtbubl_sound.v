@@ -175,7 +175,7 @@ jt49_dcrm2 #(.sw(10)) u_dcrm (
 
 reg  [7:0] fm0_gain, psg_gain;
 
-wire [7:0] fm1_gain = tokio ? 8'h40 : 8'h04; // YM3526
+wire [7:0] fm1_gain = tokio ? 8'h40 : 8'h10; // YM3526
 
 always @(posedge clk) begin
     if( tokio ) begin
@@ -188,10 +188,10 @@ always @(posedge clk) begin
         fm0_gain <= fm1_gain;
     end else begin
         case( fx_level )
-            2'd0: fm0_gain <= 8'h08;
-            2'd1: fm0_gain <= 8'h10;
-            2'd2: fm0_gain <= 8'h20;
-            2'd3: fm0_gain <= 8'h40;
+            2'd0: fm0_gain <= 8'h18;
+            2'd1: fm0_gain <= 8'h30;
+            2'd2: fm0_gain <= 8'h60;
+            2'd3: fm0_gain <= 8'hC0;
         endcase
         psg_gain <= fm0_gain;
     end
