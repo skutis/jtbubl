@@ -1,0 +1,27 @@
+name: MiST compilation
+
+on:
+  push:
+
+jobs:
+
+  generate_arc:
+  
+    runs-on: ubuntu-latest
+    
+    container:
+      image: jotego/quartus13
+      credentials:
+        username: jotego
+        password: ${{ secrets.DOCKER_LOGIN }}
+    
+    steps:
+      - name: check out
+        uses: actions/checkout@v2
+        with:
+          submodules: true
+      - name: convert MRA
+        run: cd ${{ github.repository }}; source setprj.sh; cd modules/jtframe/cc; make
+      - name: compile Bubble Bobble
+        run: jtcore bubl
+
