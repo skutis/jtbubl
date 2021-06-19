@@ -6,6 +6,10 @@ on:
 jobs:
 
   quartus_compile:
+
+    env:
+      FTPUSER: ${{ secrets.FTPUSER }}
+      FTPPASS: ${{ secrets.FTPPASS }}
   
     runs-on: ubuntu-latest
     
@@ -21,8 +25,6 @@ jobs:
         with:
           submodules: true
           repository: ${{ github.repository }}
-      - name: convert MRA
-        run: cd $(basename ${{ github.repository }}); source setprj.sh; cd modules/jtframe/cc; make
-      - name: compile Bubble Bobble
-        run: cd $(basename ${{ github.repository }}); source setprj.sh; jtcore bubl
+      - name: compile for MiST
+        run: docked_build.sh bubl
 
