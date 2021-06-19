@@ -1,4 +1,4 @@
-name: MiST compilation.
+name: MiST compilation
 
 on:
   push:
