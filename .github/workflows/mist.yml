@@ -26,7 +26,7 @@ jobs:
           submodules: true
           repository: ${{ github.repository }}
       - name: show files
-        run: ls
+        run: ls ..
       - name: compile for MiST
-        run: docked_build.sh bubl
+        run: ../docked_build.sh bubl
 

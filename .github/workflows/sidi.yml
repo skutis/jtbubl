@@ -26,5 +26,5 @@ jobs:
           submodules: true
           repository: ${{ github.repository }}
       - name: compile for SiDi
-        run: docked_build.sh bubl -sidi
+        run: ../docked_build.sh bubl -sidi
 
