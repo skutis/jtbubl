@@ -28,5 +28,5 @@ jobs:
       - name: show files
         run: ls ..
       - name: compile for MiST
-        run: ../docked_build.sh bubl
+        run: /docked_build.sh bubl
 
