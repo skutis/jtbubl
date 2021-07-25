@@ -104,12 +104,18 @@ reg  [ 7:0] wdog_cnt, int_vector;
 reg         last_VBL;
 
 wire [ 7:0] work2main_dout, work2sub_dout;
+wire        sub_m1_n, main_m1_n;
 
 reg         lwaitn, swaitn;
 wire        main_halt_n;
 reg         main_wait_n, sub_wait_n;
 reg         lde, sde; // original signal names: lde = main drives, sde = sub drives
 wire        VBL_gated;
+wire        sub_int_ack, main_int_ack;
+
+assign      sub_int_ack = ~sub_iorq_n & ~sub_m1_n;
+assign      main_int_ack = ~main_iorq_n & ~main_m1_n;
+
 
 assign      VBL_gated    = ~LVBL & dip_pause;
 assign      main_rom_addr = main_addr[15] ?
@@ -318,7 +324,7 @@ jtframe_z80 u_maincpu(
     .int_n    ( main_int_n     ),
     .nmi_n    ( 1'b1           ),
     .busrq_n  ( 1'b1           ),
-    .m1_n     (                ),
+    .m1_n     ( main_m1_n      ),
     .mreq_n   ( main_mreq_n    ),
     .iorq_n   ( main_iorq_n    ),
     .rd_n     ( main_rdn       ),
@@ -360,7 +366,7 @@ jtframe_z80 u_subcpu(
     .int_n    ( sub_int_n      ),
     .nmi_n    ( ~main2sub_nmi  ),
     .busrq_n  ( 1'b1           ),
-    .m1_n     (                ),
+    .m1_n     ( sub_m1_n       ),
     .mreq_n   ( sub_mreq_n     ),
     .iorq_n   ( sub_iorq_n     ),
     .rd_n     ( sub_rd_n       ),
@@ -397,7 +403,7 @@ jtframe_ff u_subint(
     .q      (               ),
     .qn     ( sub_int_n     ),
     .set    ( 1'b0          ),
-    .clr    ( ~sub_iorq_n   ),
+    .clr    ( sub_int_ack   ),
     .sigedge( VBL_gated     )
 );
 
@@ -412,7 +418,7 @@ jtframe_ff u_mcu2main (
     .q      (                ),
     .qn     ( main_int_n     ),
     .set    ( 1'b0           ),
-    .clr    ( ~main_iorq_n   ),
+    .clr    ( main_int_ack   ),
     // This is a jumper on the schematics
     // it can come from P1[6] or from VBL
     .sigedge( tokio ? VBL_gated : p1_out[6] )
