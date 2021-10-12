@@ -19,6 +19,7 @@
 module jtbubl_game(
     input           rst,
     input           clk,
+    input           rst24,
     input           clk24,
     output          pxl2_cen,   // 12   MHz
     output          pxl_cen,    //  6   MHz
@@ -152,8 +153,8 @@ end
 
 reg cpu_start;
 
-always @(posedge clk24, posedge rst) begin
-    if( rst ) begin
+always @(posedge clk24, posedge rst24) begin
+    if( rst24 ) begin
         cpu_start <= 0;
     end else begin
         if( &{ main_ok, sub_ok, mcu_ok, snd_ok } ) cpu_start <= 1;
@@ -163,7 +164,7 @@ end
 
 `ifndef NOMAIN
 jtbubl_main u_main(
-    .rst            ( rst           ),
+    .rst            ( rst24         ),
     .clk24          ( clk24         ),        // 24 MHz
     .cen12          ( cen12         ),
     .cen6           ( cen6          ),
@@ -270,8 +271,8 @@ jtbubl_video u_video(
 
 `ifndef NOSOUND
 jtbubl_sound u_sound(
+    .rst        ( rst24         ),
     .clk        ( clk24         ), // 24 MHz
-    .rst        ( rst           ),
     //.rstn       ( snd_rstn      ),
     .rstn       ( 1'b1          ),
     .cen3       ( cen3          ),
