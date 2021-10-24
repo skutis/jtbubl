@@ -5,6 +5,8 @@ on:
   push:
     branches:
       - build
+      - sidi
+      - build_bubl
 
 jobs:
 
@@ -33,4 +35,4 @@ jobs:
           submodules: true
           repository: ${{ github.repository }}
       - name: compile for sidi
-        run: /docked_build.sh bubl -sidi 
+        run: /docked_build.sh bubl -sidi  

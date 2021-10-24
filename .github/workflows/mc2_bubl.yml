@@ -5,6 +5,8 @@ on:
   push:
     branches:
       - build
+      - mc2
+      - build_bubl
 
 jobs:
 
@@ -33,4 +35,4 @@ jobs:
           submodules: true
           repository: ${{ github.repository }}
       - name: compile for mc2
-        run: /docked_build.sh bubl -mc2 
+        run: /docked_build.sh bubl -mc2  

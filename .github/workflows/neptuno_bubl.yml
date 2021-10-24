@@ -5,6 +5,8 @@ on:
   push:
     branches:
       - build
+      - neptuno
+      - build_bubl
 
 jobs:
 
@@ -33,4 +35,4 @@ jobs:
           submodules: true
           repository: ${{ github.repository }}
       - name: compile for neptuno
-        run: /docked_build.sh bubl -neptuno 
+        run: /docked_build.sh bubl -neptuno  

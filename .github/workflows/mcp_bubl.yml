@@ -5,6 +5,8 @@ on:
   push:
     branches:
       - build
+      - mcp
+      - build_bubl
 
 jobs:
 
@@ -33,4 +35,4 @@ jobs:
           submodules: true
           repository: ${{ github.repository }}
       - name: compile for mcp
-        run: /docked_build.sh bubl -mcp 
+        run: /docked_build.sh bubl -mcp  
