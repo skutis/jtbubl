@@ -114,6 +114,7 @@ jtbubl_gfx u_gfx(
     .prog_data  ( prog_data      ),
     .prom_we    ( prom_we        ),
     // Screen
+    .flip       ( flip           ),
     .LHBL       ( preLHBL        ),
     .LVBL       ( preLVBL        ),
     .vdump      ( vdump[7:0]     ),

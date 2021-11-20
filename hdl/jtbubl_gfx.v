@@ -27,6 +27,7 @@ module jtbubl_gfx(
     input      [ 3:0]   prog_data,
     input               prom_we,
     // Screen
+    input               flip,
     input               LHBL,
     input               LVBL,
     input      [8:0]    hdump,
@@ -139,7 +140,7 @@ always @(posedge clk, posedge rst) begin
             if(idle) begin
                 case( {ch, oa[0]} )
                     2'd0: begin
-                        vsub    <= scan2_data+vdump;
+                        vsub    <= scan2_data+(vdump^{8{flip}});
                         sa_base <= scan3_data;
                     end
                     2'd1: begin
@@ -308,9 +309,10 @@ jtframe_prom #(.dw(4),.aw(8), .simfile("a71-25.41")) u_prom(
     .q      ( dec_dout  )
 );
 
-jtframe_obj_buffer u_line(
+jtframe_obj_buffer #(.FLIP_OFFSET(9'h100)) u_line(
     .clk    ( clk           ),
     .LHBL   ( LHBL          ),
+    .flip   ( flip          ),
     // New data writes
     .wr_data( line_din      ),
     .wr_addr( line_addr     ),
