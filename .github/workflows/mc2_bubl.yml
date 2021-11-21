@@ -8,6 +8,11 @@ on:
       - mc2
       - build_bubl
 
+  workflow_dispatch:
+
+  repository_dispatch:
+    types: rebuild
+
 jobs:
 
   mc2_compilation:
