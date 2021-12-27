@@ -1,7 +1,5 @@
 #!/bin/bash
 for i in scene*; do
     k=${i#scene}
-    govideo.sh -s $k
+    sim_video.sh -s $k -verilator
 done
-rm video-?.jpg
-rm video.raw

@@ -92,6 +92,7 @@ wire [12:0] cpu_addr;
 wire        vram_cs,  pal_cs;
 wire        cpu_cen, cpu_rnw, cpu_irqn;
 wire [ 7:0] vram_dout, pal_dout, cpu_dout;
+wire        snd_flag;
 
 assign prog_rd    = 0;
 assign dwnld_busy = downloading;
@@ -99,10 +100,10 @@ assign { dipsw_b, dipsw_a }   = dipsw[15:0];
 assign dip_flip               = flip;
 assign { LHBL_dly, LVBL_dly } = { LHBL, LVBL };
 
-localparam [24:0] SUB_OFFSET = 25'h2_8000 >> 1;
-localparam [24:0] SND_OFFSET = 25'h3_0000 >> 1;
-localparam [24:0] MCU_OFFSET = 25'h3_8000 >> 1;
-localparam [24:0] GFX_OFFSET = 25'h4_0000 >> 1;
+localparam [21:0] SUB_OFFSET = 22'h2_8000 >> 1;
+localparam [21:0] SND_OFFSET = 22'h3_0000 >> 1;
+localparam [21:0] MCU_OFFSET = 22'h3_8000 >> 1;
+localparam [21:0] GFX_OFFSET = 22'h4_0000 >> 1;
 localparam [24:0] PROM_START = 25'hC_0000;
 
 jtframe_cen24 u_cen(
@@ -111,6 +112,7 @@ jtframe_cen24 u_cen(
     .cen6       ( cen6          ),
     .cen4       ( cen4          ),
     .cen3       ( cen3          ),
+    .cen8       (               ),
     .cen3q      (               ), // 1/4 advanced with respect to cen3
     .cen1p5     (               ),
     // 180 shifted signals
@@ -121,6 +123,8 @@ jtframe_cen24 u_cen(
     .cen1p5b    (               )
 );
 
+wire [7:0] nc;
+
 jtframe_dwnld #(.PROM_START(PROM_START))
 u_dwnld(
     .clk            ( clk           ),
@@ -129,11 +133,12 @@ u_dwnld(
     .ioctl_dout     ( ioctl_dout    ),
     .ioctl_wr       ( ioctl_wr      ),
     .prog_addr      ( prog_addr     ),
-    .prog_data      ( prog_data     ),
+    .prog_data      ( {nc,prog_data}),
     .prog_mask      ( prog_mask     ), // active low
     .prog_we        ( prog_we       ),
     .prom_we        ( prom_we       ),
-    .sdram_ack      ( sdram_ack     )
+    .sdram_ack      ( sdram_ack     ),
+    .header         (               )
 );
 
 `ifdef SIMULATION
@@ -371,7 +376,6 @@ jtframe_rom #(
     .slot7_dout  (               ),
     .slot8_dout  (               ),
 
-    .ready       (               ),
     // SDRAM interface
     .sdram_req   ( sdram_req     ),
     .sdram_ack   ( sdram_ack     ),
@@ -379,7 +383,7 @@ jtframe_rom #(
     .data_rdy    ( data_rdy      ),
     .downloading ( downloading   ),
     .sdram_addr  ( sdram_addr    ),
-    .data_read   ( data_read     )
+    .data_read   (data_read[15:0])
 );
 
 endmodule

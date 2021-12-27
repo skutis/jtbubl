@@ -127,14 +127,14 @@ always @(posedge clk, posedge rst) begin
         sa_base <= 8'd0;
         newdata <= 0;
     end else begin
-        if( !LHBL ) begin // note that tile drawing is disabled if LHBL is low
+        if( hdump[8] && hdump<9'h12B ) begin // note that tile drawing is disabled if LHBL is low
             oa      <= 9'h80;
             ch      <= 0;
             idle    <= 0;
             oatop   <= 1;
             newdata <= 0;
         end else begin
-            if( !busy && oa[8:1]!=8'hE0 ) begin // the oa limit was not on the original
+            if( !busy && oa[8:1]!=8'hE0 ) begin // the oa limit was not in the original
                 { oa[8:1], ch, oa[0], idle } <= { oa[8:1], ch, oa[0], idle } + 10'd1;
             end
             if(idle) begin
@@ -185,11 +185,11 @@ always @(posedge clk, posedge rst) begin
         line_we <= 0;
         waitok  <= 2'b11;
     end else begin
-        if( !LHBL ) begin
+        /*if( !LHBL ) begin
             busy    <= 0;
             line_we <= 0;
             rom_cs  <= 0;            
-        end else
+        end else*/
         if( newdata & ~next) begin
             busy        <= 1;
             rom_cs      <= 1;
