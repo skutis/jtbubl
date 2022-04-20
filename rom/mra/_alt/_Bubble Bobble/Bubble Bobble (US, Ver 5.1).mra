@@ -22,7 +22,11 @@
 <misterromdescription>
     <about author="jotego" webpage="https://patreon.com/topapate" source="https://github.com/jotego" twitter="@topapate"/>
     <name>Bubble Bobble (US, Ver 5.1)</name>
+	<mameversion>0217</mameversion>
     <setname>bublboblr</setname>
+    <year>1986</year>
+    <manufacturer>Taito</manufacturer>
+    <category>Platform</category>
     <rbf>jtbubl</rbf>
     <rom index="0" zip="bublboblr.zip|bublbobl.zip" type="merged" md5="None">
         <!-- maincpu - starts at 0x0 -->
@@ -79,7 +83,7 @@
     <rom index="1">
         <part>00</part>
     </rom>
-    <switches default="FF,FF" base="16">
+    <switches default="FE,FF" base="16">
         <!-- DSW0 -->
         <dip name="Flip Screen" bits="1" ids="On,Off"/>
         <dip name="Mode" bits="0" ids="Test /Pause,Test,Game, English,Game, Japanese"/>
