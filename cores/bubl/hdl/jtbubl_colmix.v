@@ -22,10 +22,10 @@ module jtbubl_colmix(
     //output              pxl2_cen,
     input               pxl_cen,
     // Screen
-    input               LHBL,
-    input               LVBL,
-    output              LHBL_dly,
-    output              LVBL_dly,
+    input               preLHBL,
+    input               preLVBL,
+    output              LHBL,
+    output              LVBL,
     input      [ 7:0]   col_addr,
     // CPU interface
     input               pal_cs,
@@ -94,10 +94,10 @@ always @(*) //if(pxl_cen)
 jtframe_blank #(.DLY(1),.DW(16)) u_blank(
     .clk        ( clk       ),
     .pxl_cen    ( pxl_cen   ),
+    .preLHBL    ( preLHBL   ),
+    .preLVBL    ( preLVBL   ),
     .LHBL       ( LHBL      ),
     .LVBL       ( LVBL      ),
-    .LHBL_dly   ( LHBL_dly  ),
-    .LVBL_dly   ( LVBL_dly  ),
     .preLBL     (           ),
     .rgb_in     ( col_in    ),
     .rgb_out    ( col_out   )

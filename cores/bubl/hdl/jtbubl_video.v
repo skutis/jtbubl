@@ -116,8 +116,8 @@ jtbubl_gfx u_gfx(
     .prom_we    ( prom_we        ),
     // Screen
     .flip       ( flip           ),
-    .LHBL       ( preLHBL        ),
-    .LVBL       ( preLVBL        ),
+    .LHBL       ( LHBL           ),
+    .LVBL       ( LVBL           ),
     .vdump      ( vdump[7:0]     ),
     .hdump      ( hdump          ),
     // CPU interface
@@ -141,10 +141,10 @@ jtbubl_colmix u_colmix(
     .clk24      ( clk24          ),
     .pxl_cen    ( pxl_cen        ),
     // Screen
-    .LHBL       ( preLHBL        ),
-    .LVBL       ( preLVBL        ),
-    .LHBL_dly   ( LHBL           ),
-    .LVBL_dly   ( LVBL           ),
+    .preLHBL    ( preLHBL        ),
+    .preLVBL    ( preLVBL        ),
+    .LHBL       ( LHBL           ),
+    .LVBL       ( LVBL           ),
     // Colour address to palette
     .col_addr   ( col_addr       ),
     // CPU interface

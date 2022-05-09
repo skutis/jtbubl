@@ -26,8 +26,8 @@ module jtbubl_game(
     output   [3:0]  red,
     output   [3:0]  green,
     output   [3:0]  blue,
-    output          LHBL_dly,
-    output          LVBL_dly,
+    output          LHBL,
+    output          LVBL,
     output          HS,
     output          VS,
     // cabinet I/O
@@ -85,7 +85,6 @@ wire        cen12, cen6, cen4, cen3, prom_we;
 reg         tokio;
 
 wire [ 7:0] dipsw_a, dipsw_b;
-wire        LHBL, LVBL;
 wire        main_flag, main_stb, snd_stb;
 
 wire [12:0] cpu_addr;
@@ -98,7 +97,6 @@ assign prog_rd    = 0;
 assign dwnld_busy = downloading;
 assign { dipsw_b, dipsw_a }   = dipsw[15:0];
 assign dip_flip               = flip;
-assign { LHBL_dly, LVBL_dly } = { LHBL, LVBL };
 
 localparam [21:0] SUB_OFFSET = 22'h2_8000 >> 1;
 localparam [21:0] SND_OFFSET = 22'h3_0000 >> 1;
