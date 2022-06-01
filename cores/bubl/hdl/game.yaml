@@ -48,4 +48,4 @@ modules:
         - hdl/jt03.qip
         - jt49/hdl/filter/jt49_dcrm2.v
     - get:
-      - jtopl/hdl/jt26.qip
+      - jtopl/hdl/jt26.yaml
