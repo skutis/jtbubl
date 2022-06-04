@@ -32,9 +32,7 @@ jtframe:
   - from: cpu
     get:
       # Z80
-      - t80/T80.qip
-      - jtframe_z80wait.v
-      - jtframe_z80.v
+      - jtframe_z80.yaml
       # MCU
       - 6801_core.sv
       - jtframe_6801mcu.v
