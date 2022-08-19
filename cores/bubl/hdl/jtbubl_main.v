@@ -106,9 +106,7 @@ reg         last_VBL;
 wire [ 7:0] work2main_dout, work2sub_dout;
 wire        sub_m1_n, main_m1_n;
 
-reg         lwaitn, swaitn;
 wire        main_halt_n;
-reg         main_wait_n, sub_wait_n;
 reg         lde, sde; // original signal names: lde = main drives, sde = sub drives
 wire        VBL_gated;
 wire        sub_int_ack, main_int_ack;
@@ -287,13 +285,6 @@ always @(posedge clk24, posedge rst) begin
     if( rst )
         h1 <= 0;
     else if(cen6) h1<=~h1;
-end
-
-always @(*) begin
-    lwaitn = ~( sde & main_work_cs );
-    swaitn = ~( lde & sub_work_cs  );
-    main_wait_n = lwaitn;
-    sub_wait_n  = swaitn;
 end
 
 always @(posedge clk24, negedge main_rst_n) begin
