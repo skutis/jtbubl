@@ -66,23 +66,10 @@
     "zone_display_mode": 0
   },
   "meta": {
-    "filename": "extermination.kicad_prl",
+    "filename": "exterm.kicad_prl",
     "version": 3
   },
   "project": {
-    "files": [
-      {
-        "name": "extermination.kicad_pcb",
-        "open": false,
-        "window": {
-          "display": 0,
-          "maximized": true,
-          "pos_x": 36,
-          "pos_y": -1,
-          "size_x": 1848,
-          "size_y": 1053
-        }
-      }
-    ]
+    "files": []
   }
 }
