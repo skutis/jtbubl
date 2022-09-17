@@ -1,0 +1,38 @@
+[global]
+mraauthor=["jotego"]
+platform="jtexterm"
+
+[features]
+beta = true
+# debug = true
+
+[parse]
+sourcefile="tnzs.cpp"
+# skip = { bootlegs=true, setnames = [ "kikcubic", "kikcubicb", "buccanrs", "buccanrsa", "buccanrsb" ] }
+
+[buttons]
+core=$JTFRAME_BUTTONS
+Names = [ { names="Punch, Kick "} ]
+
+[dipsw]
+bitcnt = 16
+delete = [ "Unused", "Unknown" ]
+
+[ROM]
+regions = [
+    { name="maincpu", No_offset=true   },
+    { name="sub", start=$BA1_START },
+    { name="audiocpu", start=$BA2_START },
+    { name="samples", start=$PCM_START },
+    { name="gfx1", start=$BA3_START, width=16, No_offset=true },
+    { name="mcu", start=$MCU_START, No_offset=true   },
+    { name="proms", start=$PROM_START, No_offset=true },
+    { name="pal", skip=true },
+]
+
+order = [
+    "maincpu", "sub", "audiocpu", "samples",
+    "gfx1", "mcu", "proms"
+]
+
+
