@@ -3,8 +3,8 @@ game:
     get:
       - jtexterm_game.v
       - jtexterm_main.v
+      - jtexterm_video.v
       - jtexterm_colmix.v
-      # - jtexterm_video.v
       # - jtexterm_gfx.v
       - jtexterm_snd.v
 jtframe:

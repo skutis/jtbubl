@@ -22,10 +22,12 @@ module jtexterm_colmix(
     input        pxl_cen,
     input        LHBL,
     input        LVBL,
+
     input  [9:0] cpu_addr,
     input  [7:0] cpu_dout,
-    input        cpu_wrn,
+    input        cpu_rnw,
     output [7:0] cpu_din,
+    input        pal_cs,
 
     output [4:0] red,
     output [4:0] green,
@@ -34,25 +36,29 @@ module jtexterm_colmix(
     input  [3:0] gfx_en
 );
 
+wire [7:0] pal_dout;
+wire [9:0] pal_addr = 0;
+wire       pal_we;
 
+assign pal_we = pal_cs & ~cpu_rnw;
 assign red   = 0;
 assign green = 0;
 assign blue  = 0;
 
 // Palette RAM X1-007 chip
 jtframe_dual_ram #(.aw(10)) u_comm(
-    .clk0   ( clk_cpu            ),
-    .clk1   ( clk24              ),
+    .clk0   ( clk_cpu      ),
+    .clk1   ( clk          ),
     // Main CPU
-    .addr0  ( cpu_addr           ),
-    .data0  ( cpu_dout           ),
-    .we0    ( ~cpu_wrn           ),
-    .q0     ( cpu_din            ),
+    .addr0  ( cpu_addr     ),
+    .data0  ( cpu_dout     ),
+    .we0    ( pal_we       ),
+    .q0     ( cpu_din      ),
     // Color mixer
-    .addr1  ( pal_addr           ),
-    .data1  (                    ),
-    .we1    ( 1'b0               ),
-    .q1     ( pal_dout           )
+    .addr1  ( pal_addr     ),
+    .data1  (              ),
+    .we1    ( 1'b0         ),
+    .q1     ( pal_dout     )
 );
 
 endmodule

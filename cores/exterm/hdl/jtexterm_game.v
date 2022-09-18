@@ -117,14 +117,6 @@ jtframe_frac_cen #(.WC(4),.W(3)) u_cen24(
     .cenb   (           )
 );
 
-jtframe_frac_cen #(.WC(4),.W(2)) u_cen48(
-    .clk    ( clk       ),    // 48 MHz
-    .n      ( 4'd1      ),
-    .m      ( 4'd8      ),
-    .cen    ( { pxl_cen, pxl2_cen } ),
-    .cenb   (           )
-);
-
 `ifndef NOMAIN
 jtexterm_main u_main(
     .rst            ( rst24         ),
@@ -169,43 +161,43 @@ jtexterm_main u_main(
     assign cpu_cen = 0;
 `endif
 
-// jtexterm_video u_video(
-//     .rst            ( rst           ),
-//     .clk            ( clk           ),
-//     .clk24          ( clk24         ),
+jtexterm_video u_video(
+    .rst            ( rst           ),
+    .clk            ( clk           ),
+    .clk_cpu        ( clk24         ),
 
-//     .pxl2_cen       ( pxl2_cen      ),
-//     .pxl_cen        ( pxl_cen       ),
-//     .LHBL           ( LHBL          ),
-//     .LVBL           ( LVBL          ),
-//     .HS             ( HS            ),
-//     .VS             ( VS            ),
-//     // PROMs
-//     // .prom_we        ( prom_we       ),
-//     // .prog_addr      ( prog_addr[7:0]),
-//     // .prog_data      ( prog_data[3:0]),
-//     // GFX - CPU interface
-//     .cpu_rnw        ( cpu_rnw       ),
-//     .cpu_addr       ( cpu_addr      ),
-//     .cpu_dout       ( cpu_dout      ),
+    .pxl2_cen       ( pxl2_cen      ),
+    .pxl_cen        ( pxl_cen       ),
+    .LHBL           ( LHBL          ),
+    .LVBL           ( LVBL          ),
+    .HS             ( HS            ),
+    .VS             ( VS            ),
+    // PROMs
+    // .prom_we        ( prom_we       ),
+    // .prog_addr      ( prog_addr[7:0]),
+    // .prog_data      ( prog_data[3:0]),
+    // GFX - CPU interface
+    .cpu_rnw        ( cpu_rnw       ),
+    .cpu_addr       ( cpu_addr      ),
+    .cpu_dout       ( cpu_dout      ),
 
-//     .vram_cs        ( vram_cs       ),
-//     .vram_dout      ( vram_dout     ),
+    .vram_cs        ( vram_cs       ),
+    .vram_dout      ( vram_dout     ),
 
-//     .pal_cs         ( pal_cs        ),
-//     .pal_dout       ( pal_dout      ),
-//     // SDRAM
-//     .rom_addr       ( gfx_addr      ),
-//     .rom_data       ( gfx_data      ),
-//     .rom_ok         ( gfx_ok        ),
-//     .rom_cs         ( gfx_cs        ),
-//     // pixels
-//     .red            ( red           ),
-//     .green          ( green         ),
-//     .blue           ( blue          ),
-//     // Test
-//     .gfx_en         ( gfx_en        )
-// );
+    .pal_cs         ( pal_cs        ),
+    .pal_dout       ( pal_dout      ),
+    // SDRAM
+    .rom_addr       ( gfx_addr      ),
+    .rom_data       ( gfx_data      ),
+    .rom_ok         ( gfx_ok        ),
+    .rom_cs         ( gfx_cs        ),
+    // pixels
+    .red            ( red           ),
+    .green          ( green         ),
+    .blue           ( blue          ),
+    // Test
+    .gfx_en         ( gfx_en        )
+);
 
 `ifndef NOSOUND
 jtexterm_snd u_sound(
