@@ -54,7 +54,7 @@ module jtexterm_video(
 );
 
 wire [ 8:0] vrender, vrender1, vdump, hdump;
-wire [ 9:0] col_addr;
+wire [ 8:0] col_addr;
 
 jtframe_frac_cen #(.WC(4),.W(2)) u_cen48(
     .clk    ( clk       ),    // 48 MHz
@@ -134,10 +134,10 @@ jtexterm_colmix u_colmix(
     .cpu_din    ( pal_dout       ),
     .pal_cs     ( pal_cs         ),
     // Colour output
+    .col_addr   ( col_addr       ),
     .red        ( red            ),
     .green      ( green          ),
-    .blue       ( blue           ),
-    .gfx_en     ( gfx_en         )
+    .blue       ( blue           )
 );
 
 endmodule

@@ -23,27 +23,36 @@ module jtexterm_colmix(
     input        LHBL,
     input        LVBL,
 
+    input  [8:0] col_addr,
+
     input  [9:0] cpu_addr,
     input  [7:0] cpu_dout,
     input        cpu_rnw,
     output [7:0] cpu_din,
     input        pal_cs,
 
-    output [4:0] red,
-    output [4:0] green,
-    output [4:0] blue,
-
-    input  [3:0] gfx_en
+    output reg [4:0] red,
+    output reg [4:0] green,
+    output reg [4:0] blue
 );
 
 wire [7:0] pal_dout;
 wire [9:0] pal_addr = 0;
+reg  [7:0] pall;
 wire       pal_we;
 
+assign pal_addr = { half, coll }
 assign pal_we = pal_cs & ~cpu_rnw;
-assign red   = 0;
-assign green = 0;
-assign blue  = 0;
+
+always @(posedge clk) begin
+    half <= ~half;
+    if( pxl_cen ) begin
+        { red, green, blue } <= { pal_dout, pall };
+        half <= 1;
+        coll <= col_addr;
+    end
+    pall <= pal_dout;
+end
 
 // Palette RAM X1-007 chip
 jtframe_dual_ram #(.aw(10)) u_comm(

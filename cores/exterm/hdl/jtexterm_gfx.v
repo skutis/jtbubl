@@ -44,7 +44,7 @@ module jtexterm_gfx(
     input      [31:0]   rom_data,
     input               rom_ok,
     output              rom_cs,
-    output     [ 9:0]   col_addr
+    output     [ 8:0]   col_addr
 );
 
 wire        vram_we;
@@ -72,6 +72,20 @@ jtframe_dual_ram #(.aw(13)) u_vram(
     .data1  ( 8'd0       ),
     .we1    ( 1'd0       ),
     .q1     ( scan_dout  )
+);
+
+jtframe_obj_buffer #(.FLIP_OFFSET(9'h100)) u_line(
+    .clk    ( clk           ),
+    .LHBL   ( ~hs           ),
+    .flip   ( flip          ),
+    // New data writes
+    .wr_data( line_din      ),
+    .wr_addr( line_addr     ),
+    .we     ( line_we       ),
+    // Old data reads (and erases)
+    .rd_addr( hdump         ),
+    .rd     ( pxl_cen       ),  // data will be erased after the rd event
+    .rd_data( col_addr      )
 );
 
 endmodule

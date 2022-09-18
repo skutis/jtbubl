@@ -99,7 +99,6 @@ wire [12:0] shr_addr, cpu_addr;
 wire [16:0] main_addr;
 wire        cen6, cen3, cen1p5;
 
-wire [12:0] cpu_addr;
 wire        vram_cs,  pal_cs, flip;
 wire        cpu_rnw, gfx_lyr_cs, gfx_ctrl_cs;
 
