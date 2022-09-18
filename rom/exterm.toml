@@ -12,7 +12,7 @@ sourcefile="tnzs.cpp"
 
 [buttons]
 core=$JTFRAME_BUTTONS
-Names = [ { names="Punch, Kick "} ]
+# Names = [ { names="Punch, Kick "} ]
 
 [dipsw]
 bitcnt = 16
