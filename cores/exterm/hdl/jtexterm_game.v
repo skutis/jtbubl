@@ -100,13 +100,13 @@ wire [16:0] main_addr;
 wire        cen6, cen3, cen1p5;
 
 wire [12:0] cpu_addr;
-wire        vram_cs,  pal_cs;
+wire        vram_cs,  pal_cs, flip;
 wire        cpu_rnw, gfx_lyr_cs, gfx_ctrl_cs;
 
 assign ba_wr      = 0;
 assign ba0_din    = 0;
 assign ba0_din_m  = 3;
-assign dip_flip   = 1;
+assign dip_flip   = flip;
 
 
 jtframe_frac_cen #(.WC(4),.W(3)) u_cen24(
@@ -172,6 +172,7 @@ jtexterm_video u_video(
     .LVBL           ( LVBL          ),
     .HS             ( HS            ),
     .VS             ( VS            ),
+    .flip           ( flip          ),
     // PROMs
     // .prom_we        ( prom_we       ),
     // .prog_addr      ( prog_addr[7:0]),

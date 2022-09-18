@@ -156,5 +156,4 @@ jtframe_dual_ram #(.aw(13)) u_comm(
     .q1     ( shr_dout   )
 );
 
-
 endmodule
