@@ -2,6 +2,7 @@
 *.jpg
 *.raw
 *.rom
+*bak
 mist/*
 mister/*
 sidi/*

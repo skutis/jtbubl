@@ -59,7 +59,7 @@ localparam [7:0] PSG_GAIN = 8'h10,
                  FM_GAIN  = 8'h10;
 
 wire        irq_ack, mreq_n, m1_n, iorq_n, rd_n, wr_n,
-            fmint_n;
+            fmint_n, int_n;
 reg  [ 7:0] din, cab_dout;
 wire [ 7:0] fm_dout, dout;
 reg  [ 1:0] bank;
@@ -174,14 +174,15 @@ jt03 u_2203(
     .psg_A      (            ),
     .psg_B      (            ),
     .psg_C      (            ),
-    .snd        (            )
+    .snd        (            ),
+    .debug_view (            )
 );
 
 jtframe_mixer #(.W1(10)) u_mixer(
     .rst    ( rst          ),
     .clk    ( clk          ),
-    .cen    ( cen3         ),
-    .ch0    ( fm0_snd      ),
+    .cen    ( cen1p5       ),
+    .ch0    ( fm_snd       ),
     .ch1    ( psg_snd      ),
     .ch2    ( 16'd0        ),
     .ch3    ( 16'd0        ),

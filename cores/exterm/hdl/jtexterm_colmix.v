@@ -31,8 +31,13 @@ module jtexterm_colmix(
     output [4:0] green,
     output [4:0] blue,
 
-    input  [3:0] gfx_en,
+    input  [3:0] gfx_en
 );
+
+
+assign red   = 0;
+assign green = 0;
+assign blue  = 0;
 
 // Palette RAM X1-007 chip
 jtframe_dual_ram #(.aw(10)) u_comm(
