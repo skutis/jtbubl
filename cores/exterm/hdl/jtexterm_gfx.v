@@ -37,6 +37,7 @@ module jtexterm_gfx(
     input      [12:0]   cpu_addr,
     input      [ 7:0]   cpu_dout,
     input               vram_cs,
+    input               vctrl_cs,
     output     [ 7:0]   cpu_din,
 
     // SDRAM interface
@@ -47,18 +48,62 @@ module jtexterm_gfx(
     output     [ 8:0]   col_addr
 );
 
-wire        vram_we;
-wire [12:0] scan_addr;
+wire        vram_we, vctrl_we;
+reg  [12:0] scan_addr;
+reg  [10:0] ctrl_addr;
 wire [ 7:0] scan_dout;
+reg  [ 5:0] col;
 
-assign scan_addr = 0;
-assign vram_we = vram_cs & ~cpu_rnw;
+assign vram_we  = vram_cs  & ~cpu_rnw;
+assign vctrl_we = vctrl_cs & ~cpu_rnw;
 assign rom_cs = 0;
 assign rom_addr = 0;
 assign col_addr = 0;
 assign flip = 0;
+assign cpu_din = vctrl_cs ? attr2cpu : vram2cpu;
 
-// TODO: add bus contention
+// always @* begin
+//     case( st )
+//         0: ctrl_addr = { 1'b1, }
+//     endcase
+// end
+
+always @(posedge clk, posedge rst) begin
+    if( rst ) begin
+        scan_cen <= 0;
+        done     <= 0;
+    end else begin
+        scan_cen <= ~scan_cen;
+        dr_start <= 0;
+        if( hs ) begin
+            st  <= 0;
+            col <= 0;
+            done  <= 0;
+        end else if(scan_cen && !done) begin
+            0: begin
+                ypos <= scan_dout + vdump[7:0];
+            end
+            1: begin
+                if( !match ) st <= 7;
+                xpos <= scan_dout;
+            end
+            2: code[7:0] <= scan_dout;
+            3: { xflip, yflip, code[13:8] } <= scan_dout;
+            4: attr[7:0] <= scan_dout;
+            5: begin
+                if( dr_busy ) st <= 5;
+                dr_start <= 1;
+            end
+            default: begin
+                col   <= col+1;
+                done  <= &col;
+                st    <= 0;
+            end
+        end
+    end
+end
+
+// This seems to be time multiplexed with no bus contention
 jtframe_dual_ram #(.aw(13)) u_vram(
     .clk0   ( clk        ),
     .clk1   ( clk_cpu    ),
@@ -66,12 +111,27 @@ jtframe_dual_ram #(.aw(13)) u_vram(
     .addr0  ( cpu_addr   ),
     .data0  ( cpu_dout   ),
     .we0    ( vram_we    ),
-    .q0     ( cpu_din    ),
+    .q0     ( vram2cpu   ),
     // MCU
     .addr1  ( scan_addr  ),
     .data1  ( 8'd0       ),
     .we1    ( 1'd0       ),
     .q1     ( scan_dout  )
+);
+
+jtframe_dual_ram #(.aw(10)) u_attr(
+    .clk0   ( clk        ),
+    .clk1   ( clk_cpu    ),
+    // Main CPU
+    .addr0  ( cpu_addr   ),
+    .data0  ( cpu_dout   ),
+    .we0    ( vctrl_we   ),
+    .q0     ( attr2cpu   ),
+    // MCU
+    .addr1  ( ctrl_addr  ),
+    .data1  ( 8'd0       ),
+    .we1    ( 1'd0       ),
+    .q1     ( ctrl_dout  )
 );
 
 jtframe_obj_buffer #(.FLIP_OFFSET(9'h100)) u_line(

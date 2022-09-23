@@ -24,8 +24,7 @@ module jtexterm_main(
 
     // Video devices
     output reg          vram_cs,
-    output reg          gfx_ctrl_cs,
-    output reg          gfx_lyr_cs,
+    output reg          vctrl_cs,
     output reg          pal_cs,
     input      [ 7:0]   pal_dout,
     input      [ 7:0]   vram_dout,
@@ -59,6 +58,7 @@ wire [ 7:0] dout, ram_dout;
 reg  [ 2:0] bank;
 wire [15:0] A;
 reg         ram_cs, bank_cs;
+wire        Af;
 
 assign cpu_rnw = wr_n;
 assign cpu_addr = A[12:0];
@@ -75,13 +75,12 @@ always @* begin
 end
 
 always @(posedge clk) begin
-    rom_cs      <= !mreq_n && A[15:12]  < 4'hc;
-    vram_cs     <= !mreq_n && A[15:13] == 3'b110; // C,D
-    ram_cs      <= !mreq_n && A[15:12] == 4'he; // A[12:0] used in Insector X (?)
-    gfx_ctrl_cs <= !mreq_n && A[15: 8] == 8'hf3;
-    gfx_lyr_cs  <= !mreq_n && A[15: 8] == 8'hf4;
-    bank_cs     <= !mreq_n && A[15: 8] == 8'hf6;
-    pal_cs      <= !mreq_n && A[15: 8] == 8'hf8;
+    rom_cs   <= !mreq_n && A[15:12]  < 4'hc;
+    vram_cs  <= !mreq_n && A[15:13] == 3'b110; // C,D
+    ram_cs   <= !mreq_n && A[15:12] == 4'he; // A[12:0] used in Insector X (?)
+    vctrl_cs <= !mreq_n && A[15:12] == 4'hf && A[11:8]<6;
+    bank_cs  <= !mreq_n && A[15: 8] == 8'hf6;
+    pal_cs   <= !mreq_n && A[15: 8] == 8'hf8;
 end
 
 always @(posedge clk) begin

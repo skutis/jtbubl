@@ -35,39 +35,6 @@ module jtexterm_game(
     input   [ 1:0]  coin_input,
     input   [ 6:0]  joystick1,
     input   [ 6:0]  joystick2,
-    // SDRAM interface
-    input           downloading,
-    output          dwnld_busy,
-
-    // Bank 0: allows R/W
-    output   [21:0] ba0_addr,
-    output   [21:0] ba1_addr,
-    output   [21:0] ba2_addr,
-    output   [21:0] ba3_addr,
-    output   [ 3:0] ba_rd,
-    output          ba_wr,
-    output   [15:0] ba0_din,
-    output   [ 1:0] ba0_din_m,  // write mask
-    input    [ 3:0] ba_ack,
-    input    [ 3:0] ba_dst,
-    input    [ 3:0] ba_dok,
-    input    [ 3:0] ba_rdy,
-
-    input    [15:0] data_read,
-    // ROM LOAD
-    input   [24:0]  ioctl_addr,
-    input   [ 7:0]  ioctl_dout,
-    input           ioctl_wr,
-    output  [21:0]  prog_addr,
-    output  [15:0]  prog_data,
-    output  [ 1:0]  prog_mask,
-    output  [ 1:0]  prog_ba,
-    output          prog_we,
-    output          prog_rd,
-    input           prog_ack,
-    input           prog_dok,
-    input           prog_dst,
-    input           prog_rdy,
     // DIP switches
     input   [31:0]  status,     // only bits 31:16 are looked at
     input   [31:0]  dipsw,
@@ -82,31 +49,33 @@ module jtexterm_game(
     output          game_led,
     input           enable_psg,
     input           enable_fm,
+    // Memory interface
+    output          main_cs,
+    output          sub_cs,
+    output          gfx_cs,
+    input           main_ok,
+    input           sub_ok,
+    input           gfx_ok,
+    input    [ 7:0] main_data,
+    input    [ 7:0] sub_data,
+    input    [31:0] gfx_data,
+    output   [19:0] gfx_addr,
+    output   [16:0] main_addr,
+    output   [15:0] sub_addr,
     // Debug
     input   [ 3:0]  gfx_en
 );
 
-wire        main_cs, sub_cs, gfx_cs;
-wire        main_ok, sub_ok, gfx_ok;
 wire        shr_we, snd_rstn;
-wire [31:0] gfx_data;
-wire [19:0] gfx_addr;
-
-wire [ 7:0] main_data, sub_data, shr_din, shr_dout,
+wire [ 7:0] shr_din, shr_dout,
             vram_dout, pal_dout, cpu_dout;
-wire [15:0] sub_addr;
 wire [12:0] shr_addr, cpu_addr;
-wire [16:0] main_addr;
 wire        cen6, cen3, cen1p5;
 
 wire        vram_cs,  pal_cs, flip;
-wire        cpu_rnw, gfx_lyr_cs, gfx_ctrl_cs;
+wire        cpu_rnw, vctrl_cs;
 
-assign ba_wr      = 0;
-assign ba0_din    = 0;
-assign ba0_din_m  = 3;
 assign dip_flip   = flip;
-
 
 jtframe_frac_cen #(.WC(4),.W(3)) u_cen24(
     .clk    ( clk24     ),    // 24 MHz
@@ -142,9 +111,7 @@ jtexterm_main u_main(
     .cpu_dout       ( cpu_dout      ),
     .cpu_rnw        ( cpu_rnw       ),
 
-    .gfx_ctrl_cs    ( gfx_ctrl_cs   ),
-    .gfx_lyr_cs     ( gfx_lyr_cs    ),
-
+    .vctrl_cs       ( vctrl_cs      ),
     .vram_cs        ( vram_cs       ),
     .vram_dout      ( vram_dout     ),
 
@@ -243,69 +210,5 @@ assign sample   = 0;
 assign snd_flag = 0;
 assign main_stb = 0;
 `endif
-
-jtexterm_sdram u_sdram(
-    .rst        ( rst       ),
-    .clk        ( clk       ),
-
-    // Main CPU
-    .main_cs    ( main_cs   ),
-    .main_addr  ( main_addr ),
-    .main_data  ( main_data ),
-    .main_ok    ( main_ok   ),
-
-    // Sub CPU
-    .sub_addr   ( sub_addr  ),
-    .sub_cs     ( sub_cs    ),
-    .sub_data   ( sub_data  ),
-    .sub_ok     ( sub_ok    ),
-
-    // Sound CPU
-    // .snd_addr   ( snd_addr  ),
-    // .snd_cs     ( snd_cs    ),
-    // .snd_data   ( snd_data  ),
-    // .snd_ok     ( snd_ok    ),
-
-    // PCM ROM
-    // .pcm_addr (pcm_addr ),
-    // .pcm_cs   (pcm_cs   ),
-    // .pcm_data (pcm_data ),
-    // .pcm_ok   (pcm_ok   ),
-
-    // Sprite interface
-    .gfx_ok      ( gfx_ok    ),
-    .gfx_cs      ( gfx_cs    ),
-    .gfx_addr    ( gfx_addr  ),
-    .gfx_data    ( gfx_data  ),
-
-    // Bank 0: allows R/W
-    .ba0_addr    ( ba0_addr      ),
-    .ba1_addr    ( ba1_addr      ),
-    .ba2_addr    ( ba2_addr      ),
-    .ba3_addr    ( ba3_addr      ),
-    .ba_rd       ( ba_rd         ),
-    .ba_ack      ( ba_ack        ),
-    .ba_dst      ( ba_dst        ),
-    .ba_dok      ( ba_dok        ),
-    .ba_rdy      ( ba_rdy        ),
-
-    .data_read   ( data_read     ),
-
-    // ROM load
-    .downloading ( downloading   ),
-    .dwnld_busy  ( dwnld_busy    ),
-
-    .ioctl_addr  ( ioctl_addr    ),
-    .ioctl_dout  ( ioctl_dout    ),
-    .ioctl_wr    ( ioctl_wr      ),
-    .prog_addr   ( prog_addr     ),
-    .prog_data   ( prog_data     ),
-    .prog_mask   ( prog_mask     ),
-    .prog_ba     ( prog_ba       ),
-    .prog_we     ( prog_we       ),
-    .prog_rd     ( prog_rd       ),
-    .prog_ack    ( prog_ack      ),
-    .prog_rdy    ( prog_rdy      )
-);
 
 endmodule

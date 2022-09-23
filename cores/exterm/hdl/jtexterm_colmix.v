@@ -39,9 +39,11 @@ module jtexterm_colmix(
 wire [7:0] pal_dout;
 wire [9:0] pal_addr = 0;
 reg  [7:0] pall;
+reg  [8:0] coll;
 wire       pal_we;
+reg        half;
 
-assign pal_addr = { half, coll }
+assign pal_addr = { half, coll };
 assign pal_we = pal_cs & ~cpu_rnw;
 
 always @(posedge clk) begin

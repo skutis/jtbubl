@@ -5,9 +5,9 @@ game:
       - jtexterm_main.v
       - jtexterm_video.v
       - jtexterm_colmix.v
-      - jtexterm_gfx.v
+      # - jtexterm_gfx.v
       - jtexterm_snd.v
-      - jtexterm_sdram.v
+      - jtexterm_game_sdram.v
 jtframe:
   - get:
       - jtframe_ff.v

@@ -70,7 +70,7 @@ jtframe_vtimer #(
     .HB_END  ( 9'd383 ),
     .V_START ( 9'd016 ),
     .VS_START( 9'd254 ),
-    .VB_START( 9'd240 ),
+    .VB_START( 9'd239 ),
     .VB_END  ( 9'd279 )
 ) u_timer(
     .clk        ( clk        ),
@@ -86,7 +86,7 @@ jtframe_vtimer #(
     .HS         ( HS         ),
     .VS         ( VS         )
 );
-
+/*
 jtexterm_gfx u_gfx(
     .rst        ( rst            ),
     .clk        ( clk            ),
@@ -118,7 +118,7 @@ jtexterm_gfx u_gfx(
     .rom_cs     ( rom_cs         ),
     // Color address to palette
     .col_addr   ( col_addr       )
-);
+);*/
 
 jtexterm_colmix u_colmix(
     .clk        ( clk            ),
