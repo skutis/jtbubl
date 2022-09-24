@@ -6,12 +6,16 @@ sdram:
           name: main
           addr_width: 17
           data_width: 8
-    # -
-    #   buses:
+    # Bank 1 for the sub CPU
+    -
+      buses:
         -
           name: sub
           addr_width: 16
           data_width: 8
+    # Bank 2 for audio
+    -
+    # Bank 3 for graphics
     -
       buses:
         -

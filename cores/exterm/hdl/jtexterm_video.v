@@ -39,6 +39,7 @@ module jtexterm_video(
     input      [12:0]   cpu_addr,
     input      [ 7:0]   cpu_dout,
     input               vram_cs,
+    input               vctrl_cs,
     output     [ 7:0]   vram_dout,
     // SDRAM interface
     output     [19:0]   rom_addr,
@@ -86,7 +87,7 @@ jtframe_vtimer #(
     .HS         ( HS         ),
     .VS         ( VS         )
 );
-/*
+
 jtexterm_gfx u_gfx(
     .rst        ( rst            ),
     .clk        ( clk            ),
@@ -107,6 +108,7 @@ jtexterm_gfx u_gfx(
     .hdump      ( hdump          ),
     // CPU interface
     .vram_cs    ( vram_cs        ),
+    .vctrl_cs   ( vctrl_cs       ),
     .cpu_din    ( vram_dout      ),
     .cpu_addr   ( cpu_addr       ),
     .cpu_rnw    ( cpu_rnw        ),
@@ -118,7 +120,7 @@ jtexterm_gfx u_gfx(
     .rom_cs     ( rom_cs         ),
     // Color address to palette
     .col_addr   ( col_addr       )
-);*/
+);
 
 jtexterm_colmix u_colmix(
     .clk        ( clk            ),

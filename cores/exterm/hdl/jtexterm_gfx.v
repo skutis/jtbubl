@@ -51,8 +51,13 @@ module jtexterm_gfx(
 wire        vram_we, vctrl_we;
 reg  [12:0] scan_addr;
 reg  [10:0] ctrl_addr;
-wire [ 7:0] scan_dout;
+wire [ 7:0] scan_dout, attr2cpu, vram2cpu;
 reg  [ 5:0] col;
+reg  [ 7:0] attr, xpos, ypos;
+reg         scan_cen, done, dr_start, dr_busy,
+            match, xflip, yflip;
+reg  [ 2:0] st;
+reg  [13:0] code;
 
 assign vram_we  = vram_cs  & ~cpu_rnw;
 assign vctrl_we = vctrl_cs & ~cpu_rnw;
@@ -80,25 +85,27 @@ always @(posedge clk, posedge rst) begin
             col <= 0;
             done  <= 0;
         end else if(scan_cen && !done) begin
-            0: begin
-                ypos <= scan_dout + vdump[7:0];
-            end
-            1: begin
-                if( !match ) st <= 7;
-                xpos <= scan_dout;
-            end
-            2: code[7:0] <= scan_dout;
-            3: { xflip, yflip, code[13:8] } <= scan_dout;
-            4: attr[7:0] <= scan_dout;
-            5: begin
-                if( dr_busy ) st <= 5;
-                dr_start <= 1;
-            end
-            default: begin
-                col   <= col+1;
-                done  <= &col;
-                st    <= 0;
-            end
+            case( st )
+                0: begin
+                    ypos <= scan_dout + vdump[7:0];
+                end
+                1: begin
+                    if( !match ) st <= 7;
+                    xpos <= scan_dout;
+                end
+                2: code[7:0] <= scan_dout;
+                3: { xflip, yflip, code[13:8] } <= scan_dout;
+                4: attr <= scan_dout;
+                5: begin
+                    if( dr_busy ) st <= 5;
+                    dr_start <= 1;
+                end
+                default: begin
+                    col   <= col+1;
+                    done  <= &col;
+                    st    <= 0;
+                end
+            endcase
         end
     end
 end
@@ -112,7 +119,7 @@ jtframe_dual_ram #(.aw(13)) u_vram(
     .data0  ( cpu_dout   ),
     .we0    ( vram_we    ),
     .q0     ( vram2cpu   ),
-    // MCU
+    // GFX
     .addr1  ( scan_addr  ),
     .data1  ( 8'd0       ),
     .we1    ( 1'd0       ),
@@ -127,7 +134,7 @@ jtframe_dual_ram #(.aw(10)) u_attr(
     .data0  ( cpu_dout   ),
     .we0    ( vctrl_we   ),
     .q0     ( attr2cpu   ),
-    // MCU
+    // GFX
     .addr1  ( ctrl_addr  ),
     .data1  ( 8'd0       ),
     .we1    ( 1'd0       ),

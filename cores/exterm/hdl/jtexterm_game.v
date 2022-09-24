@@ -149,6 +149,7 @@ jtexterm_video u_video(
     .cpu_dout       ( cpu_dout      ),
 
     .vram_cs        ( vram_cs       ),
+    .vctrl_cs       ( vctrl_cs      ),
     .vram_dout      ( vram_dout     ),
 
     .pal_cs         ( pal_cs        ),
