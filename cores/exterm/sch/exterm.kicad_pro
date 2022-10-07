@@ -279,7 +279,7 @@
     "page_layout_descr_file": ""
   },
   "schematic": {
-    "annotate_start_num": 0,
+    "annotate_start_num": 21,
     "drawing": {
       "default_line_thickness": 6.0,
       "default_text_size": 50.0,
@@ -324,6 +324,18 @@
     [
       "ee510b62-e27a-427f-9d20-4cf757f0a850",
       "capacitors"
+    ],
+    [
+      "aaa5d4e4-a8ac-496e-a29f-b15f3f7e6120",
+      "main"
+    ],
+    [
+      "da0c6f65-248e-4722-9ffc-0adbf4dd22aa",
+      "colmix"
+    ],
+    [
+      "b08e4834-2cfc-4924-9f36-0ae10cbebc91",
+      "gfx"
     ]
   ],
   "text_variables": {}
