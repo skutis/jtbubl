@@ -16,3 +16,7 @@ mame.xml
 jtexterm_game_sdram.v
 game_test.v
 test.cpp
+jtkiwi_game_sdram.v
+snd.wav
+waiver
+mem_ports.inc
