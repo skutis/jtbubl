@@ -1,13 +1,13 @@
 game:
-  - from: exterm
+  - from: kiwi
     get:
-      - jtexterm_game.v
-      - jtexterm_main.v
-      - jtexterm_video.v
-      - jtexterm_colmix.v
-      # - jtexterm_gfx.v
-      - jtexterm_snd.v
-      - jtexterm_game_sdram.v
+      - jtkiwi_game.v
+      - jtkiwi_main.v
+      - jtkiwi_video.v
+      - jtkiwi_colmix.v
+      # - jtkiwi_gfx.v
+      - jtkiwi_snd.v
+      - jtkiwi_game_sdram.v
 jtframe:
   - get:
       - jtframe_ff.v

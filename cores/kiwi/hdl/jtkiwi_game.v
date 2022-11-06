@@ -16,7 +16,7 @@
     Version: 1.0
     Date: 02-05-2020 */
 
-module jtexterm_game(
+module jtkiwi_game(
     input           rst,
     input           clk,
     input           rst24,
@@ -86,7 +86,7 @@ jtframe_frac_cen #(.WC(4),.W(3)) u_cen24(
 );
 
 `ifndef NOMAIN
-jtexterm_main u_main(
+jtkiwi_main u_main(
     .rst            ( rst24         ),
     .clk            ( clk24         ),        // 24 MHz
     .cen6           ( cen6          ),
@@ -127,7 +127,7 @@ jtexterm_main u_main(
     assign cpu_cen = 0;
 `endif
 
-jtexterm_video u_video(
+jtkiwi_video u_video(
     .rst            ( rst           ),
     .clk            ( clk           ),
     .clk_cpu        ( clk24         ),
@@ -168,7 +168,7 @@ jtexterm_video u_video(
 );
 
 `ifndef NOSOUND
-jtexterm_snd u_sound(
+jtkiwi_snd u_sound(
     .rst        ( rst24         ),
     .clk        ( clk24         ), // 24 MHz
     .snd_rstn   ( snd_rstn      ),

@@ -16,7 +16,7 @@
     Version: 1.0
     Date: 17-9-2022 */
 
-module jtexterm_main(
+module jtkiwi_main(
     input               rst,
     input               clk,
     input               cen6,

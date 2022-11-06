@@ -16,7 +16,7 @@
     Version: 1.0
     Date: 18-09-2022 */
 
-module jtexterm_gfx(
+module jtkiwi_gfx(
     input               rst,
     input               clk,
     input               clk_cpu,

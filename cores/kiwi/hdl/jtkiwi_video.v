@@ -16,7 +16,7 @@
     Version: 1.0
     Date: 18-09-2022 */
 
-module jtexterm_video(
+module jtkiwi_video(
     input               rst,
     input               clk,
     input               clk_cpu,
@@ -88,7 +88,7 @@ jtframe_vtimer #(
     .VS         ( VS         )
 );
 
-jtexterm_gfx u_gfx(
+jtkiwi_gfx u_gfx(
     .rst        ( rst            ),
     .clk        ( clk            ),
     .clk_cpu    ( clk_cpu        ),
@@ -122,7 +122,7 @@ jtexterm_gfx u_gfx(
     .col_addr   ( col_addr       )
 );
 
-jtexterm_colmix u_colmix(
+jtkiwi_colmix u_colmix(
     .clk        ( clk            ),
     .clk_cpu    ( clk_cpu        ),
     .pxl_cen    ( pxl_cen        ),

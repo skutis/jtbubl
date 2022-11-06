@@ -16,7 +16,7 @@
     Version: 1.0
     Date: 18-9-2022 */
 
-module jtexterm_colmix(
+module jtkiwi_colmix(
     input        clk,
     input        clk_cpu,
     input        pxl_cen,
