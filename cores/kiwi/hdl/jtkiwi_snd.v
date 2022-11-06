@@ -54,7 +54,7 @@ module jtkiwi_snd(
     output               sample,
     output               peak
 );
-
+`ifndef NOSOUND
 localparam [7:0] PSG_GAIN = 8'h10,
                  FM_GAIN  = 8'h10;
 
@@ -193,5 +193,16 @@ jtframe_mixer #(.W1(10)) u_mixer(
     .mixed  ( snd          ),
     .peak   ( peak         )
 );
-
+`else
+    initial begin
+        rom_addr = 0;
+        rom_cs   = 0;
+    end
+    assign ram_addr = 0;
+    assign ram_din  = 0;
+    assign ram_we   = 0;
+    assign snd      = 0;
+    assign sample   = 0;
+    assign peak     = 0;
+`endif
 endmodule

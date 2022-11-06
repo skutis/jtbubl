@@ -49,21 +49,10 @@ module jtkiwi_game(
     output          game_led,
     input           enable_psg,
     input           enable_fm,
-    // Memory interface
-    output          main_cs,
-    output          sub_cs,
-    output          gfx_cs,
-    input           main_ok,
-    input           sub_ok,
-    input           gfx_ok,
-    input    [ 7:0] main_data,
-    input    [ 7:0] sub_data,
-    input    [31:0] gfx_data,
-    output   [19:0] gfx_addr,
-    output   [16:0] main_addr,
-    output   [15:0] sub_addr,
     // Debug
-    input   [ 3:0]  gfx_en
+    input   [ 3:0]  gfx_en,
+    // Memory interface
+    `include "mem_ports.inc"
 );
 
 wire        shr_we, snd_rstn;
@@ -85,7 +74,6 @@ jtframe_frac_cen #(.WC(4),.W(3)) u_cen24(
     .cenb   (           )
 );
 
-`ifndef NOMAIN
 jtkiwi_main u_main(
     .rst            ( rst24         ),
     .clk            ( clk24         ),        // 24 MHz
@@ -119,13 +107,6 @@ jtkiwi_main u_main(
     .pal_dout       ( pal_dout      ),
     .dip_pause      ( dip_pause     )
 );
-`else
-    assign main_cs = 0;
-    assign cpu_rnw = 1;
-    assign vram_cs = 0;
-    assign pal_cs  = 0;
-    assign cpu_cen = 0;
-`endif
 
 jtkiwi_video u_video(
     .rst            ( rst           ),
@@ -167,7 +148,6 @@ jtkiwi_video u_video(
     .gfx_en         ( gfx_en        )
 );
 
-`ifndef NOSOUND
 jtkiwi_snd u_sound(
     .rst        ( rst24         ),
     .clk        ( clk24         ), // 24 MHz
@@ -203,13 +183,5 @@ jtkiwi_snd u_sound(
     .sample     ( sample        ),
     .peak       ( game_led      )
 );
-`else
-assign snd_cs   = 0;
-assign snd_addr = 15'd0;
-assign snd      = 16'd0;
-assign sample   = 0;
-assign snd_flag = 0;
-assign main_stb = 0;
-`endif
 
 endmodule

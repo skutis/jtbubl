@@ -50,7 +50,7 @@ module jtkiwi_main(
     input               rom_ok,
     input      [ 7:0]   rom_data
 );
-
+`ifndef NOMAIN
 wire        irq_ack, mreq_n, m1_n, iorq_n, rd_n, wr_n,
             int_n, ram_we;
 reg  [ 7:0] din;
@@ -154,5 +154,18 @@ jtframe_dual_ram #(.aw(13)) u_comm(
     .we1    ( shr_we     ),
     .q1     ( shr_dout   )
 );
-
+`else
+    initial begin
+        rom_cs   = 0;
+        rom_addr = 0;
+        vram_cs  = 0;
+        vctrl_cs = 0;
+        pal_cs   = 0;
+        snd_rstn = 0;
+    end
+    assign cpu_rnw  = 1;
+    assign cpu_addr = 1;
+    assign cpu_dout = 0;
+    assign shr_dout = 0;
+`endif
 endmodule

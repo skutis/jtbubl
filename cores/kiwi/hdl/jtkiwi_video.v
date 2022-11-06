@@ -42,7 +42,7 @@ module jtkiwi_video(
     input               vctrl_cs,
     output     [ 7:0]   vram_dout,
     // SDRAM interface
-    output     [19:0]   rom_addr,
+    output     [19:2]   rom_addr,
     input      [31:0]   rom_data,
     input               rom_ok,
     output              rom_cs,
@@ -87,7 +87,7 @@ jtframe_vtimer #(
     .HS         ( HS         ),
     .VS         ( VS         )
 );
-
+/*
 jtkiwi_gfx u_gfx(
     .rst        ( rst            ),
     .clk        ( clk            ),
@@ -121,7 +121,7 @@ jtkiwi_gfx u_gfx(
     // Color address to palette
     .col_addr   ( col_addr       )
 );
-
+*/
 jtkiwi_colmix u_colmix(
     .clk        ( clk            ),
     .clk_cpu    ( clk_cpu        ),
