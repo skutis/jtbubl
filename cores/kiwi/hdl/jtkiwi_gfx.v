@@ -16,6 +16,10 @@
     Version: 1.0
     Date: 18-09-2022 */
 
+// There is bus contention to access the memories
+// in this module, based. When H4 is high, the
+// GPU is in control. When H4 is low, it's the CPU
+
 module jtkiwi_gfx(
     input               rst,
     input               clk,
@@ -48,97 +52,96 @@ module jtkiwi_gfx(
     output     [ 8:0]   col_addr
 );
 
-wire        vram_we, vctrl_we;
+wire        yram_we;
+wire [ 1:0] vram_we;
 reg  [12:0] scan_addr;
-reg  [10:0] ctrl_addr;
-wire [ 7:0] scan_dout, attr2cpu, vram2cpu;
+wire [ 7:0] yram_dout, vram2cpu;
 reg  [ 5:0] col;
 reg  [ 7:0] attr, xpos, ypos;
+reg  [ 7:0] cfg[0:3], flag;
 reg         scan_cen, done, dr_start, dr_busy,
-            match, xflip, yflip;
+            match, xflip, yflip,
+            yram_cs, cfg_cs, flag_cs;
 reg  [ 2:0] st;
 reg  [13:0] code;
+wire        buf_upper, buf_lower;
+wire [15:0] vram_dout, scan_dout;
+wire [ 3:0] col_cfg;
 
-assign vram_we  = vram_cs  & ~cpu_rnw;
-assign vctrl_we = vctrl_cs & ~cpu_rnw;
-assign rom_cs = 0;
+`ifdef SIMULATION
+wire [7:0] cfg0 = cfg[0], cfg1 = cfg[1], cfg2 = cfg[2], cfg3 = cfg[3];
+`endif
+
+assign vram_we  = {2{vram_cs  & ~cpu_rnw}} & { cpu_addr[12], ~cpu_addr[12] };
+assign yram_we  = vctrl_cs & ~cpu_rnw;
+assign rom_cs   = 0;
 assign rom_addr = 0;
 assign col_addr = 0;
-assign flip = 0;
-assign cpu_din = vctrl_cs ? attr2cpu : vram2cpu;
+assign flip     = 0;
+assign buf_upper= cfg[1][6];
+assign buf_lower= cfg[1][5];
+assign col_cfg  = cfg[1][3:0];
+assign cpu_din  = vctrl_cs     ? yram_dout :
+                  cpu_addr[12] ? vram_dout[15:8] : vram_dout[7:0];
 
-// always @* begin
-//     case( st )
-//         0: ctrl_addr = { 1'b1, }
-//     endcase
-// end
+always @* begin
+    yram_cs = 0;
+    cfg_cs  = 0;
+    flag_cs = 0;
+    if( vctrl_cs) case( cpu_addr[11:8] )
+        0,1,2: yram_cs = 1;
+        3: cfg_cs  = 1;
+        4: flag_cs = 1;
+        default:;
+    endcase
+end
 
 always @(posedge clk, posedge rst) begin
     if( rst ) begin
-        scan_cen <= 0;
-        done     <= 0;
+        cfg[0] <= 0;
+        cfg[1] <= 0;
+        cfg[2] <= 0;
+        cfg[3] <= 0;
     end else begin
-        scan_cen <= ~scan_cen;
-        dr_start <= 0;
-        if( hs ) begin
-            st  <= 0;
-            col <= 0;
-            done  <= 0;
-        end else if(scan_cen && !done) begin
-            case( st )
-                0: begin
-                    ypos <= scan_dout + vdump[7:0];
-                end
-                1: begin
-                    if( !match ) st <= 7;
-                    xpos <= scan_dout;
-                end
-                2: code[7:0] <= scan_dout;
-                3: { xflip, yflip, code[13:8] } <= scan_dout;
-                4: attr <= scan_dout;
-                5: begin
-                    if( dr_busy ) st <= 5;
-                    dr_start <= 1;
-                end
-                default: begin
-                    col   <= col+1;
-                    done  <= &col;
-                    st    <= 0;
-                end
-            endcase
-        end
+        if( cfg_cs  ) cfg[ cpu_addr[1:0] ] <= cpu_dout;
+        if( flag_cs ) flag <= cpu_dout;
     end
 end
 
-// This seems to be time multiplexed with no bus contention
-jtframe_dual_ram #(.aw(13)) u_vram(
+
+
+// This is an external memory chip. The original
+// one is an 8-bit memory. Changed to 16-bit access
+// to ease the drawing logic
+jtframe_dual_ram16 #(.aw(12)) u_vram(
     .clk0   ( clk        ),
     .clk1   ( clk_cpu    ),
     // Main CPU
-    .addr0  ( cpu_addr   ),
-    .data0  ( cpu_dout   ),
+    .addr0  ( cpu_addr[11:0] ),
+    .data0  ( {2{cpu_dout}}  ),
     .we0    ( vram_we    ),
     .q0     ( vram2cpu   ),
     // GFX
     .addr1  ( scan_addr  ),
-    .data1  ( 8'd0       ),
-    .we1    ( 1'd0       ),
+    .data1  ( 16'd0      ),
+    .we1    ( 2'd0       ),
     .q1     ( scan_dout  )
 );
 
-jtframe_dual_ram #(.aw(10)) u_attr(
+// This memory is internal to the SETA-X1-001 chip
+jtframe_dual_ram #(.aw(10)) u_yram(
     .clk0   ( clk        ),
     .clk1   ( clk_cpu    ),
     // Main CPU
     .addr0  ( cpu_addr   ),
     .data0  ( cpu_dout   ),
-    .we0    ( vctrl_we   ),
-    .q0     ( attr2cpu   ),
+    .we0    ( yram_we    ),
+    .q0     ( yram_dout  ),
     // GFX
-    .addr1  ( ctrl_addr  ),
+    .addr1  ( scan_addr[9:0] ),
     .data1  ( 8'd0       ),
     .we1    ( 1'd0       ),
-    .q1     ( ctrl_dout  )
+    .q1     ( posy_dout  )
 );
 
 jtframe_obj_buffer #(.FLIP_OFFSET(9'h100)) u_line(

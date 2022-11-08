@@ -114,6 +114,8 @@ jtframe_ff u_irq(
     .sigedge( ~LVBL     )
 );
 
+// To do: add dev_busy to match the wait signal
+// when accessing the VRAM
 jtframe_z80_devwait u_gamecpu(
     .rst_n    ( ~rst   ),
     .clk      ( clk    ),

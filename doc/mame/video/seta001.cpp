@@ -271,7 +271,7 @@ void seta001_device::draw_background( bitmap_ind16 &bitmap, const rectangle &cli
 	const uint8_t* scrollram = &m_spriteylow[0x200];
 
 	/* Sprites Banking and/or Sprites Buffering */
-	uint16_t bank = ( ((ctrl2 ^ (~ctrl2<<1)) & 0x40) ? bank_size : 0 );
+	uint16_t bank = ( ((ctrl2 ^ (~ctrl2<<1)) & 0x40) ? bank_size : 0 ); // bank_size = 0x800
 
 	int const max_y   =   0xf0;
 

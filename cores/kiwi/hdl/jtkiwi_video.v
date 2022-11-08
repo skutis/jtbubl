@@ -87,7 +87,7 @@ jtframe_vtimer #(
     .HS         ( HS         ),
     .VS         ( VS         )
 );
-/*
+
 jtkiwi_gfx u_gfx(
     .rst        ( rst            ),
     .clk        ( clk            ),
@@ -121,7 +121,7 @@ jtkiwi_gfx u_gfx(
     // Color address to palette
     .col_addr   ( col_addr       )
 );
-*/
+
 jtkiwi_colmix u_colmix(
     .clk        ( clk            ),
     .clk_cpu    ( clk_cpu        ),
