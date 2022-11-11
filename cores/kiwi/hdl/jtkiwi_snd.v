@@ -66,7 +66,7 @@ reg  [ 1:0] bank;
 wire [15:0] A;
 wire [ 9:0] psg_snd;
 reg         ram_cs, bank_cs, fm_cs, cab_cs,
-            mcu_rst;
+            mcu_rst, comb_rstn=0;
 wire signed [15:0] fm_snd;
 
 assign ram_din  = dout;
@@ -83,12 +83,14 @@ always @* begin
     end
 end
 
+always @(posedge clk) comb_rstn <= snd_rstn & ~rst;
+
 always @(posedge clk) begin
-    rom_cs  <= !mreq_n && A[15:12]  < 4'ha;
-    bank_cs <= !mreq_n && A[15:12] == 4'ha && !wr_n;
-    fm_cs   <= !mreq_n && A[15:12] == 4'hb;
-    cab_cs  <= !mreq_n && A[15:12] == 4'hc;
-    ram_cs  <= !mreq_n && A[15:13] == 3'b111; // D,E
+    rom_cs  <= !mreq_n &&  A[15:12]  < 4'ha;
+    bank_cs <= !mreq_n &&  A[15:12] == 4'ha && !wr_n;
+    fm_cs   <= !mreq_n &&  A[15:12] == 4'hb;
+    cab_cs  <= !mreq_n &&  A[15:12] == 4'hc;
+    ram_cs  <= !mreq_n && (A[15:12] == 4'hd || A[15:12] == 4'he);
 end
 
 always @(posedge clk, posedge rst) begin
@@ -131,7 +133,7 @@ jtframe_ff u_irq(
 );
 
 jtframe_z80_devwait u_gamecpu(
-    .rst_n    ( ~rst           ),
+    .rst_n    ( comb_rstn      ),
     .clk      ( clk            ),
     .cen      ( cen6           ),
     .cpu_cen  (                ),
@@ -155,7 +157,7 @@ jtframe_z80_devwait u_gamecpu(
 );
 
 jt03 u_2203(
-    .rst        ( ~snd_rstn  ),
+    .rst        ( comb_rstn  ),
     .clk        ( clk        ),
     .cen        ( cen1p5     ),
     .din        ( dout       ),

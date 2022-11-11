@@ -80,7 +80,7 @@ always @(posedge clk) begin
     ram_cs   <= !mreq_n && A[15:12] == 4'he; // A[12:0] used in Insector X (?)
     vctrl_cs <= !mreq_n && A[15:12] == 4'hf && A[11:8]<=3; // internal RAM and config registers
     bank_cs  <= !mreq_n && A[15: 8] == 8'hf6 && !wr_n;
-    pal_cs   <= !mreq_n && A[15: 8] == 8'hf8;
+    pal_cs   <= !mreq_n && A[15:12] == 4'hf && A[11:10]==2'b10;
 end
 
 always @(posedge clk) begin
