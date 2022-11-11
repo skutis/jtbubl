@@ -75,6 +75,7 @@ always @(posedge clk, posedge rst) begin
         hsl     <= 0;
     end else begin
         hsl <= hs;
+        dr_draw <= 0;
         if ( hs & ~hsl ) line <= ~line;
         if( hs || vrender>223 || col_cfg==0 ) begin
             col_cnt <= col_cfg == 1 ? 5'd0 : {~col_cfg+4'd1,1'b0};
