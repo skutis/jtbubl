@@ -5,7 +5,7 @@ game:
       - jtkiwi_main.v
       - jtkiwi_video.v
       - jtkiwi_colmix.v
-      # - jtkiwi_gfx.v
+      - jtkiwi_gfx.v
       - jtkiwi_snd.v
       - jtkiwi_game_sdram.v
 jtframe:
@@ -19,6 +19,7 @@ jtframe:
   - from: ram
     get:
       - jtframe_ram.v
+      - jtframe_dual_ram16.v
       - jtframe_obj_buffer.v
       - jtframe_prom.v
   - from: video

@@ -32,9 +32,10 @@ module jtkiwi_gfx(
     input               LVBL,
     input               hs,
     input               vs,
-    output              flip,
+    output reg          flip,
 
     input      [ 8:0]   vdump,
+    input      [ 8:0]   vrender,
     input      [ 8:0]   hdump,
 
     input               cpu_rnw,
@@ -45,27 +46,38 @@ module jtkiwi_gfx(
     output     [ 7:0]   cpu_din,
 
     // SDRAM interface
-    output     [19:0]   rom_addr,
-    input      [31:0]   rom_data,
-    input               rom_ok,
-    output              rom_cs,
-    output     [ 8:0]   col_addr
+    output     [19:2]   scr_addr,
+    input      [31:0]   scr_data,
+    input               scr_ok,
+    output              scr_cs,
+
+    output     [19:2]   obj_addr,
+    input      [31:0]   obj_data,
+    input               obj_ok,
+    output              obj_cs,
+
+    output      [ 8:0]  scr_pxl
 );
 
 wire        yram_we;
 wire [ 1:0] vram_we;
-reg  [12:0] scan_addr;
-wire [ 7:0] yram_dout, vram2cpu;
+wire [11:0] scode_addr;
+reg  [11:0] code_addr;
+reg  [ 9:0] lut_addr;
+wire [ 7:0] yram_dout;
+wire [ 7:0] slut_addr;
 reg  [ 5:0] col;
-reg  [ 7:0] attr, xpos, ypos;
+reg  [ 7:0] attr, xpos, ypos, lut_data;
 reg  [ 7:0] cfg[0:3], flag;
 reg         scan_cen, done, dr_start, dr_busy,
             match, xflip, yflip,
             yram_cs, cfg_cs, flag_cs;
 reg  [ 2:0] st;
 reg  [13:0] code;
+reg  [ 1:0] lut_cnt;
+reg         page;
 wire        buf_upper, buf_lower;
-wire [15:0] vram_dout, scan_dout;
+wire [15:0] vram_dout, code_dout;
 wire [ 3:0] col_cfg;
 
 `ifdef SIMULATION
@@ -74,9 +86,8 @@ wire [7:0] cfg0 = cfg[0], cfg1 = cfg[1], cfg2 = cfg[2], cfg3 = cfg[3];
 
 assign vram_we  = {2{vram_cs  & ~cpu_rnw}} & { cpu_addr[12], ~cpu_addr[12] };
 assign yram_we  = vctrl_cs & ~cpu_rnw;
-assign rom_cs   = 0;
-assign rom_addr = 0;
-assign col_addr = 0;
+assign obj_cs   = 0;
+assign obj_addr = 0;
 assign flip     = 0;
 assign buf_upper= cfg[1][6];
 assign buf_lower= cfg[1][5];
@@ -98,6 +109,14 @@ end
 
 always @(posedge clk, posedge rst) begin
     if( rst ) begin
+        lut_cnt <= 0;
+    end else begin
+        lut_cnt <= lut_cnt + 1'd1;
+    end
+end
+
+always @(posedge clk, posedge rst) begin
+    if( rst ) begin
         cfg[0] <= 0;
         cfg[1] <= 0;
         cfg[2] <= 0;
@@ -108,7 +127,44 @@ always @(posedge clk, posedge rst) begin
     end
 end
 
+always @* begin
+    case( lut_cnt )
+        3,0: begin
+            lut_addr  = { 2'b10, slut_addr };
+            code_addr = scode_addr;
+        end
+        1,2: begin
+            lut_addr  = 0; // objects
+            code_addr = 0;
+        end
+    endcase
+end
 
+jtkiwi_tilemap u_tilemap(
+    .rst        ( rst       ),
+    .clk        ( clk       ),
+    .lut_cen    (~lut_cnt[1]),
+
+    .hs         ( hs        ),
+    .flip       ( flip      ),
+    .page       ( page      ),
+
+    .lut_addr   ( scode_addr),
+    .lut_data   ( code_dout ),
+
+    // Column scroll
+    .col_addr   ( slut_addr ),
+    .col_data   ( lut_data  ),
+
+    .rom_addr   ( scr_addr  ),
+    .rom_cs     ( scr_cs    ),
+    .rom_ok     ( scr_ok    ),
+    .rom_data   ( scr_data  ),
+
+    .vrender    ( vrender   ),
+    .hdump      ( hdump     ),
+    .pxl        ( scr_pxl   )
+);
 
 // This is an external memory chip. The original
 // one is an 8-bit memory. Changed to 16-bit access
@@ -120,12 +176,12 @@ jtframe_dual_ram16 #(.aw(12)) u_vram(
     .addr0  ( cpu_addr[11:0] ),
     .data0  ( {2{cpu_dout}}  ),
     .we0    ( vram_we    ),
-    .q0     ( vram2cpu   ),
+    .q0     ( vram_dout  ),
     // GFX
-    .addr1  ( scan_addr  ),
+    .addr1  ( code_addr  ),
     .data1  ( 16'd0      ),
     .we1    ( 2'd0       ),
-    .q1     ( scan_dout  )
+    .q1     ( code_dout  )
 );
 
 // This memory is internal to the SETA-X1-001 chip
@@ -133,17 +189,17 @@ jtframe_dual_ram #(.aw(10)) u_yram(
     .clk0   ( clk        ),
     .clk1   ( clk_cpu    ),
     // Main CPU
-    .addr0  ( cpu_addr   ),
+    .addr0  (cpu_addr[9:0]),
     .data0  ( cpu_dout   ),
     .we0    ( yram_we    ),
     .q0     ( yram_dout  ),
     // GFX
-    .addr1  ( scan_addr[9:0] ),
+    .addr1  ( lut_addr   ),
     .data1  ( 8'd0       ),
     .we1    ( 1'd0       ),
-    .q1     ( posy_dout  )
+    .q1     ( lut_data   )
 );
-
+/*
 jtframe_obj_buffer #(.FLIP_OFFSET(9'h100)) u_line(
     .clk    ( clk           ),
     .LHBL   ( ~hs           ),
@@ -157,5 +213,5 @@ jtframe_obj_buffer #(.FLIP_OFFSET(9'h100)) u_line(
     .rd     ( pxl_cen       ),  // data will be erased after the rd event
     .rd_data( col_addr      )
 );
-
+*/
 endmodule

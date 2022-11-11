@@ -42,10 +42,15 @@ module jtkiwi_video(
     input               vctrl_cs,
     output     [ 7:0]   vram_dout,
     // SDRAM interface
-    output     [19:2]   rom_addr,
-    input      [31:0]   rom_data,
-    input               rom_ok,
-    output              rom_cs,
+    output     [19:2]   scr_addr,
+    input      [31:0]   scr_data,
+    input               scr_ok,
+    output              scr_cs,
+
+    output     [19:2]   obj_addr,
+    input      [31:0]   obj_data,
+    input               obj_ok,
+    output              obj_cs,
     // Colours
     output     [ 4:0]   red,
     output     [ 4:0]   green,
@@ -55,7 +60,7 @@ module jtkiwi_video(
 );
 
 wire [ 8:0] vrender, vrender1, vdump, hdump;
-wire [ 8:0] col_addr;
+wire [ 8:0] scr_pxl, obj_pxl;
 
 jtframe_frac_cen #(.WC(4),.W(2)) u_cen48(
     .clk    ( clk       ),    // 48 MHz
@@ -105,6 +110,7 @@ jtkiwi_gfx u_gfx(
     .vs         ( VS             ),
     .hs         ( HS             ),
     .vdump      ( vdump          ),
+    .vrender    ( vrender        ),
     .hdump      ( hdump          ),
     // CPU interface
     .vram_cs    ( vram_cs        ),
@@ -114,12 +120,17 @@ jtkiwi_gfx u_gfx(
     .cpu_rnw    ( cpu_rnw        ),
     .cpu_dout   ( cpu_dout       ),
     // SDRAM
-    .rom_addr   ( rom_addr       ),
-    .rom_data   ( rom_data       ),
-    .rom_ok     ( rom_ok         ),
-    .rom_cs     ( rom_cs         ),
+    .scr_addr   ( scr_addr       ),
+    .scr_data   ( scr_data       ),
+    .scr_ok     ( scr_ok         ),
+    .scr_cs     ( scr_cs         ),
+
+    .obj_addr   ( obj_addr       ),
+    .obj_data   ( obj_data       ),
+    .obj_ok     ( obj_ok         ),
+    .obj_cs     ( obj_cs         ),
     // Color address to palette
-    .col_addr   ( col_addr       )
+    .scr_pxl    ( scr_pxl        )
 );
 
 jtkiwi_colmix u_colmix(
@@ -136,7 +147,7 @@ jtkiwi_colmix u_colmix(
     .cpu_din    ( pal_dout       ),
     .pal_cs     ( pal_cs         ),
     // Colour output
-    .col_addr   ( col_addr       ),
+    .col_addr   ( scr_pxl        ),
     .red        ( red            ),
     .green      ( green          ),
     .blue       ( blue           )

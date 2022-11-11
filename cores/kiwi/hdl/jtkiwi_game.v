@@ -136,10 +136,15 @@ jtkiwi_video u_video(
     .pal_cs         ( pal_cs        ),
     .pal_dout       ( pal_dout      ),
     // SDRAM
-    .rom_addr       ( gfx_addr      ),
-    .rom_data       ( gfx_data      ),
-    .rom_ok         ( gfx_ok        ),
-    .rom_cs         ( gfx_cs        ),
+    .scr_addr       ( scr_addr      ),
+    .scr_data       ( scr_data      ),
+    .scr_ok         ( scr_ok        ),
+    .scr_cs         ( scr_cs        ),
+
+    .obj_addr       ( obj_addr      ),
+    .obj_data       ( obj_data      ),
+    .obj_ok         ( obj_ok        ),
+    .obj_cs         ( obj_cs        ),
     // pixels
     .red            ( red           ),
     .green          ( green         ),
