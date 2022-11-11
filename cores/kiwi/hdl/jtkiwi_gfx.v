@@ -84,7 +84,7 @@ wire [7:0] cfg0 = cfg[0], cfg1 = cfg[1], cfg2 = cfg[2], cfg3 = cfg[3];
 `endif
 
 assign vram_we  = {2{vram_cs  & ~cpu_rnw}} & { cpu_addr[12], ~cpu_addr[12] };
-assign yram_we  = vctrl_cs & ~cpu_rnw;
+assign yram_we  = yram_cs & ~cpu_rnw;
 assign obj_cs   = 0;
 assign obj_addr = 0;
 assign flip     = cfg[0][6]; // only flip y?
@@ -92,8 +92,8 @@ assign video_en = cfg[0][4]; // uncertain
 assign buf_upper= cfg[1][6];
 assign buf_lower= cfg[1][5];
 assign col_cfg  = cfg[1][3:0];
-assign cpu_din  = vctrl_cs     ? yram_dout :
-                  cpu_addr[12] ? vram_dout[15:8] : vram_dout[7:0];
+assign cpu_din  = yram_cs      ? yram_dout :
+                  vram_cs      ? (cpu_addr[12] ? vram_dout[15:8] : vram_dout[7:0]) : 8'hff;
 
 assign page = buf_upper; // should it be buf_lower? something else?
 

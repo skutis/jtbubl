@@ -78,15 +78,15 @@ always @(posedge clk) begin
     rom_cs   <= !mreq_n && A[15:12]  < 4'hc;
     vram_cs  <= !mreq_n && A[15:13] == 3'b110; // C,D
     ram_cs   <= !mreq_n && A[15:12] == 4'he; // A[12:0] used in Insector X (?)
-    vctrl_cs <= !mreq_n && A[15:12] == 4'hf && A[11:8]==3;
-    bank_cs  <= !mreq_n && A[15: 8] == 8'hf6;
+    vctrl_cs <= !mreq_n && A[15:12] == 4'hf && A[11:8]<=3; // internal RAM and config registers
+    bank_cs  <= !mreq_n && A[15: 8] == 8'hf6 && !wr_n;
     pal_cs   <= !mreq_n && A[15: 8] == 8'hf8;
 end
 
 always @(posedge clk) begin
     din <= rom_cs  ? rom_data  :
            ram_cs  ? ram_dout  :
-           vram_cs ? vram_dout :
+           (vram_cs | vctrl_cs) ? vram_dout :
            pal_cs  ? pal_dout  : 8'hff;
 end
 
