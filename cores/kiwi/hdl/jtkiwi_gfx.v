@@ -78,6 +78,7 @@ wire        page;
 wire        buf_upper, buf_lower;
 wire [15:0] vram_dout, code_dout;
 wire [ 3:0] col_cfg;
+reg         tile_cen;
 
 `ifdef SIMULATION
 wire [7:0] cfg0 = cfg[0], cfg1 = cfg[1], cfg2 = cfg[2], cfg3 = cfg[3];
@@ -112,15 +113,17 @@ end
 always @(posedge clk, posedge rst) begin
     if( rst ) begin
         lut_cnt <= 0;
+        tile_cen <= 0;
     end else begin
         lut_cnt <= lut_cnt + 1'd1;
+        tile_cen <= lut_cnt==2;
     end
 end
 
 always @(posedge clk, posedge rst) begin
     if( rst ) begin
         cfg[0]  <= 0;
-        cfg[1]  <= 0;
+        cfg[1]  <= 9;
         cfg[2]  <= 0;
         cfg[3]  <= 0;
     end else begin
@@ -131,11 +134,11 @@ end
 
 always @* begin
     case( lut_cnt )
-        3,0: begin
+        0,1: begin
             lut_addr  = { 2'b10, slut_addr };
             code_addr = scode_addr;
         end
-        1,2: begin
+        2,3: begin
             lut_addr  = 0; // objects
             code_addr = 0;
         end
@@ -145,7 +148,7 @@ end
 jtkiwi_tilemap u_tilemap(
     .rst        ( rst       ),
     .clk        ( clk       ),
-    .lut_cen    (~lut_cnt[1]),
+    .lut_cen    ( tile_cen  ),
 
     .hs         ( hs        ),
     .flip       ( flip      ),
@@ -172,7 +175,10 @@ jtkiwi_tilemap u_tilemap(
 // This is an external memory chip. The original
 // one is an 8-bit memory. Changed to 16-bit access
 // to ease the drawing logic
-jtframe_dual_ram16 #(.aw(12)) u_vram(
+jtframe_dual_ram16 #(.aw(12),
+    .simfile_lo("vram_lo.bin"),
+    .simfile_hi("vram_hi.bin")
+) u_vram(
     .clk0   ( clk_cpu    ),
     .clk1   ( clk        ),
     // Main CPU
@@ -188,7 +194,7 @@ jtframe_dual_ram16 #(.aw(12)) u_vram(
 );
 
 // This memory is internal to the SETA-X1-001 chip
-jtframe_dual_ram #(.aw(10)) u_yram(
+jtframe_dual_ram #(.aw(10),.simfile("lut.bin")) u_yram(
     .clk0   ( clk_cpu    ),
     .clk1   ( clk        ),
     // Main CPU

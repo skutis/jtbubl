@@ -72,6 +72,7 @@ always @(posedge clk, posedge rst) begin
             if( rom_ok && rom_cs && cnt[4]) begin
                 pxl_data <= rom_data;
                 rom_lsb  <= ~rom_lsb;
+                cnt[4]   <= 0;
                 if( rom_lsb^hflip ) begin
                     busy   <= 0;
                     buf_we <= 0;

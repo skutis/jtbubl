@@ -37,7 +37,7 @@ module jtkiwi_colmix(
 );
 
 wire [7:0] pal_dout;
-wire [9:0] pal_addr = 0;
+wire [9:0] pal_addr;
 reg  [7:0] pall;
 reg  [8:0] coll;
 wire       pal_we;
@@ -57,7 +57,7 @@ always @(posedge clk) begin
 end
 
 // Palette RAM X1-007 chip
-jtframe_dual_ram #(.aw(10)) u_comm(
+jtframe_dual_ram #(.aw(10),.simfile("pal.bin")) u_comm(
     .clk0   ( clk_cpu      ),
     .clk1   ( clk          ),
     // Main CPU
