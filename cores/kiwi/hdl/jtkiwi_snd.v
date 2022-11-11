@@ -77,18 +77,18 @@ assign irq_ack = /*!m1_n &&*/ !iorq_n; // The original PCB just uses iorq_n,
     // the orthodox way to do it is to use m1_n too
 
 always @* begin
-    rom_addr = { 1'b0, A[14:0] };
-    if( A[15] ) begin
-        rom_addr[15:13] = { 1'b1, bank };
+    rom_addr = A;
+    if( A[15] ) begin // Bank access
+        rom_addr[14:13] = bank;
     end
 end
 
 always @(posedge clk) begin
     rom_cs  <= !mreq_n && A[15:12]  < 4'ha;
-    bank_cs <= !mreq_n && A[15:12] == 4'ha;
+    bank_cs <= !mreq_n && A[15:12] == 4'ha && !wr_n;
     fm_cs   <= !mreq_n && A[15:12] == 4'hb;
-    ram_cs  <= !mreq_n && A[15:13] == 3'b110; // C,D
-    cab_cs  <= !mreq_n && A[15:12] == 4'hf;
+    cab_cs  <= !mreq_n && A[15:12] == 4'hc;
+    ram_cs  <= !mreq_n && A[15:13] == 3'b111; // D,E
 end
 
 always @(posedge clk, posedge rst) begin

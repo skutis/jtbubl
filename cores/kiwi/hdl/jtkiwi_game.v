@@ -66,6 +66,16 @@ wire        cpu_rnw, vctrl_cs;
 
 assign dip_flip   = flip;
 
+// GFX re-arrengement in SDRAM
+// wire is_gfx = prog_ba==3 && ioctl_addr < `MCU_START;
+
+// always @* begin
+//     post_addr = prog_addr;
+//     if( is_gfx ) begin
+//         post_addr[]
+//     end
+// end
+
 jtframe_frac_cen #(.WC(4),.W(3)) u_cen24(
     .clk    ( clk24     ),    // 24 MHz
     .n      ( 4'd1      ),

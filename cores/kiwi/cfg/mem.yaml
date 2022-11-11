@@ -1,4 +1,5 @@
 sdram:
+  # post_addr: true
   banks:
     - 
       buses:

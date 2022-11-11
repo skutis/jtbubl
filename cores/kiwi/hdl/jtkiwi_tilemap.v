@@ -28,6 +28,7 @@ module jtkiwi_tilemap(
     input               hs,
     input               flip,
     input               page,
+    input      [ 3:0]   col_cfg,
 
     output     [11:0]   lut_addr,
     input      [15:0]   lut_data,
@@ -75,8 +76,8 @@ always @(posedge clk, posedge rst) begin
     end else begin
         hsl <= hs;
         if ( hs & ~hsl ) line <= ~line;
-        if( hs || vrender>223 ) begin
-            col_cnt <= 0;
+        if( hs || vrender>223 || col_cfg==0 ) begin
+            col_cnt <= col_cfg == 1 ? 5'd0 : {~col_cfg+4'd1,1'b0};
             done    <= 0;
             st      <= 0;
             dr_draw <= 0;
@@ -129,13 +130,18 @@ jtkiwi_draw u_draw(
     .buf_din    ( buf_din       )
 );
 
+// During HS the contents of the memory are cleared
+wire [8:0] mux_din  = hs ? 9'd0  : buf_din;
+wire [8:0] mux_addr = hs ? hdump : buf_addr;
+wire       mux_we   = hs ? 1'b1  : buf_we;
+
 jtframe_dual_ram #(.aw(10),.dw(9)) u_linebuf(
     .clk0   ( clk       ),
     .clk1   ( clk       ),
     // New line writting
-    .data0  ( buf_din   ),
-    .addr0  ( { line, buf_addr}  ),
-    .we0    ( buf_we    ),
+    .data0  ( mux_din   ),
+    .addr0  ( { line, mux_addr}  ),
+    .we0    ( mux_we    ),
     .q0     (           ),
     // Previous line reading
     .data1  ( 9'd0      ),

@@ -59,14 +59,13 @@ module jtkiwi_gfx(
     output      [ 8:0]  scr_pxl
 );
 
-wire        yram_we;
+wire        yram_we, video_en;
 wire [ 1:0] vram_we;
 wire [11:0] scode_addr;
 reg  [11:0] code_addr;
 reg  [ 9:0] lut_addr;
 wire [ 7:0] yram_dout;
 wire [ 7:0] slut_addr;
-reg  [ 5:0] col;
 reg  [ 7:0] attr, xpos, ypos, lut_data;
 reg  [ 7:0] cfg[0:3], flag;
 reg         scan_cen, done, dr_start, dr_busy,
@@ -75,7 +74,7 @@ reg         scan_cen, done, dr_start, dr_busy,
 reg  [ 2:0] st;
 reg  [13:0] code;
 reg  [ 1:0] lut_cnt;
-reg         page;
+wire        page;
 wire        buf_upper, buf_lower;
 wire [15:0] vram_dout, code_dout;
 wire [ 3:0] col_cfg;
@@ -88,12 +87,15 @@ assign vram_we  = {2{vram_cs  & ~cpu_rnw}} & { cpu_addr[12], ~cpu_addr[12] };
 assign yram_we  = vctrl_cs & ~cpu_rnw;
 assign obj_cs   = 0;
 assign obj_addr = 0;
-assign flip     = 0;
+assign flip     = cfg[0][6]; // only flip y?
+assign video_en = cfg[0][4]; // uncertain
 assign buf_upper= cfg[1][6];
 assign buf_lower= cfg[1][5];
 assign col_cfg  = cfg[1][3:0];
 assign cpu_din  = vctrl_cs     ? yram_dout :
                   cpu_addr[12] ? vram_dout[15:8] : vram_dout[7:0];
+
+assign page = buf_upper; // should it be buf_lower? something else?
 
 always @* begin
     yram_cs = 0;
@@ -117,10 +119,10 @@ end
 
 always @(posedge clk, posedge rst) begin
     if( rst ) begin
-        cfg[0] <= 0;
-        cfg[1] <= 0;
-        cfg[2] <= 0;
-        cfg[3] <= 0;
+        cfg[0]  <= 0;
+        cfg[1]  <= 0;
+        cfg[2]  <= 0;
+        cfg[3]  <= 0;
     end else begin
         if( cfg_cs  ) cfg[ cpu_addr[1:0] ] <= cpu_dout;
         if( flag_cs ) flag <= cpu_dout;
@@ -148,6 +150,7 @@ jtkiwi_tilemap u_tilemap(
     .hs         ( hs        ),
     .flip       ( flip      ),
     .page       ( page      ),
+    .col_cfg    ( col_cfg   ),
 
     .lut_addr   ( scode_addr),
     .lut_data   ( code_dout ),
@@ -170,8 +173,8 @@ jtkiwi_tilemap u_tilemap(
 // one is an 8-bit memory. Changed to 16-bit access
 // to ease the drawing logic
 jtframe_dual_ram16 #(.aw(12)) u_vram(
-    .clk0   ( clk        ),
-    .clk1   ( clk_cpu    ),
+    .clk0   ( clk_cpu    ),
+    .clk1   ( clk        ),
     // Main CPU
     .addr0  ( cpu_addr[11:0] ),
     .data0  ( {2{cpu_dout}}  ),
@@ -186,8 +189,8 @@ jtframe_dual_ram16 #(.aw(12)) u_vram(
 
 // This memory is internal to the SETA-X1-001 chip
 jtframe_dual_ram #(.aw(10)) u_yram(
-    .clk0   ( clk        ),
-    .clk1   ( clk_cpu    ),
+    .clk0   ( clk_cpu    ),
+    .clk1   ( clk        ),
     // Main CPU
     .addr0  (cpu_addr[9:0]),
     .data0  ( cpu_dout   ),

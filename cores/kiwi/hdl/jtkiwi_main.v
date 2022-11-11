@@ -70,7 +70,7 @@ assign ram_we  = ram_cs & ~wr_n;
 always @* begin
     rom_addr = { 2'b0, A[14:0] };
     if( A[15] ) begin
-        rom_addr[16:14] = 3'b1 + bank;
+        rom_addr[16:13] = 4'b100 + bank;
     end
 end
 
@@ -78,7 +78,7 @@ always @(posedge clk) begin
     rom_cs   <= !mreq_n && A[15:12]  < 4'hc;
     vram_cs  <= !mreq_n && A[15:13] == 3'b110; // C,D
     ram_cs   <= !mreq_n && A[15:12] == 4'he; // A[12:0] used in Insector X (?)
-    vctrl_cs <= !mreq_n && A[15:12] == 4'hf && A[11:8]<6;
+    vctrl_cs <= !mreq_n && A[15:12] == 4'hf && A[11:8]==3;
     bank_cs  <= !mreq_n && A[15: 8] == 8'hf6;
     pal_cs   <= !mreq_n && A[15: 8] == 8'hf8;
 end
