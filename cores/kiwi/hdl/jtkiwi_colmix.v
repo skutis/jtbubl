@@ -49,7 +49,11 @@ assign pal_we = pal_cs & ~cpu_rnw;
 always @(posedge clk) begin
     half <= ~half;
     if( pxl_cen ) begin
+`ifdef GRAY
+        { red, green, blue } <= {3{ {coll[3:0]}, 1'b0 } };
+`else
         { red, green, blue } <= { pal_dout[6:0], pall };
+`endif
         half <= 1;
         coll <= col_addr;
     end

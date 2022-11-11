@@ -37,25 +37,29 @@ module jtkiwi_draw(
     input      [31:0]   rom_data,
 
     output reg [ 8:0]   buf_addr,
-    output reg          buf_we,
+    output              buf_we,
     output     [ 8:0]   buf_din
 );
 
 reg  [31:0] pxl_data;
 reg         rom_lsb;
-reg  [ 4:0] cnt;
+reg  [ 3:0] cnt;
 wire [ 4:0] pal;
+wire [ 3:0] ysubf;
 wire        hflip, vflip;
 
-assign buf_din = { pal, hflip ? pxl_data[3:0] : pxl_data[31:28] };
-assign rom_addr = { code[12:0], ysub^{4{vflip}}, rom_lsb };
+assign ysubf    = ysub^{4{~vflip}};
+assign buf_din  = { pal, hflip ?
+    { pxl_data[31], pxl_data[23], pxl_data[15], pxl_data[7] } :
+    { pxl_data[24], pxl_data[16], pxl_data[8], pxl_data[0] } };
+assign rom_addr = { code[12:0], ysubf[3], rom_lsb, ysubf[2:0] };
 assign { hflip, vflip, pal } = attr[15:9];
+assign buf_we   = busy;
 
 always @(posedge clk, posedge rst) begin
     if( rst ) begin
         rom_cs   <= 0;
         buf_addr <= 0;
-        buf_we   <= 0;
         pxl_data <= 0;
         busy     <= 0;
         cnt      <= 0;
@@ -66,26 +70,24 @@ always @(posedge clk, posedge rst) begin
                 rom_cs   <= 1;
                 buf_addr <= xpos;
                 busy     <= 1;
-                cnt      <= 5'h10;
+                cnt      <= 8;
             end
         end else begin
-            if( rom_ok && rom_cs && cnt[4]) begin
+            if( rom_ok && rom_cs && cnt[3]) begin
                 pxl_data <= rom_data;
-                rom_lsb  <= ~rom_lsb;
-                cnt[4]   <= 0;
+                cnt[3]   <= 0;
                 if( rom_lsb^hflip ) begin
-                    busy   <= 0;
-                    buf_we <= 0;
                     rom_cs <= 0;
                 end else begin
                     rom_cs <= 1;
-                    buf_we <= 1;
                 end
             end
-            if( !cnt[4] ) begin
+            if( !cnt[3] ) begin
                 cnt      <= cnt+1'd1;
                 buf_addr <= buf_addr+1'd1;
-                pxl_data <= hflip ? pxl_data >> 4 : pxl_data << 4;
+                pxl_data <= hflip ? pxl_data << 1 : pxl_data >> 1;
+                rom_lsb  <= ~hflip;
+                if( cnt[2:0]==7 && !rom_cs ) busy <= 0;
             end
         end
     end
