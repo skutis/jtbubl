@@ -65,7 +65,7 @@ wire [ 8:0] scr_pxl, obj_pxl;
 jtframe_frac_cen #(.WC(4),.W(2)) u_cen48(
     .clk    ( clk       ),    // 48 MHz
     .n      ( 4'd1      ),
-    .m      ( 4'd8      ),
+    .m      ( 4'd4      ),
     .cen    ( { pxl_cen, pxl2_cen } ),
     .cenb   (           )
 );

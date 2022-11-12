@@ -32,7 +32,7 @@ module jtkiwi_gfx(
     input               LVBL,
     input               hs,
     input               vs,
-    output reg          flip,
+    output              flip,
 
     input      [ 8:0]   vdump,
     input      [ 8:0]   vrender,
@@ -61,12 +61,12 @@ module jtkiwi_gfx(
 
 wire        yram_we, video_en;
 wire [ 1:0] vram_we;
-wire [11:0] scode_addr;
+wire [11:0] tm_addr;
 reg  [11:0] code_addr;
-reg  [ 9:0] lut_addr;
-wire [ 7:0] yram_dout;
-wire [ 7:0] slut_addr;
-reg  [ 7:0] attr, xpos, ypos, lut_data;
+reg  [ 9:0] col_addr;
+wire [ 7:0] yram_dout, col_data;
+wire [ 7:0] scol_addr;
+reg  [ 7:0] attr, xpos, ypos;
 reg  [ 7:0] cfg[0:3], flag;
 reg         scan_cen, done, dr_start, dr_busy,
             match, xflip, yflip,
@@ -78,6 +78,7 @@ wire        page;
 wire        buf_upper, buf_lower;
 wire [15:0] vram_dout, code_dout;
 wire [ 3:0] col_cfg;
+wire [ 1:0] col0;
 reg         tile_cen;
 
 `ifdef SIMULATION
@@ -90,6 +91,7 @@ assign obj_cs   = 0;
 assign obj_addr = 0;
 assign flip     = cfg[0][6]; // only flip y?
 assign video_en = cfg[0][4]; // uncertain
+assign col0     = cfg[0][1:0]; // start column in the tilemap VRAM
 assign buf_upper= cfg[1][6];
 assign buf_lower= cfg[1][5];
 assign col_cfg  = cfg[1][3:0];
@@ -116,17 +118,24 @@ always @(posedge clk, posedge rst) begin
         tile_cen <= 0;
     end else begin
         lut_cnt <= lut_cnt + 1'd1;
-        tile_cen <= lut_cnt==2;
+        tile_cen <= lut_cnt==0;
     end
 end
 
+`ifdef NOMAIN
+initial $readmemh("seta_cfg.hex",cfg);
+`endif
+
 always @(posedge clk, posedge rst) begin
+`ifndef NOMAIN
     if( rst ) begin
         cfg[0]  <= 0;
         cfg[1]  <= 9;
         cfg[2]  <= 0;
         cfg[3]  <= 0;
-    end else begin
+    end else
+`endif
+    begin
         if( cfg_cs  ) cfg[ cpu_addr[1:0] ] <= cpu_dout;
         if( flag_cs ) flag <= cpu_dout;
     end
@@ -135,11 +144,11 @@ end
 always @* begin
     case( lut_cnt )
         0,1: begin
-            lut_addr  = { 2'b10, slut_addr };
-            code_addr = scode_addr;
+            col_addr  = { 2'b10, scol_addr };
+            code_addr = tm_addr;
         end
         2,3: begin
-            lut_addr  = 0; // objects
+            col_addr  = 0; // objects
             code_addr = 0;
         end
     endcase
@@ -154,13 +163,14 @@ jtkiwi_tilemap u_tilemap(
     .flip       ( flip      ),
     .page       ( page      ),
     .col_cfg    ( col_cfg   ),
+    .col0       ( col0      ),
 
-    .lut_addr   ( scode_addr),
-    .lut_data   ( code_dout ),
+    .tm_addr    ( tm_addr   ),
+    .tm_data    ( code_dout ),
 
     // Column scroll
-    .col_addr   ( slut_addr ),
-    .col_data   ( lut_data  ),
+    .col_addr   ( scol_addr ),
+    .col_data   ( col_data  ),
 
     .rom_addr   ( scr_addr  ),
     .rom_cs     ( scr_cs    ),
@@ -203,10 +213,10 @@ jtframe_dual_ram #(.aw(10),.simfile("lut.bin")) u_yram(
     .we0    ( yram_we    ),
     .q0     ( yram_dout  ),
     // GFX
-    .addr1  ( lut_addr   ),
+    .addr1  ( col_addr   ),
     .data1  ( 8'd0       ),
     .we1    ( 1'd0       ),
-    .q1     ( lut_data   )
+    .q1     ( col_data   )
 );
 /*
 jtframe_obj_buffer #(.FLIP_OFFSET(9'h100)) u_line(

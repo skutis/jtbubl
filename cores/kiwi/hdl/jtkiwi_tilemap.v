@@ -29,9 +29,10 @@ module jtkiwi_tilemap(
     input               flip,
     input               page,
     input      [ 3:0]   col_cfg,
+    input      [ 1:0]   col0,
 
-    output     [11:0]   lut_addr,
-    input      [15:0]   lut_data,
+    output     [11:0]   tm_addr,
+    input      [15:0]   tm_data,
 
     // Column scroll
     output     [ 7:0]   col_addr,
@@ -49,7 +50,7 @@ module jtkiwi_tilemap(
 
 reg         line, done, hsl;
 reg  [ 4:0] col_cnt;
-reg  [ 3:0] dr_ysub;
+reg  [ 3:0] dr_ysub, col_end;
 reg  [ 8:0] eff_h, eff_v, dr_xpos;
 reg  [ 7:0] yscr, xscr;
 reg  [ 1:0] st;
@@ -59,12 +60,12 @@ wire        dr_busy;
 wire [ 8:0] buf_din, buf_addr;
 wire        buf_we;
 
-assign lut_addr = { page, 1'b1, st[0], eff_v[7:4], eff_h[8:5], eff_h[4] }; // 1 + 1 + 1 + 4 + 5 = 12
-assign col_addr = { col_cnt[4:1], st[0], 3'd0 };
+assign tm_addr  = { page, 1'b1, st[0], eff_h[8:5], eff_v[7:4], eff_h[4] }; // 1 + 1 + 1 + 4 + 5 = 12
+assign col_addr = { col_cnt[4:1], 1'd0, st[0], 2'd0 };
 
 always @* begin
     eff_v = vrender + { 1'b0, yscr };
-    eff_h = { col_cnt, 4'd0 } + { 1'd0, xscr };
+    eff_h = { col_cnt + {col0,3'd0}, 4'b0 } + { 1'd0, xscr };
 end
 
 // Columns are 32-pixel wide
@@ -78,29 +79,30 @@ always @(posedge clk, posedge rst) begin
         dr_draw <= 0;
         if ( hs & ~hsl ) line <= ~line;
         if( hs || vrender>223 || col_cfg==0 ) begin
-            col_cnt <= col_cfg == 1 ? 5'd0 : {~col_cfg+4'd1,1'b0};
-            done    <= 0;
+            col_cnt <= 0;
+            done    <= col_cfg==0; // don't do anything for col_cfg==0
             st      <= 0;
             dr_draw <= 0;
             dr_code <= 0;
             dr_attr <= 0;
             dr_xpos <= 0;
             dr_ysub <= 0;
+            col_end <= col_cfg==1 ? 4'hf : col_cfg-4'd1;
         end else if( !done && lut_cen ) begin
             st <= st + 1'd1;
             case( st )
                 0: yscr <= col_data;
                 1: xscr <= col_data;
-                2: code <= lut_data;
+                2: code <= tm_data;
                 3: begin
                     if( !dr_busy )  begin
                         dr_draw <= 1;
                         dr_code <= code;
-                        dr_attr <= lut_data;
+                        dr_attr <= tm_data;
                         dr_xpos <= { col_cnt, 4'd0 } - {4'd0, xscr[3:0]};
                         dr_ysub <= vrender[3:0] - yscr[3:0];
                         col_cnt <=  col_cnt + 1'd1;
-                        done    <= &col_cnt;
+                        done    <= col_cnt[4:1]==col_end && col_cnt[0];
                     end else begin
                         st <= st;
                     end

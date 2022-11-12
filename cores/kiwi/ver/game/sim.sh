@@ -19,6 +19,7 @@ if [ ! -z "$SCENE" ]; then
         exit 1
     fi
     cp $SCENE/{pal,lut}.bin .
+    cp $SCENE/seta_cfg.hex .
     dd if=$SCENE/vram.bin of=vram_lo.bin count=8
     dd if=$SCENE/vram.bin of=vram_hi.bin count=8 skip=8
 fi

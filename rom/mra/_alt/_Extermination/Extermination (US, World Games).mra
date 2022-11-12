@@ -23,13 +23,13 @@
     <about author="jotego" webpage="https://patreon.com/jotego" source="https://github.com/jotego" twitter="@topapate"/>
     <name>Extermination (US, World Games)</name>
     <setname>extrmatnu</setname>
-    <rbf>jtexterm</rbf>
-    <mameversion>0237</mameversion>
+    <rbf>jtkiwi</rbf>
+    <mameversion>0243</mameversion>
     <year>1987</year>
     <manufacturer>Taito (World Games license)</manufacturer>
     <players>2</players>
     <joystick>8</joystick>
-    <rotation>vertical</rotation>
+    <rotation>vertical (ccw)</rotation>
     <region>World</region>
     <mraauthor>jotego</mraauthor>
     <rom index="0" zip="extrmatnu.zip|extrmatn.zip" md5="None">
@@ -73,5 +73,5 @@
         <dip name="Difficulty" bits="8,9" ids="Hardest,Hard,Easy,Medium"/>
         <dip name="Damage Multiplier" bits="14,15" ids="*3,*2,*1.5,*1"/>
     </switches>
-    <buttons names="Punch, Kick ,Start,Coin,Core credits" default="Y,X,Start,Select,-" count="2"/>
+    <buttons names="button 1,button 2,-,Start,Coin,Core credits" default="Y,X,B,Start,Select,-" count="2"/>
 </misterromdescription>

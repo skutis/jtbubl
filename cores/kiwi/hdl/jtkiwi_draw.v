@@ -32,7 +32,7 @@ module jtkiwi_draw(
     input      [ 3:0]   ysub,
 
     output     [19:2]   rom_addr,
-    output              rom_cs,
+    output reg          rom_cs,
     input               rom_ok,
     input      [31:0]   rom_data,
 
