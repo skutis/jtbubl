@@ -55,6 +55,7 @@ reg  [ 3:0] dr_ysub, col_end;
 reg  [ 8:0] eff_h, eff_v, dr_xpos;
 reg  [ 7:0] yscr;
 reg  [ 8:0] xscr;
+wire [ 8:0] vf;
 reg  [ 1:0] st;
 reg         dr_draw;
 reg  [15:0] code, dr_code, dr_attr;
@@ -64,10 +65,11 @@ wire        buf_we;
 
 assign tm_addr  = { page, 1'b1, st[0], eff_h[8:5], eff_v[7:4], eff_h[4] }; // 1 + 1 + 1 + 4 + 5 = 12
 assign col_addr = { col_cnt[4:1], 1'd0, st[0], 2'd0 };
+assign vf       = {9{flip}} ^ vrender;
 
 always @* begin
-    eff_v = vrender + { 1'b0, yscr };
-    eff_h = { col_cnt + {col0,3'd0}, 4'b0 } + xscr;
+    eff_v = vf + { 1'b0, yscr };
+    eff_h = { col_cnt + {col0,3'd0}, 4'b0 };
 end
 
 // Columns are 32-pixel wide
@@ -101,7 +103,7 @@ always @(posedge clk, posedge rst) begin
                         dr_draw <= 1;
                         dr_code <= code;
                         dr_attr <= tm_data;
-                        dr_xpos <= { col_cnt, 4'd0 } - {4'd0, xscr[3:0]};
+                        dr_xpos <= { 4'd0, col_cnt[0], 4'd0 } + xscr;
                         dr_ysub <= eff_v[3:0];
                         col_cnt <=  col_cnt + 1'd1;
                         done    <= col_cnt[4:1]==col_end && col_cnt[0];
