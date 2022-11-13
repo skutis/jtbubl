@@ -54,7 +54,7 @@ always @(posedge clk) begin
 `else
         { red, green, blue } <= { pal_dout[6:0], pall };
 `endif
-        half <= 1;
+        half <= 0;
         coll <= col_addr;
     end
     pall <= pal_dout;

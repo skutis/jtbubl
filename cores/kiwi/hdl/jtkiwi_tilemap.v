@@ -23,11 +23,12 @@
 module jtkiwi_tilemap(
     input               rst,
     input               clk,
-    input               lut_cen,
+    input               tm_cen,
 
     input               hs,
     input               flip,
     input               page,
+    input      [15:0]   col_xmsb,
     input      [ 3:0]   col_cfg,
     input      [ 1:0]   col0,
 
@@ -52,7 +53,8 @@ reg         line, done, hsl;
 reg  [ 4:0] col_cnt;
 reg  [ 3:0] dr_ysub, col_end;
 reg  [ 8:0] eff_h, eff_v, dr_xpos;
-reg  [ 7:0] yscr, xscr;
+reg  [ 7:0] yscr;
+reg  [ 8:0] xscr;
 reg  [ 1:0] st;
 reg         dr_draw;
 reg  [15:0] code, dr_code, dr_attr;
@@ -65,7 +67,7 @@ assign col_addr = { col_cnt[4:1], 1'd0, st[0], 2'd0 };
 
 always @* begin
     eff_v = vrender + { 1'b0, yscr };
-    eff_h = { col_cnt + {col0,3'd0}, 4'b0 } + { 1'd0, xscr };
+    eff_h = { col_cnt + {col0,3'd0}, 4'b0 } + xscr;
 end
 
 // Columns are 32-pixel wide
@@ -88,11 +90,11 @@ always @(posedge clk, posedge rst) begin
             dr_xpos <= 0;
             dr_ysub <= 0;
             col_end <= col_cfg==1 ? 4'hf : col_cfg-4'd1;
-        end else if( !done && lut_cen ) begin
+        end else if( !done && tm_cen ) begin
             st <= st + 1'd1;
             case( st )
                 0: yscr <= col_data;
-                1: xscr <= col_data;
+                1: xscr <= { col_xmsb[col_cnt[4:1]], col_data };
                 2: code <= tm_data;
                 3: begin
                     if( !dr_busy )  begin
@@ -122,6 +124,7 @@ jtkiwi_draw u_draw(
     .attr       ( dr_attr       ),
     .xpos       ( dr_xpos       ),
     .ysub       ( dr_ysub       ),
+    .flip       ( flip          ),
 
     .rom_addr   ( rom_addr      ),
     .rom_cs     ( rom_cs        ),

@@ -30,6 +30,7 @@ module jtkiwi_draw(
     input      [15:0]   attr,
     input      [ 8:0]   xpos,
     input      [ 3:0]   ysub,
+    input               flip,
 
     output     [19:2]   rom_addr,
     output reg          rom_cs,
@@ -46,14 +47,20 @@ reg         rom_lsb;
 reg  [ 3:0] cnt;
 wire [ 4:0] pal;
 wire [ 3:0] ysubf;
-wire        hflip, vflip;
+wire        hflip, vflip, hflipx;
 
+assign hflipx   = hflip ^ flip;
 assign ysubf    = ysub^{4{~vflip}};
-assign buf_din  = { pal, hflip ?
-    { pxl_data[31], pxl_data[23], pxl_data[15], pxl_data[7] } :
-    { pxl_data[24], pxl_data[16], pxl_data[8], pxl_data[0] } };
+assign buf_din  = { pal, hflipx ?
+    { pxl_data[23], pxl_data[ 7], pxl_data[31], pxl_data[15] } :
+    { pxl_data[16], pxl_data[ 0], pxl_data[24], pxl_data[ 8] } };
+
+    // { pxl_data[15], pxl_data[31], pxl_data[ 7], pxl_data[23] } :
+    // { pxl_data[ 8], pxl_data[24], pxl_data[ 0], pxl_data[16] } };
+
 assign rom_addr = { code[12:0], ysubf[3], rom_lsb, ysubf[2:0] };
-assign { hflip, vflip, pal } = attr[15:9];
+assign { hflip, vflip } = attr[15:14]^{1'b0,flip};
+assign pal = attr[13:9];
 assign buf_we   = busy;
 
 always @(posedge clk, posedge rst) begin
@@ -85,7 +92,7 @@ always @(posedge clk, posedge rst) begin
             if( !cnt[3] ) begin
                 cnt      <= cnt+1'd1;
                 buf_addr <= buf_addr+1'd1;
-                pxl_data <= hflip ? pxl_data << 1 : pxl_data >> 1;
+                pxl_data <= hflipx ? pxl_data << 1 : pxl_data >> 1;
                 rom_lsb  <= ~hflip;
                 if( cnt[2:0]==7 && !rom_cs ) busy <= 0;
             end
