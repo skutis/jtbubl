@@ -80,7 +80,7 @@ always @(posedge clk, posedge rst) begin
         hsl <= hs;
         dr_draw <= 0;
         if ( hs & ~hsl ) line <= ~line;
-        if( hs || vrender>223 || col_cfg==0 ) begin
+        if( hs || vrender>9'hf0 || col_cfg==0 ) begin
             col_cnt <= 0;
             done    <= col_cfg==0; // don't do anything for col_cfg==0
             st      <= 0;
@@ -102,7 +102,7 @@ always @(posedge clk, posedge rst) begin
                         dr_code <= code;
                         dr_attr <= tm_data;
                         dr_xpos <= { col_cnt, 4'd0 } - {4'd0, xscr[3:0]};
-                        dr_ysub <= vrender[3:0] - yscr[3:0];
+                        dr_ysub <= eff_v[3:0];
                         col_cnt <=  col_cnt + 1'd1;
                         done    <= col_cnt[4:1]==col_end && col_cnt[0];
                     end else begin

@@ -74,8 +74,8 @@ reg         scan_cen, done, dr_start, dr_busy,
 reg  [ 2:0] st;
 reg  [13:0] code;
 reg  [ 1:0] cen_cnt;
-wire        page;
-wire        buf_upper, buf_lower;
+wire        tm_page;
+wire        buf_lower;
 wire [15:0] vram_dout, code_dout, col_xmsb;
 wire [ 3:0] col_cfg;
 wire [ 1:0] col0;
@@ -92,14 +92,12 @@ assign obj_addr = 0;
 assign flip     = cfg[0][6]; // only flip y?
 assign video_en = cfg[0][4]; // uncertain
 assign col0     = cfg[0][1:0]; // start column in the tilemap VRAM
-assign buf_upper= cfg[1][6];
+assign tm_page  = cfg[1][6];
 assign buf_lower= cfg[1][5];
 assign col_cfg  = cfg[1][3:0];
 assign col_xmsb = { cfg[3], cfg[2] };
 assign cpu_din  = yram_cs      ? yram_dout :
                   vram_cs      ? (cpu_addr[12] ? vram_dout[15:8] : vram_dout[7:0]) : 8'hff;
-
-assign page = buf_upper; // should it be buf_lower? something else?
 
 always @* begin
     yram_cs = 0;
@@ -162,7 +160,7 @@ jtkiwi_tilemap u_tilemap(
 
     .hs         ( hs        ),
     .flip       ( flip      ),
-    .page       ( page      ),
+    .page       ( tm_page   ),
 
     .col_xmsb   ( col_xmsb  ),
     .col_cfg    ( col_cfg   ),

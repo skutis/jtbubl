@@ -41,16 +41,18 @@ wire [9:0] pal_addr;
 reg  [7:0] pall;
 reg  [8:0] coll;
 wire       pal_we;
+wire       blank;
 reg        half;
 
 assign pal_addr = { half, coll };
-assign pal_we = pal_cs & ~cpu_rnw;
+assign pal_we   = pal_cs & ~cpu_rnw;
+assign blank    = ~(LVBL & LHBL);
 
 always @(posedge clk) begin
     half <= ~half;
     if( pxl_cen ) begin
 `ifdef GRAY
-        { red, green, blue } <= {3{ {coll[3:0]}, 1'b0 } };
+        { red, green, blue } <= ~{3{ {coll[3:0]}, 1'b0 } };
 `else
         { red, green, blue } <= { pal_dout[6:0], pall };
 `endif
@@ -58,6 +60,7 @@ always @(posedge clk) begin
         coll <= col_addr;
     end
     pall <= pal_dout;
+    if( blank ) {red,green,blue} <= 0;
 end
 
 // Palette RAM X1-007 chip
