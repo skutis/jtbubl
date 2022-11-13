@@ -56,7 +56,8 @@ module jtkiwi_gfx(
     input               obj_ok,
     output              obj_cs,
 
-    output      [ 8:0]  scr_pxl
+    output      [ 8:0]  scr_pxl,
+    input       [ 7:0]  debug_bus
 );
 
 wire        yram_we, video_en;
@@ -180,7 +181,8 @@ jtkiwi_tilemap u_tilemap(
 
     .vrender    ( vrender   ),
     .hdump      ( hdump     ),
-    .pxl        ( scr_pxl   )
+    .pxl        ( scr_pxl   ),
+    .debug_bus  ( debug_bus )
 );
 
 // This is an external memory chip. The original

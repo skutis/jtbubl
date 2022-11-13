@@ -51,6 +51,8 @@ module jtkiwi_game(
     input           enable_fm,
     // Debug
     input   [ 3:0]  gfx_en,
+    input   [ 7:0]  debug_bus,
+    output  [ 7:0]  debug_view,
     // Memory interface
     `include "mem_ports.inc"
 );
@@ -160,7 +162,8 @@ jtkiwi_video u_video(
     .green          ( green         ),
     .blue           ( blue          ),
     // Test
-    .gfx_en         ( gfx_en        )
+    .gfx_en         ( gfx_en        ),
+    .debug_bus      ( debug_bus     )
 );
 
 jtkiwi_snd u_sound(

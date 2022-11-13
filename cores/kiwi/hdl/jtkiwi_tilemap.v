@@ -46,7 +46,9 @@ module jtkiwi_tilemap(
 
     input      [ 8:0]   vrender,
     input      [ 8:0]   hdump,
-    output     [ 8:0]   pxl
+    output     [ 8:0]   pxl,
+
+    input      [ 7:0]   debug_bus
 );
 
 reg         line, done, hsl;
@@ -135,7 +137,8 @@ jtkiwi_draw u_draw(
 
     .buf_addr   ( buf_addr      ),
     .buf_we     ( buf_we        ),
-    .buf_din    ( buf_din       )
+    .buf_din    ( buf_din       ),
+    .debug_bus  ( debug_bus     )
 );
 
 // During HS the contents of the memory are cleared

@@ -39,21 +39,24 @@ module jtkiwi_draw(
 
     output reg [ 8:0]   buf_addr,
     output              buf_we,
-    output     [ 8:0]   buf_din
+    output     [ 8:0]   buf_din,
+
+    input      [ 7:0]   debug_bus
 );
 
 reg  [31:0] pxl_data;
 reg         rom_lsb;
 reg  [ 3:0] cnt;
 wire [ 4:0] pal;
-wire [ 3:0] ysubf;
+wire [ 3:0] ysubf, pxl_sort, pxl_in;
 wire        hflip, vflip, hflipx;
 
 assign hflipx   = hflip ^ flip;
 assign ysubf    = ysub^{4{~vflip}};
-assign buf_din  = { pal, hflipx ?
+assign buf_din  = { pal, pxl_sort };
+assign pxl_in   = hflipx ?
     { pxl_data[23], pxl_data[ 7], pxl_data[31], pxl_data[15] } :
-    { pxl_data[16], pxl_data[ 0], pxl_data[24], pxl_data[ 8] } };
+    { pxl_data[16], pxl_data[ 0], pxl_data[24], pxl_data[ 8] };
 
     // { pxl_data[15], pxl_data[31], pxl_data[ 7], pxl_data[23] } :
     // { pxl_data[ 8], pxl_data[24], pxl_data[ 0], pxl_data[16] } };
@@ -62,6 +65,12 @@ assign rom_addr = { code[12:0], ysubf[3], rom_lsb, ysubf[2:0] };
 assign { hflip, vflip } = attr[15:14]^{1'b0,flip};
 assign pal = attr[13:9];
 assign buf_we   = busy;
+
+jtframe_sort u_sort(
+    .debug_bus  ( debug_bus ),
+    .busin      ( pxl_in    ),
+    .busout     ( pxl_sort  )
+);
 
 always @(posedge clk, posedge rst) begin
     if( rst ) begin

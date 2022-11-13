@@ -56,7 +56,8 @@ module jtkiwi_video(
     output     [ 4:0]   green,
     output     [ 4:0]   blue,
     // Test
-    input      [ 3:0]   gfx_en
+    input      [ 3:0]   gfx_en,
+    input      [ 7:0]   debug_bus
 );
 
 wire [ 8:0] vrender, vrender1, vdump, hdump;
@@ -130,7 +131,8 @@ jtkiwi_gfx u_gfx(
     .obj_ok     ( obj_ok         ),
     .obj_cs     ( obj_cs         ),
     // Color address to palette
-    .scr_pxl    ( scr_pxl        )
+    .scr_pxl    ( scr_pxl        ),
+    .debug_bus  ( debug_bus      )
 );
 
 jtkiwi_colmix u_colmix(
