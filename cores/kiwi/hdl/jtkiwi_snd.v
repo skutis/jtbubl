@@ -70,8 +70,8 @@ reg         ram_cs, bank_cs, fm_cs, cab_cs,
 wire signed [15:0] fm_snd;
 
 assign ram_din  = dout;
-assign ram_we   = ~wr_n;
-assign ram_addr = A[12:0];
+assign ram_we   = ram_cs & ~wr_n;
+assign ram_addr = `ifdef SIMULATION !ram_cs ? 13'd0 : `endif A[12:0];
 
 assign irq_ack = /*!m1_n &&*/ !iorq_n; // The original PCB just uses iorq_n,
     // the orthodox way to do it is to use m1_n too
@@ -199,6 +199,7 @@ jtframe_mixer #(.W1(10)) u_mixer(
     initial begin
         rom_addr = 0;
         rom_cs   = 0;
+        $display("WARNING: without the sound CPU, the main CPU won't work correctly");
     end
     assign ram_addr = 0;
     assign ram_din  = 0;

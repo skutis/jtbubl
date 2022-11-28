@@ -17,44 +17,7 @@
     Date: 02-05-2020 */
 
 module jtkiwi_game(
-    input           rst,
-    input           clk,
-    input           rst24,
-    input           clk24,
-    output          pxl2_cen,   // 12   MHz
-    output          pxl_cen,    //  6   MHz
-    output   [4:0]  red,
-    output   [4:0]  green,
-    output   [4:0]  blue,
-    output          LHBL,
-    output          LVBL,
-    output          HS,
-    output          VS,
-    // cabinet I/O
-    input   [ 1:0]  start_button,
-    input   [ 1:0]  coin_input,
-    input   [ 6:0]  joystick1,
-    input   [ 6:0]  joystick2,
-    // DIP switches
-    input   [31:0]  status,     // only bits 31:16 are looked at
-    input   [31:0]  dipsw,
-    input           service,
-    input           dip_pause,
-    inout           dip_flip,
-    input           dip_test,
-    input   [ 1:0]  dip_fxlevel,
-    // Sound output
-    output  signed [15:0] snd,
-    output          sample,
-    output          game_led,
-    input           enable_psg,
-    input           enable_fm,
-    // Debug
-    input   [ 3:0]  gfx_en,
-    input   [ 7:0]  debug_bus,
-    output  [ 7:0]  debug_view,
-    // Memory interface
-    `include "mem_ports.inc"
+    `include "jtframe_game_ports.inc" // see $JTFRAME/hdl/inc/jtframe_game_ports.inc
 );
 
 wire        shr_we, snd_rstn;
@@ -66,8 +29,8 @@ wire        cen6, cen3, cen1p5;
 wire        vram_cs,  pal_cs, flip;
 wire        cpu_rnw, vctrl_cs;
 
-assign dip_flip   = flip;
-assign debug_view = 0;
+assign  dip_flip   = flip;
+initial debug_view = 0;
 
 // GFX re-arrengement in SDRAM
 // wire is_gfx = prog_ba==3 && ioctl_addr < `MCU_START;

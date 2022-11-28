@@ -68,11 +68,15 @@ assign irq_ack = /*!m1_n &&*/ !iorq_n; // The original PCB just uses iorq_n,
 assign ram_we  = ram_cs & ~wr_n;
 
 always @* begin
-    rom_addr = { 2'b0, A[14:0] };
+    rom_addr = { 3'b0, A[13:0] };
     if( A[15] ) begin
-        rom_addr[16:13] = 4'b100 + bank;
+        rom_addr[16:14] = bank;
     end
 end
+
+`ifdef SIMULATION
+wire rombank_cs = rom_cs && A[15:12]>=8;
+`endif
 
 always @(posedge clk) begin
     rom_cs   <= !mreq_n && A[15:12]  < 4'hc;
