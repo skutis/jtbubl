@@ -368,8 +368,8 @@ void seta001_device::draw_foreground( screen_device &screen, bitmap_ind16 &bitma
 	int const total_color_codes   =   gfx(0)->colors();
 
 	uint8_t *char_pointer = &m_spritecodelow[0x0000];
-	uint8_t *x_pointer = &m_spritecodelow[0x0200];
 	uint8_t *ctrl_pointer = &m_spritecodehigh[0x0000];
+	uint8_t *x_pointer = &m_spritecodelow[0x0200];
 	uint8_t *color_pointer = &m_spritecodehigh[0x0200];
 
 	// note that drgnunit, stg and qzkklogy run on the same board, yet they need different alignment

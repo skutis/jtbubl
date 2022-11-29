@@ -57,12 +57,13 @@ module jtkiwi_gfx(
     output              obj_cs,
 
     output      [ 8:0]  scr_pxl,
+    output      [ 8:0]  obj_pxl,
     input       [ 7:0]  debug_bus
 );
 
 wire        yram_we, video_en;
 wire [ 1:0] vram_we;
-wire [11:0] tm_addr;
+wire [11:0] tm_addr, lut_addr;
 reg  [11:0] code_addr;
 reg  [ 9:0] col_addr;
 wire [ 7:0] yram_dout, col_data;
@@ -76,11 +77,13 @@ reg  [ 2:0] st;
 reg  [13:0] code;
 reg  [ 1:0] cen_cnt;
 wire        tm_page;
-wire        buf_lower;
+wire        obj_page;
 wire [15:0] vram_dout, code_dout, col_xmsb;
 wire [ 3:0] col_cfg;
 wire [ 1:0] col0;
-reg         tm_cen;
+reg         tm_cen, lut_cen;
+// Objects
+wire [ 8:0] y_addr;
 
 `ifdef SIMULATION
 wire [7:0] cfg0 = cfg[0], cfg1 = cfg[1], cfg2 = cfg[2], cfg3 = cfg[3];
@@ -88,13 +91,11 @@ wire [7:0] cfg0 = cfg[0], cfg1 = cfg[1], cfg2 = cfg[2], cfg3 = cfg[3];
 
 assign vram_we  = {2{vram_cs  & ~cpu_rnw}} & { cpu_addr[12], ~cpu_addr[12] };
 assign yram_we  = yram_cs & ~cpu_rnw;
-assign obj_cs   = 0;
-assign obj_addr = 0;
 assign flip     = cfg[0][6]; // only flip y?
 assign video_en = cfg[0][4]; // uncertain
 assign col0     = cfg[0][1:0]; // start column in the tilemap VRAM
 assign tm_page  = cfg[1][6];
-assign buf_lower= cfg[1][5];
+assign obj_page = cfg[1][5];
 assign col_cfg  = cfg[1][3:0];
 assign col_xmsb = { cfg[3], cfg[2] };
 assign cpu_din  = yram_cs      ? yram_dout :
@@ -115,10 +116,12 @@ end
 always @(posedge clk, posedge rst) begin
     if( rst ) begin
         cen_cnt <= 0;
-        tm_cen <= 0;
+        tm_cen  <= 0;
+        lut_cen <= 0;
     end else begin
         cen_cnt <= cen_cnt + 1'd1;
         tm_cen  <= cen_cnt==0;
+        lut_cen <= cen_cnt==2;
     end
 end
 
@@ -147,9 +150,9 @@ always @* begin
             col_addr  = { 2'b10, scol_addr };
             code_addr = tm_addr;
         end
-        2,3: begin
-            col_addr  = 0; // objects
-            code_addr = 0;
+        2,3: begin // objects
+            col_addr  = { 1'b0, y_addr };
+            code_addr = lut_addr;
         end
     endcase
 end
@@ -185,9 +188,41 @@ jtkiwi_tilemap u_tilemap(
     .debug_bus  ( debug_bus )
 );
 
+jtkiwi_obj u_obj(
+    .rst        ( rst       ),
+    .clk        ( clk       ),
+    .lut_cen    ( lut_cen   ),
+    .pxl_cen    ( pxl_cen   ),
+
+    .hs         ( hs        ),
+    .flip       ( flip      ),
+    .page       ( obj_page  ),
+
+    .lut_addr   ( lut_addr  ),
+    .lut_data   ( code_dout ),
+
+    // Column scroll
+    .y_addr     ( y_addr    ),
+    .y_data     ( col_data  ),
+
+    .rom_addr   ( obj_addr  ),
+    .rom_cs     ( obj_cs    ),
+    .rom_ok     ( obj_ok    ),
+    .rom_data   ( obj_data  ),
+
+    .vrender    ( vrender   ),
+    .hdump      ( hdump     ),
+    .pxl        ( obj_pxl   ),
+    .debug_bus  ( debug_bus )
+);
+
 // This is an external memory chip. The original
 // one is an 8-bit memory. Changed to 16-bit access
 // to ease the drawing logic
+// the upper byte refers to the upper half of the
+// memory for the CPU
+// In MAME the lower half is called spritecodelow
+// and the upper spritecodehigh
 jtframe_dual_ram16 #(.aw(12),
     .simfile_lo("vram_lo.bin"),
     .simfile_hi("vram_hi.bin")
@@ -207,6 +242,7 @@ jtframe_dual_ram16 #(.aw(12),
 );
 
 // This memory is internal to the SETA-X1-001 chip
+// this is called spriteylow by MAME
 jtframe_dual_ram #(.aw(10),.simfile("col.bin")) u_yram(
     .clk0   ( clk_cpu    ),
     .clk1   ( clk        ),
@@ -221,19 +257,5 @@ jtframe_dual_ram #(.aw(10),.simfile("col.bin")) u_yram(
     .we1    ( 1'd0       ),
     .q1     ( col_data   )
 );
-/*
-jtframe_obj_buffer #(.FLIP_OFFSET(9'h100)) u_line(
-    .clk    ( clk           ),
-    .LHBL   ( ~hs           ),
-    .flip   ( flip          ),
-    // New data writes
-    .wr_data( line_din      ),
-    .wr_addr( line_addr     ),
-    .we     ( line_we       ),
-    // Old data reads (and erases)
-    .rd_addr( hdump         ),
-    .rd     ( pxl_cen       ),  // data will be erased after the rd event
-    .rd_data( col_addr      )
-);
-*/
+
 endmodule

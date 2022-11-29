@@ -132,6 +132,7 @@ jtkiwi_gfx u_gfx(
     .obj_cs     ( obj_cs         ),
     // Color address to palette
     .scr_pxl    ( scr_pxl        ),
+    .obj_pxl    ( obj_pxl        ),
     .debug_bus  ( debug_bus      )
 );
 
@@ -149,7 +150,8 @@ jtkiwi_colmix u_colmix(
     .cpu_din    ( pal_dout       ),
     .pal_cs     ( pal_cs         ),
     // Colour output
-    .col_addr   ( scr_pxl        ),
+    .scr_pxl    ( scr_pxl        ),
+    .obj_pxl    ( obj_pxl        ),
     .red        ( red            ),
     .green      ( green          ),
     .blue       ( blue           )

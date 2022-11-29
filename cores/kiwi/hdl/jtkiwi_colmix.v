@@ -23,7 +23,8 @@ module jtkiwi_colmix(
     input        LHBL,
     input        LVBL,
 
-    input  [8:0] col_addr,
+    input  [8:0] scr_pxl,
+    input  [8:0] obj_pxl,
 
     input  [9:0] cpu_addr,
     input  [7:0] cpu_dout,
@@ -39,7 +40,7 @@ module jtkiwi_colmix(
 wire [7:0] pal_dout;
 wire [9:0] pal_addr;
 reg  [7:0] pall;
-reg  [8:0] coll;
+reg  [8:0] coll, col_addr;
 wire       pal_we;
 wire       blank;
 reg        half;
@@ -47,6 +48,10 @@ reg        half;
 assign pal_addr = { half, coll };
 assign pal_we   = pal_cs & ~cpu_rnw;
 assign blank    = ~(LVBL & LHBL);
+
+always @* begin
+    col_addr = obj_pxl[3:0] != 4'hf ? obj_pxl : scr_pxl; // simple priority for now.
+end
 
 always @(posedge clk) begin
     half <= ~half;

@@ -5,8 +5,10 @@ game:
       - jtkiwi_main.v
       - jtkiwi_video.v
       - jtkiwi_colmix.v
-      - jtkiwi_gfx.v
       - jtkiwi_snd.v
+      - jtkiwi_gfx.v
+      - jtkiwi_obj.v
+      - jtkiwi_tilemap.v
       - jtkiwi_game_sdram.v
 jtframe:
   - get:

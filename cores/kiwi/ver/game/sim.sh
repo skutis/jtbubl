@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Use cpsnap.sh to copy MAME scenes to a new folder
+
 ARG=
 SCENE=
 

@@ -1,7 +1,9 @@
 *.arc
+*.arc
 *.bak
 *.bin
 *.cfg
+*.f
 *.fst
 *.hex
 *.jdi
@@ -19,7 +21,6 @@
 *.rbf
 *.rbf_r
 *.rom
-*.rom
 *.rpt
 *.smsg
 *.sof
@@ -31,8 +32,8 @@
 */mist/incremental_db
 */mister/*
 */obj_dir/*
+*_game_sdram.v
 .DS_Store
-.simvision
 .simvision
 build_id.v
 core.def
@@ -43,7 +44,11 @@ cores/*/mister/*
 cores/*/neptuno/*
 cores/*/pocket/*
 cores/*/sidi/*
+cores/*/sockit/*
 cores/*/zxuno/*
+defmacros.h
+game_env.F
+game_test.v
 history
 INCA_libs
 jtsim.f
@@ -51,11 +56,12 @@ jtsim_vhdl.f
 log/*
 macros.f
 mame.xml
-ncverilog.*
+mem_ports.inc
 ncverilog.*
 old/*
 releases/*
 sim
+test.cpp
 test.shm
 video.info
 x
