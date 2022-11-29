@@ -1,25 +1,8 @@
 {
   "board": {
     "design_settings": {
-      "defaults": {
-        "board_outline_line_width": 0.1,
-        "copper_line_width": 0.2,
-        "copper_text_size_h": 1.5,
-        "copper_text_size_v": 1.5,
-        "copper_text_thickness": 0.3,
-        "other_line_width": 0.15,
-        "silk_line_width": 0.15,
-        "silk_text_size_h": 1.0,
-        "silk_text_size_v": 1.0,
-        "silk_text_thickness": 0.15
-      },
       "diff_pair_dimensions": [],
       "drc_exclusions": [],
-      "rules": {
-        "min_copper_edge_clearance": 0.0,
-        "solder_mask_clearance": 0.0,
-        "solder_mask_min_width": 0.0
-      },
       "track_widths": [],
       "via_dimensions": []
     },
@@ -53,7 +36,7 @@
         0,
         2,
         0,
-        0,
+        1,
         0,
         0,
         1,
@@ -72,8 +55,22 @@
         0,
         1,
         0,
+        1,
+        0,
+        1,
+        2
+      ],
+      [
+        0,
+        1,
         0,
         0,
+        0,
+        0,
+        1,
+        1,
+        2,
+        1,
         1,
         2
       ],
@@ -98,20 +95,6 @@
         0,
         0,
         0,
-        1,
-        0,
-        0,
-        0,
-        0,
-        2
-      ],
-      [
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
         0,
         0,
         0,
@@ -127,8 +110,8 @@
         1,
         0,
         1,
-        0,
-        0,
+        1,
+        1,
         1,
         1,
         2
@@ -137,10 +120,10 @@
         0,
         0,
         0,
+        1,
         0,
         0,
-        0,
-        0,
+        1,
         0,
         0,
         0,
@@ -150,27 +133,27 @@
       [
         0,
         2,
-        0,
-        0,
-        0,
-        0,
-        0,
+        1,
+        2,
         0,
         0,
         1,
-        1,
+        0,
+        2,
+        2,
+        2,
         2
       ],
       [
         0,
         2,
         0,
-        0,
+        1,
         0,
         0,
         1,
         0,
-        1,
+        2,
         0,
         0,
         2
@@ -179,12 +162,12 @@
         0,
         2,
         1,
-        0,
+        1,
         0,
         0,
         1,
         0,
-        1,
+        2,
         0,
         0,
         2
@@ -225,12 +208,8 @@
       "no_connect_dangling": "warning",
       "pin_not_connected": "error",
       "pin_not_driven": "error",
-      "pin_to_pin": "error",
-<<<<<<< HEAD:cores/exterm/sch/exterm.kicad_pro
+      "pin_to_pin": "warning",
       "power_pin_not_driven": "error",
-=======
-      "power_pin_not_driven": "ignore",
->>>>>>> 72d8b0295acc88610694b6182edaae592803f05e:cores/kiwi/sch/insectx/insectx.kicad_pro
       "similar_labels": "warning",
       "unannotated": "error",
       "unit_value_mismatch": "error",
@@ -238,6 +217,7 @@
       "wire_dangling": "error"
     }
   },
+  "legacy": [],
   "libraries": {
     "pinned_footprint_libs": [],
     "pinned_symbol_libs": []
@@ -283,7 +263,7 @@
     "page_layout_descr_file": ""
   },
   "schematic": {
-    "annotate_start_num": 21,
+    "annotate_start_num": 0,
     "drawing": {
       "default_line_thickness": 6.0,
       "default_text_size": 50.0,
@@ -294,9 +274,9 @@
       "intersheets_ref_show": false,
       "intersheets_ref_suffix": "",
       "junction_size_choice": 3,
-      "label_size_ratio": 0.375,
-      "pin_symbol_size": 25.0,
-      "text_offset_ratio": 0.15
+      "label_size_ratio": 0.25,
+      "pin_symbol_size": 0.0,
+      "text_offset_ratio": 0.08
     },
     "legacy_lib_dir": "",
     "legacy_lib_list": [],
@@ -314,66 +294,12 @@
       "workbook_filename": ""
     },
     "page_layout_descr_file": "",
-    "plot_directory": "./",
+    "plot_directory": "",
     "spice_adjust_passive_values": false,
     "spice_external_command": "spice \"%I\"",
     "subpart_first_id": 65,
     "subpart_id_separator": 0
   },
-  "sheets": [
-    [
-      "2c3f9d8f-bede-42db-92b4-4effe97e0640",
-      ""
-    ],
-    [
-<<<<<<< HEAD:cores/exterm/sch/exterm.kicad_pro
-      "ee510b62-e27a-427f-9d20-4cf757f0a850",
-      "capacitors"
-    ],
-    [
-      "aaa5d4e4-a8ac-496e-a29f-b15f3f7e6120",
-      "main"
-    ],
-    [
-      "da0c6f65-248e-4722-9ffc-0adbf4dd22aa",
-      "colmix"
-    ],
-    [
-      "b08e4834-2cfc-4924-9f36-0ae10cbebc91",
-      "gfx"
-    ],
-    [
-      "c6841e36-369c-4ec5-8775-45ccee2f40f8",
-      "watchdog"
-    ],
-    [
-      "d85fa95c-9501-4e42-b4df-e1de2ac12973",
-      "sound"
-    ],
-    [
-      "56b56d0d-b39e-4c35-9319-a5a0a82603aa",
-      "mcu"
-=======
-      "b04704f3-03cc-4d58-9d43-3b3c2e174b11",
-      "CPU"
-    ],
-    [
-      "16c3e204-ad8a-4f06-a756-88d678bc7f59",
-      "Graphics"
-    ],
-    [
-      "13370cc0-b190-43dd-88c3-d51ef2ac8c37",
-      "IO"
-    ],
-    [
-      "02a541dc-2473-4c49-aa23-597b76c8d609",
-      "Sound"
-    ],
-    [
-      "71bd28d5-cd71-4e09-9220-abe513c828c1",
-      "Misc"
->>>>>>> 72d8b0295acc88610694b6182edaae592803f05e:cores/kiwi/sch/insectx/insectx.kicad_pro
-    ]
-  ],
+  "sheets": [],
   "text_variables": {}
 }
