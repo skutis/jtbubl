@@ -50,7 +50,7 @@ assign pal_we   = pal_cs & ~cpu_rnw;
 assign blank    = ~(LVBL & LHBL);
 
 always @* begin
-    col_addr = obj_pxl[3:0] != 4'hf ? obj_pxl : scr_pxl; // simple priority for now.
+    col_addr = obj_pxl[3:0] != 4'h0 ? obj_pxl : scr_pxl; // simple priority for now.
 end
 
 always @(posedge clk) begin

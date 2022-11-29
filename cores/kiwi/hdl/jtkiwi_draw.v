@@ -44,6 +44,10 @@ module jtkiwi_draw(
     input      [ 7:0]   debug_bus
 );
 
+// Each tile is 16x16 and comes from the same ROM
+// but it looks like the sprites have the two 8x16 halves swapped
+parameter SWAP_HALVES = 1'b0;
+
 reg  [31:0] pxl_data;
 reg         rom_lsb;
 reg  [ 3:0] cnt;
@@ -61,7 +65,7 @@ assign pxl_in   = hflipx ?
     // { pxl_data[15], pxl_data[31], pxl_data[ 7], pxl_data[23] } :
     // { pxl_data[ 8], pxl_data[24], pxl_data[ 0], pxl_data[16] } };
 
-assign rom_addr = { code[12:0], ysubf[3], rom_lsb, ysubf[2:0] };
+assign rom_addr = { code[12:0], ysubf[3], rom_lsb^SWAP_HALVES, ysubf[2:0] };
 assign { hflip, vflip } = attr[15:14]^{1'b0,flip};
 assign pal = attr[13:9];
 assign buf_we   = busy;

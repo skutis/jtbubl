@@ -195,7 +195,7 @@ jtkiwi_obj u_obj(
     .pxl_cen    ( pxl_cen   ),
 
     .hs         ( hs        ),
-    .flip       ( flip      ),
+    .flip       ( ~flip     ), // the inversion is not consistent with the tilemap. I have to check that
     .page       ( obj_page  ),
 
     .lut_addr   ( lut_addr  ),

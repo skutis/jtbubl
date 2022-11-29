@@ -104,7 +104,7 @@ always @(posedge clk, posedge rst) begin
                     if( !dr_busy )  begin
                         dr_draw <= 1;
                         dr_code <= code;
-                        dr_attr <= tm_data;
+                        dr_attr <= tm_data ^ 16'hc000;
                         dr_xpos <= { 4'd0, col_cnt[0], 4'd0 } + xscr;
                         dr_ysub <= eff_v[3:0];
                         col_cnt <=  col_cnt + 1'd1;

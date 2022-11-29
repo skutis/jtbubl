@@ -60,7 +60,7 @@ wire        dr_busy;
 wire [ 8:0] buf_din, buf_addr;
 wire        buf_we;
 
-assign lut_addr = { page, 1'b0, st[1], objcnt }; // 1 + 1 + 1 + 9 = 12
+assign lut_addr = { page, 1'b0, ~st[1], objcnt }; // 1 + 1 + 1 + 9 = 12
 assign y_addr   = objcnt;
 assign vf       = {9{flip}} ^ vrender;
 
@@ -102,13 +102,13 @@ always @(posedge clk, posedge rst) begin
                     end
                 end
                 1: { pal, code[15:14], xpos } <= lut_data;
-                2: { vflip, hflip, code[13:0] } <= lut_data;
+                2: { hflip, vflip, code[13:0] } <= lut_data;
                 3: begin
                     if( !dr_busy )  begin
                         dr_draw <= 1;
                         dr_code <= code;
-                        dr_attr <= { vflip, hflip, pal, 9'd0 };
-                        dr_xpos <= xpos ^ 9'h100;
+                        dr_attr <= { hflip, vflip, pal, 9'd0 };
+                        dr_xpos <= xpos;
                         dr_ysub <= ysub;
                         objcnt <=  objcnt + 1'd1;
                         done    <= &objcnt;
@@ -121,7 +121,7 @@ always @(posedge clk, posedge rst) begin
     end
 end
 
-jtkiwi_draw u_draw(
+jtkiwi_draw #(.SWAP_HALVES(1'b1)) u_draw (
     .rst        ( rst           ),
     .clk        ( clk           ),
 
@@ -146,7 +146,11 @@ jtkiwi_draw u_draw(
 
 // During HS the contents of the memory are cleared
 
-jtframe_obj_buffer #(.DW(9)) u_linebuf(
+jtframe_obj_buffer #(
+    .DW   ( 9 ),
+    .ALPHA( 0 ),
+    .FLIP_OFFSET(9'h100)
+) u_linebuf(
     .clk    ( clk       ),
     .flip   ( flip      ),
     .LHBL   ( ~hs       ),
