@@ -300,6 +300,31 @@
     "subpart_first_id": 65,
     "subpart_id_separator": 0
   },
-  "sheets": [],
+  "sheets": [
+    [
+      "2c3f9d8f-bede-42db-92b4-4effe97e0640",
+      ""
+    ],
+    [
+      "b04704f3-03cc-4d58-9d43-3b3c2e174b11",
+      "CPU"
+    ],
+    [
+      "16c3e204-ad8a-4f06-a756-88d678bc7f59",
+      "Graphics"
+    ],
+    [
+      "13370cc0-b190-43dd-88c3-d51ef2ac8c37",
+      "IO"
+    ],
+    [
+      "02a541dc-2473-4c49-aa23-597b76c8d609",
+      "Sound"
+    ],
+    [
+      "71bd28d5-cd71-4e09-9220-abe513c828c1",
+      "Misc"
+    ]
+  ],
   "text_variables": {}
 }
