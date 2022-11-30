@@ -4723,12 +4723,6 @@
     (path "/ee510b62-e27a-427f-9d20-4cf757f0a850/ef432b19-d577-4e61-8043-6825b1e5fce7"
       (reference "#FLG0106") (unit 1) (value "PWR_FLAG") (footprint "")
     )
-    (path "/b08e4834-2cfc-4924-9f36-0ae10cbebc91/92eb2029-73de-42fb-94bb-77e53d71c26f"
-      (reference "#FLG0107") (unit 1) (value "PWR_FLAG") (footprint "")
-    )
-    (path "/b08e4834-2cfc-4924-9f36-0ae10cbebc91/ba83bf02-368a-480a-85e8-2906a91da6a3"
-      (reference "#FLG0108") (unit 1) (value "PWR_FLAG") (footprint "")
-    )
     (path "/ee510b62-e27a-427f-9d20-4cf757f0a850/bc46835e-99ab-4d3d-8d41-4f5c6b1daa24"
       (reference "#PWR023") (unit 1) (value "VSS") (footprint "")
     )
@@ -4773,6 +4767,12 @@
     )
     (path "/56b56d0d-b39e-4c35-9319-a5a0a82603aa/339a6f4e-96cb-4cf3-b388-041dc02598fe"
       (reference "#PWR0115") (unit 1) (value "VSS") (footprint "")
+    )
+    (path "/b08e4834-2cfc-4924-9f36-0ae10cbebc91/3889d52f-e5f1-4c82-aaa6-c7dd012aa40e"
+      (reference "#PWR?") (unit 1) (value "VCC") (footprint "")
+    )
+    (path "/b08e4834-2cfc-4924-9f36-0ae10cbebc91/660622ca-6664-4b33-a1cc-1a90b164a1da"
+      (reference "#PWR?") (unit 1) (value "VSS") (footprint "")
     )
     (path "/afd416dd-712f-4eac-958d-e9c2e8fc989b"
       (reference "#PWR?") (unit 1) (value "VCC") (footprint "")
