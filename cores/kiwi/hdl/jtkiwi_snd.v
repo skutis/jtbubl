@@ -87,7 +87,7 @@ always @(posedge clk) comb_rstn <= snd_rstn & ~rst;
 
 always @(posedge clk) begin
     rom_cs  <= !mreq_n &&  A[15:12]  < 4'ha;
-    bank_cs <= !mreq_n &&  A[15:12] == 4'ha && !wr_n;
+    bank_cs <= !mreq_n &&  A[15:12] == 4'ha && !wr_n; // this cleans the watchdog counter - not implemented
     fm_cs   <= !mreq_n &&  A[15:12] == 4'hb;
     cab_cs  <= !mreq_n &&  A[15:12] == 4'hc;
     ram_cs  <= !mreq_n && (A[15:12] == 4'hd || A[15:12] == 4'he);
@@ -109,9 +109,9 @@ always @(posedge clk) begin
     case( A[2:0] )
         0: cab_dout <= { start_button[0], joystick1 };
         1: cab_dout <= { start_button[1], joystick2 };
-        2: cab_dout <= { 6'h3f, 1'b1 /*tilt*/, service };
-        3: cab_dout <= { 7'h7f, ~coin_input[0] };
-        4: cab_dout <= { 7'h7f, ~coin_input[1] };
+        2: cab_dout <= { 4'hf, coin_input, 1'b1 /*tilt*/, service };
+        // 3: cab_dout <= { 7'h7f, ~coin_input[0] };
+        // 4: cab_dout <= { 7'h7f, ~coin_input[1] };
         default: cab_dout <= 8'hff;
     endcase
     din <= rom_cs ? rom_data :
