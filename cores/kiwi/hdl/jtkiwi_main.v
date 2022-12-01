@@ -45,7 +45,7 @@ module jtkiwi_main(
     input               dip_pause,
 
     // ROM interface
-    output reg [16:0]   rom_addr,
+    output     [16:0]   rom_addr,
     output reg          rom_cs,
     input               rom_ok,
     input      [ 7:0]   rom_data
@@ -66,13 +66,7 @@ assign cpu_dout = dout;
 assign irq_ack = /*!m1_n &&*/ !iorq_n; // The original PCB just uses iorq_n,
     // the orthodox way to do it is to use m1_n too
 assign ram_we  = ram_cs & ~wr_n;
-
-always @* begin
-    rom_addr = { 3'b0, A[13:0] };
-    if( A[15] ) begin
-        rom_addr[16:14] = bank;
-    end
-end
+assign rom_addr = { {2{A[15]}} & bank[2:1], A[15] ? bank[0] : A[14], A[13:0] };
 
 `ifdef SIMULATION
 wire rombank_cs = rom_cs && A[15:12]>=8;

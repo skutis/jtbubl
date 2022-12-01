@@ -16,10 +16,18 @@ In chronological order:
  2. Bubble Bobble
  3. Extermination
  4. Insector X
+ 5. The New Zealand Story
 
 Some of the MRA files provided may not work as there is some variation in Bubble Bobble bootleg hardware which is not implemented. Official Tokio MRA file will not work because the MCU hardware is not yet implemented in the core. Only the bootleg MRA for Tokio works.
 
 Note for developers: Tokio hangs up after a life is lost if the RBF is compiled without sound.
+
+## PLD Data
+
+There are dumps of the PLD logic in
+
+1. [Insector X](https://wiki.pldarchive.co.uk/index.php?title=Insector_X)
+2. [The New Zealand Story](https://wiki.pldarchive.co.uk/index.php?title=The_New_Zealand_Story)
 
 ## Test Screen
 

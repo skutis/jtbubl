@@ -59,7 +59,7 @@ localparam [7:0] PSG_GAIN = 8'h10,
                  FM_GAIN  = 8'h10;
 
 wire        irq_ack, mreq_n, m1_n, iorq_n, rd_n, wr_n,
-            fmint_n, int_n;
+            fmint_n, int_n, rfsh_n;
 reg  [ 7:0] din, cab_dout;
 wire [ 7:0] fm_dout, dout;
 reg  [ 1:0] bank;
@@ -68,7 +68,14 @@ wire [ 9:0] psg_snd;
 reg         ram_cs, bank_cs, fm_cs, cab_cs,
             mcu_rst, comb_rstn=0;
 wire signed [15:0] fm_snd;
+wire        mem_acc;
 
+`ifdef SIMULATION
+wire shared_rd = ram_cs && !A[0] && !rd_n;
+wire shared_wr = ram_cs && !A[0] && !wr_n;
+`endif
+
+assign mem_acc  = ~mreq_n &rfsh_n;
 assign ram_din  = dout;
 assign ram_we   = ram_cs & ~wr_n;
 assign ram_addr = `ifdef SIMULATION !ram_cs ? 13'd0 : `endif A[12:0];
@@ -86,11 +93,11 @@ end
 always @(posedge clk) comb_rstn <= snd_rstn & ~rst;
 
 always @(posedge clk) begin
-    rom_cs  <= !mreq_n &&  A[15:12]  < 4'ha;
-    bank_cs <= !mreq_n &&  A[15:12] == 4'ha && !wr_n; // this cleans the watchdog counter - not implemented
-    fm_cs   <= !mreq_n &&  A[15:12] == 4'hb;
-    cab_cs  <= !mreq_n &&  A[15:12] == 4'hc;
-    ram_cs  <= !mreq_n && (A[15:12] == 4'hd || A[15:12] == 4'he);
+    rom_cs  <= mem_acc &&  A[15:12]  < 4'ha;
+    bank_cs <= mem_acc &&  A[15:12] == 4'ha; // this cleans the watchdog counter - not implemented
+    fm_cs   <= mem_acc &&  A[15:12] == 4'hb;
+    cab_cs  <= mem_acc &&  A[15:12] == 4'hc;
+    ram_cs  <= mem_acc && (A[15:12] == 4'hd || A[15:12] == 4'he);
 end
 
 always @(posedge clk, posedge rst) begin
@@ -145,7 +152,7 @@ jtframe_z80_devwait u_gamecpu(
     .iorq_n   ( iorq_n         ),
     .rd_n     ( rd_n           ),
     .wr_n     ( wr_n           ),
-    .rfsh_n   (                ),
+    .rfsh_n   ( rfsh_n         ),
     .halt_n   (                ),
     .busak_n  (                ),
     .A        ( A              ),
@@ -156,6 +163,7 @@ jtframe_z80_devwait u_gamecpu(
     .dev_busy ( 1'b0           ) // TODO: add bus contention
 );
 
+/* verilator tracing_off */
 jt03 u_2203(
     .rst        ( comb_rstn  ),
     .clk        ( clk        ),
@@ -195,6 +203,8 @@ jtframe_mixer #(.W1(10)) u_mixer(
     .mixed  ( snd          ),
     .peak   ( peak         )
 );
+/* verilator tracing_on */
+
 `else
     initial begin
         rom_addr = 0;
