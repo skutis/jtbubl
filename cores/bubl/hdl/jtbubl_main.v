@@ -328,7 +328,7 @@ jtframe_z80 u_maincpu(
     .dout     ( main_dout      )
 );
 
-jtframe_z80wait #(.devcnt(2)) u_mainwait(
+jtframe_z80wait #(.DEVCNT(2)) u_mainwait(
     .rst_n    ( main_rst_n      ),
     .clk      ( clk24           ),
     .cen_in   ( cen6            ),
@@ -370,7 +370,7 @@ jtframe_z80 u_subcpu(
     .dout     ( sub_dout       )
 );
 
-jtframe_z80wait #(.devcnt(1)) u_subwait(
+jtframe_z80wait #(.DEVCNT(1)) u_subwait(
     .rst_n    ( sub_rst_n       ),
     .clk      ( clk24           ),
     .cen_in   ( cen6            ),
