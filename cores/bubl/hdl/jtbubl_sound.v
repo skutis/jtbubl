@@ -244,7 +244,7 @@ jtopl u_opl(
     .wr_n       ( wr_n       ),
     .irq_n      ( intn_fm1   ),
     .snd        ( fm1_snd    ),
-    .sample     ( sample     )
+    .sample     (            )
 );
 
 `ifdef SIMULATION
