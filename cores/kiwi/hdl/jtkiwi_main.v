@@ -140,7 +140,7 @@ jtframe_z80_devwait u_gamecpu(
 
 // first come, first served
 // TODO: add bus contention
-jtframe_dual_ram #(.aw(13)) u_comm(
+jtframe_dual_ram #(.aw(13),.dumpfile("mainmem")) u_comm(
     .clk0   ( clk        ),
     .clk1   ( clk        ),
     // Main CPU
@@ -153,6 +153,9 @@ jtframe_dual_ram #(.aw(13)) u_comm(
     .data1  ( shr_din    ),
     .we1    ( shr_we     ),
     .q1     ( shr_dout   )
+`ifdef JTFRAME_DUAL_RAM_DUMP
+    ,.dump   ( LVBL       )
+`endif
 );
 `else
     initial begin

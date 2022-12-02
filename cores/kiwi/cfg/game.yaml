@@ -8,6 +8,7 @@ game:
       - jtkiwi_snd.v
       - jtkiwi_gfx.v
       - jtkiwi_obj.v
+      - jtkiwi_draw.v
       - jtkiwi_tilemap.v
       - jtkiwi_game_sdram.v
 jtframe:
