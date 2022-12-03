@@ -93,6 +93,10 @@ end
 always @(posedge clk) comb_rstn <= snd_rstn & ~rst;
 
 always @(posedge clk) begin
+    if( ram_we && A=='hec0a ) $display("Sub writing %02X to %04X", dout, A);
+end
+
+always @(posedge clk) begin
     rom_cs  <= mem_acc &&  A[15:12]  < 4'ha;
     bank_cs <= mem_acc &&  A[15:12] == 4'ha; // this cleans the watchdog counter - not implemented
     fm_cs   <= mem_acc &&  A[15:12] == 4'hb;
@@ -144,8 +148,13 @@ jtframe_z80_devwait u_gamecpu(
     .clk      ( clk            ),
     .cen      ( cen6           ),
     .cpu_cen  (                ),
+`ifdef NOINT
+    .int_n    ( 1'b1           ),
+    .nmi_n    ( 1'b1           ),
+`else
     .int_n    ( int_n          ),
     .nmi_n    ( fmint_n        ),
+`endif
     .busrq_n  ( 1'b1           ),
     .m1_n     ( m1_n           ),
     .mreq_n   ( mreq_n         ),

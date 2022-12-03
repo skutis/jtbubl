@@ -98,14 +98,14 @@ assign tm_page  = cfg[1][6];
 assign obj_page = cfg[1][5];
 assign col_cfg  = cfg[1][3:0];
 assign col_xmsb = { cfg[3], cfg[2] };
-assign cpu_din  = yram_cs      ? yram_dout :
-                  vram_cs      ? (cpu_addr[12] ? vram_dout[15:8] : vram_dout[7:0]) : 8'hff;
+assign cpu_din  = yram_cs ? yram_dout :
+                  vram_cs ? (cpu_addr[12] ? vram_dout[15:8] : vram_dout[7:0]) : 8'hff;
 
 always @* begin
     yram_cs = 0;
     cfg_cs  = 0;
     flag_cs = 0;
-    if( vctrl_cs) case( cpu_addr[11:8] )
+    if( vctrl_cs ) case( cpu_addr[11:8] )
         0,1,2: yram_cs = 1;
         3: cfg_cs  = 1;
         4: flag_cs = 1;

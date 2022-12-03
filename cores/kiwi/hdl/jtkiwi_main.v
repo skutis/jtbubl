@@ -48,44 +48,48 @@ module jtkiwi_main(
     output     [16:0]   rom_addr,
     output reg          rom_cs,
     input               rom_ok,
-    input      [ 7:0]   rom_data
+    input      [ 7:0]   rom_data,
+    // Debug
+    output     [ 7:0]   st_dout
 );
 `ifndef NOMAIN
 wire        irq_ack, mreq_n, m1_n, iorq_n, rd_n, wr_n,
-            int_n, ram_we;
+            rfsh_n, int_n, ram_we;
 reg  [ 7:0] din;
 wire [ 7:0] dout, ram_dout;
 reg  [ 2:0] bank;
 wire [15:0] A;
 reg         ram_cs, bank_cs;
-wire        Af;
+wire        mem_acc;
 
-assign cpu_rnw = wr_n;
+assign cpu_rnw  = wr_n;
 assign cpu_addr = A[12:0];
 assign cpu_dout = dout;
-assign irq_ack = /*!m1_n &&*/ !iorq_n; // The original PCB just uses iorq_n,
+assign irq_ack  = /*!m1_n &&*/ !iorq_n; // The original PCB just uses iorq_n,
     // the orthodox way to do it is to use m1_n too
-assign ram_we  = ram_cs & ~wr_n;
+assign ram_we   = ram_cs & ~wr_n;
 assign rom_addr = { {2{A[15]}} & bank[2:1], A[15] ? bank[0] : A[14], A[13:0] };
+assign st_dout  = { 3'd0, ~snd_rstn, 1'd0, bank };
+assign mem_acc  = ~mreq_n &rfsh_n;
 
 `ifdef SIMULATION
 wire rombank_cs = rom_cs && A[15:12]>=8;
 `endif
 
 always @(posedge clk) begin
-    rom_cs   <= !mreq_n && A[15:12]  < 4'hc;
-    vram_cs  <= !mreq_n && A[15:13] == 3'b110; // C,D
-    ram_cs   <= !mreq_n && A[15:12] == 4'he; // A[12:0] used in Insector X (?)
-    vctrl_cs <= !mreq_n && A[15:12] == 4'hf && A[11:8]<=4; // internal RAM and config registers
-    bank_cs  <= !mreq_n && A[15: 8] == 8'hf6 && !wr_n;
-    pal_cs   <= !mreq_n && A[15:12] == 4'hf && A[11:10]==2'b10;
+    rom_cs   <= mem_acc && A[15:12]  < 4'hc;
+    vram_cs  <= mem_acc && A[15:13] == 3'b110; // C,D
+    ram_cs   <= mem_acc && A[15:12] == 4'he; // A[12:0] used in Insector X (?)
+    vctrl_cs <= mem_acc && A[15:12] == 4'hf && A[11:8]<=4; // internal RAM and config registers
+    bank_cs  <= mem_acc && A[15: 8] == 8'hf6 && !wr_n;
+    pal_cs   <= mem_acc && A[15:12] == 4'hf && A[11:10]==2'b10;
 end
 
 always @(posedge clk) begin
     din <= rom_cs  ? rom_data  :
-           ram_cs  ? ram_dout  :
-           (vram_cs | vctrl_cs) ? vram_dout :
-           pal_cs  ? pal_dout  : 8'hff;
+        ram_cs  ? ram_dout  :
+        (vram_cs | vctrl_cs) ? vram_dout :
+        pal_cs  ? pal_dout  : 8'hff;
 end
 
 always @(posedge clk, posedge rst) begin
@@ -119,7 +123,11 @@ jtframe_z80_devwait u_gamecpu(
     .clk      ( clk    ),
     .cen      ( cen6   ),
     .cpu_cen  (        ),
+`ifdef NOINT
+    .int_n    ( 1'b1   ),
+`else
     .int_n    ( int_n  ),
+`endif
     .nmi_n    ( 1'b1   ),
     .busrq_n  ( 1'b1   ),
     .m1_n     ( m1_n   ),
@@ -127,7 +135,7 @@ jtframe_z80_devwait u_gamecpu(
     .iorq_n   ( iorq_n ),
     .rd_n     ( rd_n   ),
     .wr_n     ( wr_n   ),
-    .rfsh_n   (        ),
+    .rfsh_n   ( rfsh_n ),
     .halt_n   (        ),
     .busak_n  (        ),
     .A        ( A      ),
@@ -137,6 +145,18 @@ jtframe_z80_devwait u_gamecpu(
     .rom_ok   ( rom_ok ),
     .dev_busy ( 1'b0   )
 );
+
+always @(posedge clk) if(!mreq_n && cen6) begin
+    // if( ram_we && A[12:0]==13'hcff ) $display("Written %x to %X",dout,A);
+    if( A=='hec0a && cpu_rnw ) $display("Main reads %02X from %04X", din, A);
+    if( ram_cs && !cpu_rnw && A=='hec0a ) $display("Main writing %02X to %04X", dout, A);
+`ifdef NOINT
+    if ( A==16'h206 && !m1_n ) begin
+        $display("Reached main loop");
+        $finish;
+    end
+`endif
+end
 
 // first come, first served
 // TODO: add bus contention

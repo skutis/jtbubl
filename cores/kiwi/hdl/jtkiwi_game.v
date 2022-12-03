@@ -30,7 +30,7 @@ wire        vram_cs,  pal_cs, flip;
 wire        cpu_rnw, vctrl_cs;
 
 assign  dip_flip   = flip;
-initial debug_view = 0;
+always @* debug_view = 0;
 
 // GFX re-arrengement in SDRAM
 // wire is_gfx = prog_ba==3 && ioctl_addr < `MCU_START;
