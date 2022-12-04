@@ -21,7 +21,7 @@ module jtkiwi_game(
 );
 
 wire        shr_we, snd_rstn;
-wire [ 7:0] shr_din, shr_dout,
+wire [ 7:0] shr_din, shr_dout, main_st,
             vram_dout, pal_dout, cpu_dout;
 wire [12:0] shr_addr, cpu_addr;
 wire        cen6, cen3, cen1p5;
@@ -30,7 +30,7 @@ wire        vram_cs,  pal_cs, flip;
 wire        cpu_rnw, vctrl_cs;
 
 assign  dip_flip   = flip;
-always @* debug_view = 0;
+always @* debug_view = main_st;
 
 // GFX re-arrengement in SDRAM
 // wire is_gfx = prog_ba==3 && ioctl_addr < `MCU_START;
@@ -81,7 +81,8 @@ jtkiwi_main u_main(
 
     .pal_cs         ( pal_cs        ),
     .pal_dout       ( pal_dout      ),
-    .dip_pause      ( dip_pause     )
+    .dip_pause      ( dip_pause     ),
+    .st_dout        ( main_st       )
 );
 
 jtkiwi_video u_video(

@@ -104,8 +104,8 @@ always @(posedge clk) begin
     ram_cs  <= mem_acc && (A[15:12] == 4'hd || A[15:12] == 4'he);
 end
 
-always @(posedge clk, posedge rst) begin
-    if( rst ) begin
+always @(posedge clk, negedge comb_rstn) begin
+    if( !comb_rstn ) begin
         bank    <= 0;
         mcu_rst <= 0;
     end else begin
@@ -128,12 +128,33 @@ always @(posedge clk) begin
     din <= rom_cs ? rom_data :
            ram_cs ? ram_dout :
            fm_cs  ? fm_dout  :
-           cab_cs ? cab_dout : 8'hff;
+           cab_cs ? cab_dout : 8'h00;
 end
+
+`ifndef VERILATOR
+`ifdef SIMULATION
+    integer fdebug=0, line_cnt=0;
+
+    initial begin
+        if( fdebug==0 )
+            fdebug=$fopen("sub_io.log","w");
+    end
+
+    always @(posedge clk) begin
+        if( rst ) begin
+            line_cnt <= 0;
+        end else if(cen6) begin
+            if( ram_cs ) line_cnt <= line_cnt+1;
+            if( ram_cs &&  wr_n ) $fdisplay(fdebug,"%04X -> %02X - %d", A, ram_dout, line_cnt );
+            if( ram_cs && !wr_n ) $fdisplay(fdebug,"%04X <- %02X - %d", A, dout, line_cnt );
+        end
+    end
+`endif
+`endif
 
 jtframe_ff u_irq(
     .clk    ( clk       ),
-    .rst    ( rst       ),
+    .rst    ( ~comb_rstn),
     .cen    ( 1'b1      ),
     .din    ( 1'b1      ),
     .q      (           ),
@@ -172,9 +193,11 @@ jtframe_z80_devwait u_gamecpu(
     .dev_busy ( 1'b0           ) // TODO: add bus contention
 );
 
+`ifndef VERILATOR_KEEP_JT03
 /* verilator tracing_off */
+`endif
 jt03 u_2203(
-    .rst        ( comb_rstn  ),
+    .rst        ( ~comb_rstn ),
     .clk        ( clk        ),
     .cen        ( cen1p5     ),
     .din        ( dout       ),

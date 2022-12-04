@@ -89,7 +89,7 @@ always @(posedge clk) begin
     din <= rom_cs  ? rom_data  :
         ram_cs  ? ram_dout  :
         (vram_cs | vctrl_cs) ? vram_dout :
-        pal_cs  ? pal_dout  : 8'hff;
+        pal_cs  ? pal_dout  : 8'h00;
 end
 
 always @(posedge clk, posedge rst) begin
@@ -146,17 +146,32 @@ jtframe_z80_devwait u_gamecpu(
     .dev_busy ( 1'b0   )
 );
 
-always @(posedge clk) if(!mreq_n && cen6) begin
-    // if( ram_we && A[12:0]==13'hcff ) $display("Written %x to %X",dout,A);
-    if( A=='hec0a && cpu_rnw ) $display("Main reads %02X from %04X", din, A);
-    if( ram_cs && !cpu_rnw && A=='hec0a ) $display("Main writing %02X to %04X", dout, A);
-`ifdef NOINT
-    if ( A==16'h206 && !m1_n ) begin
-        $display("Reached main loop");
-        $finish;
+`ifndef VERILATOR
+`ifdef SIMULATION
+    integer fdebug=0, line_cnt=0;
+
+    initial begin
+        if( fdebug==0 )
+            fdebug=$fopen("main_io.log","w");
+    end
+
+    always @(posedge clk) begin
+        if( rst ) begin
+            line_cnt <= 0;
+        end else if(cen6) begin
+            if( ram_cs ) line_cnt <= line_cnt+1;
+            if( ram_cs &&  cpu_rnw ) $fdisplay(fdebug,"%04X -> %02X - %d", A, ram_dout, line_cnt );
+            if( ram_cs && !cpu_rnw ) $fdisplay(fdebug,"%04X <- %02X - %d", A, dout, line_cnt );
+        `ifdef NOINT
+            if ( A==16'h206 && !m1_n ) begin
+                $display("Reached main loop");
+                $finish;
+            end
+        `endif
+        end
     end
 `endif
-end
+`endif
 
 // first come, first served
 // TODO: add bus contention
