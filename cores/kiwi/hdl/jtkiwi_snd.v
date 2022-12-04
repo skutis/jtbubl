@@ -41,7 +41,7 @@ module jtkiwi_snd(
     //      access to RAM
     output     [12:0]   ram_addr,
     output     [ 7:0]   ram_din,
-    output              ram_we,
+    output              cpu_rnw,
     output reg          ram_cs,
     input      [ 7:0]   ram_dout,
     input               mshramen,
@@ -79,8 +79,8 @@ wire shared_wr = ram_cs && !A[0] && !wr_n;
 
 assign mem_acc  = ~mreq_n & rfsh_n;
 assign ram_din  = dout;
-assign ram_we   = ram_cs & ~wr_n;
 assign ram_addr = A[12:0];
+assign cpu_rnw  = wr_n;
 
 assign irq_ack = /*!m1_n &&*/ !iorq_n; // The original PCB just uses iorq_n,
     // the orthodox way to do it is to use m1_n too
@@ -93,10 +93,6 @@ always @* begin
 end
 
 always @(posedge clk) comb_rstn <= snd_rstn & ~rst;
-
-always @(posedge clk) begin
-    if( ram_we && A=='hec0a ) $display("Sub writing %02X to %04X", dout, A);
-end
 
 always @(posedge clk) begin
     rom_cs  <= mem_acc &&  A[15:12]  < 4'ha;
@@ -133,30 +129,34 @@ always @(posedge clk) begin
            cab_cs ? cab_dout : 8'h00;
 end
 
-`ifndef VERILATOR
 `ifdef SIMULATION
     integer fdebug=0, line_cnt=0, rstl=0;
 
+`ifndef VERILATOR
     initial begin
         if( fdebug==0 )
             fdebug=$fopen("sub_io.log","w");
     end
+`endif
 
     always @(posedge clk) begin
         if( rst ) begin
             line_cnt <= 0;
+`ifndef VERILATOR
             if(rstl) begin
                 $fdisplay(fdebug,"RESET");
                 rstl <= 0;
             end
-        end else if(cen6) begin
+`endif
+        end else if(cen6 && !mshramen) begin
             rstl <= 1;
             if( ram_cs ) line_cnt <= line_cnt+1;
+`ifndef VERILATOR
             if( ram_cs &&  wr_n ) $fdisplay(fdebug,"%04X -> %02X - %d", A, ram_dout, line_cnt );
             if( ram_cs && !wr_n ) $fdisplay(fdebug,"%04X <- %02X - %d", A, dout, line_cnt );
+`endif
         end
     end
-`endif
 `endif
 
 jtframe_ff u_irq(
@@ -252,7 +252,8 @@ jtframe_mixer #(.W1(10)) u_mixer(
     end
     assign ram_addr = 0;
     assign ram_din  = 0;
-    assign ram_we   = 0;
+    initial ram_cs  = 0;
+    assign cpu_rnw  = 1;
     assign snd      = 0;
     assign sample   = 0;
     assign peak     = 0;

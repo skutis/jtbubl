@@ -38,7 +38,7 @@ module jtkiwi_main(
     //      access to RAM
     input      [12:0]   shr_addr,
     input      [ 7:0]   shr_din,
-    input               shr_we,
+    input               sub_rnw,
     input               shr_cs,
     output reg          mshramen,
     output     [ 7:0]   shr_dout,
@@ -148,22 +148,25 @@ jtframe_z80_devwait u_gamecpu(
     .dev_busy ( sshramen & ram_cs )
 );
 
-`ifndef VERILATOR
 `ifdef SIMULATION
     integer fdebug=0, line_cnt=0;
 
+`ifndef VERILATOR
     initial begin
         if( fdebug==0 )
             fdebug=$fopen("main_io.log","w");
     end
+`endif
 
     always @(posedge clk) begin
         if( rst ) begin
             line_cnt <= 0;
-        end else if(cen6) begin
+        end else if(cen6 && !sshramen) begin
             if( ram_cs ) line_cnt <= line_cnt+1;
+`ifndef VERILATOR
             if( ram_cs &&  cpu_rnw ) $fdisplay(fdebug,"%04X -> %02X - %d", A, ram_dout, line_cnt );
             if( ram_cs && !cpu_rnw ) $fdisplay(fdebug,"%04X <- %02X - %d", A, dout, line_cnt );
+`endif
         `ifdef NOINT
             if ( A==16'h206 && !m1_n ) begin
                 $display("Reached main loop");
@@ -172,7 +175,6 @@ jtframe_z80_devwait u_gamecpu(
         `endif
         end
     end
-`endif
 `endif
 
 // first come, first served
@@ -198,18 +200,18 @@ jtframe_dual_ram #(.aw(13),.dumpfile("mainmem")) u_comm(
     // Main CPU
     .addr0  ( A[12:0]    ),
     .data0  ( dout       ),
-    .we0    ( ram_we     ),
+    .we0    ( mshramen & ~wr_n ),
     .q0     ( ram_dout   ),
     // MCU
     .addr1  ( shr_addr   ),
     .data1  ( shr_din    ),
-    .we1    ( shr_we     ),
+    .we1    ( sshramen & ~sub_rnw ),
     .q1     ( shr_dout   )
 `ifdef JTFRAME_DUAL_RAM_DUMP
     ,.dump   ( LVBL       )
 `endif
 );
-`else
+`else // NOMAIN
     initial begin
         rom_cs   = 0;
         rom_addr = 0;

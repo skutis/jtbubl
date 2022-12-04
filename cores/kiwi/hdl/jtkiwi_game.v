@@ -20,7 +20,7 @@ module jtkiwi_game(
     `include "jtframe_game_ports.inc" // see $JTFRAME/hdl/inc/jtframe_game_ports.inc
 );
 
-wire        shr_we, shr_cs, mshramen, snd_rstn;
+wire        sub_rnw, shr_cs, mshramen, snd_rstn;
 wire [ 7:0] shr_din, shr_dout, main_st,
             vram_dout, pal_dout, cpu_dout;
 wire [12:0] shr_addr, cpu_addr;
@@ -65,7 +65,7 @@ jtkiwi_main u_main(
     // Sub CPU access to shared RAM
     .shr_addr       ( shr_addr      ),
     .shr_dout       ( shr_dout      ),
-    .shr_we         ( shr_we        ),
+    .sub_rnw        ( sub_rnw       ),
     .shr_din        ( shr_din       ),
     .shr_cs         ( shr_cs        ),
     .mshramen       ( mshramen      ),
@@ -155,7 +155,7 @@ jtkiwi_snd u_sound(
     .ram_addr   ( shr_addr      ),
     .ram_din    ( shr_din       ),
     .ram_dout   ( shr_dout      ),
-    .ram_we     ( shr_we        ),
+    .cpu_rnw    ( sub_rnw       ),
     .ram_cs     ( shr_cs        ),
     .mshramen   ( mshramen      ),
 
