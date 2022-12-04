@@ -39,6 +39,8 @@ module jtkiwi_main(
     input      [12:0]   shr_addr,
     input      [ 7:0]   shr_din,
     input               shr_we,
+    input               shr_cs,
+    output reg          mshramen,
     output     [ 7:0]   shr_dout,
 
     // DIP switches
@@ -59,7 +61,7 @@ reg  [ 7:0] din;
 wire [ 7:0] dout, ram_dout;
 reg  [ 2:0] bank;
 wire [15:0] A;
-reg         ram_cs, bank_cs;
+reg         ram_cs, bank_cs, sshramen;
 wire        mem_acc;
 
 assign cpu_rnw  = wr_n;
@@ -68,9 +70,9 @@ assign cpu_dout = dout;
 assign irq_ack  = /*!m1_n &&*/ !iorq_n; // The original PCB just uses iorq_n,
     // the orthodox way to do it is to use m1_n too
 assign ram_we   = ram_cs & ~wr_n;
-assign rom_addr = { {2{A[15]}} & bank[2:1], A[15] ? bank[0] : A[14], A[13:0] };
+assign rom_addr = { A[15] ? bank : {2'd0, A[14]}, A[13:0] };
 assign st_dout  = { 3'd0, ~snd_rstn, 1'd0, bank };
-assign mem_acc  = ~mreq_n &rfsh_n;
+assign mem_acc  = ~mreq_n & rfsh_n;
 
 `ifdef SIMULATION
 wire rombank_cs = rom_cs && A[15:12]>=8;
@@ -143,7 +145,7 @@ jtframe_z80_devwait u_gamecpu(
     .dout     ( dout   ),
     .rom_cs   ( rom_cs ),
     .rom_ok   ( rom_ok ),
-    .dev_busy ( 1'b0   )
+    .dev_busy ( sshramen & ram_cs )
 );
 
 `ifndef VERILATOR
@@ -174,7 +176,22 @@ jtframe_z80_devwait u_gamecpu(
 `endif
 
 // first come, first served
-// TODO: add bus contention
+always @(posedge clk, posedge rst) begin
+    if( rst ) begin
+        mshramen <= 0;
+        sshramen <= 0;
+    end else begin
+        // Main CPU drives the RAM
+        if( ram_cs && !sshramen )
+            mshramen <= 1;
+        if( !ram_cs ) mshramen <= 0;
+        // Sub CPU drives the RAM
+        if( shr_cs && !mshramen && !ram_cs )
+            sshramen <= 1;
+        if( !shr_cs ) sshramen <= 0;
+    end
+end
+
 jtframe_dual_ram #(.aw(13),.dumpfile("mainmem")) u_comm(
     .clk0   ( clk        ),
     .clk1   ( clk        ),

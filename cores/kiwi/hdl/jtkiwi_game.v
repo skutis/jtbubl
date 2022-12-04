@@ -20,7 +20,7 @@ module jtkiwi_game(
     `include "jtframe_game_ports.inc" // see $JTFRAME/hdl/inc/jtframe_game_ports.inc
 );
 
-wire        shr_we, snd_rstn;
+wire        shr_we, shr_cs, mshramen, snd_rstn;
 wire [ 7:0] shr_din, shr_dout, main_st,
             vram_dout, pal_dout, cpu_dout;
 wire [12:0] shr_addr, cpu_addr;
@@ -67,6 +67,8 @@ jtkiwi_main u_main(
     .shr_dout       ( shr_dout      ),
     .shr_we         ( shr_we        ),
     .shr_din        ( shr_din       ),
+    .shr_cs         ( shr_cs        ),
+    .mshramen       ( mshramen      ),
     // Sound
     .snd_rstn       ( snd_rstn      ),
 
@@ -154,6 +156,8 @@ jtkiwi_snd u_sound(
     .ram_din    ( shr_din       ),
     .ram_dout   ( shr_dout      ),
     .ram_we     ( shr_we        ),
+    .ram_cs     ( shr_cs        ),
+    .mshramen   ( mshramen      ),
 
     // ROM
     .rom_addr   ( sub_addr      ),

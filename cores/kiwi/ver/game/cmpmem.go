@@ -1,0 +1,112 @@
+package main
+
+import(
+	"bufio"
+	"fmt"
+	"os"
+	"regexp"
+)
+
+type Access struct {
+	data, addr int
+	write bool
+	line int
+}
+
+func (a *Access)Eq( b Access) bool {
+	return a.data==b.data && a.addr==b.addr && a.write==b.write
+}
+
+func read_sim( fname string ) []Access {
+	fin, _ := os.Open(fname)
+	defer fin.Close()
+	sc := bufio.NewScanner(fin)
+	y := make([]Access,0)
+	// for k:=0; k<8; k++ {
+	// 	sc.Scan() // skip the first 8 lines
+	// }
+	line := 1
+	for sc.Scan() {
+		if( sc.Text()=="RESET" ) {
+			line = 1
+			y = make([]Access,0) // ditchess previously read stuff
+			continue
+		}
+		var acc Access
+		var dir string
+		fmt.Sscanf( sc.Text(), "%x %s %x", &acc.addr, &dir, &acc.data )
+		if dir == "<-" {
+			acc.write = true
+		}
+		acc.line = line
+		y = append( y, acc )
+		line++
+	}
+	return y
+}
+
+func read_mame( fname string ) []Access {
+	fin, _ := os.Open(fname)
+	defer fin.Close()
+	sc := bufio.NewScanner(fin)
+	y := make([]Access,0)
+	re := regexp.MustCompile("/[^/]*/")
+	line := 1
+	for sc.Scan() {
+		for _, each := range(re.FindAllString( sc.Text(), -1 )) {
+			var acc Access
+			var dir string
+			fmt.Sscanf( each, "/%x %s %x/", &acc.addr, &dir, &acc.data )
+			if dir == "<-" {
+				acc.write = true
+			}
+			acc.line = line
+			y = append( y, acc )
+		}
+		line++
+	}
+	return y
+}
+
+func main() {
+	cpu := "main"
+	if len(os.Args)>1 {
+		cpu = os.Args[1]
+		fmt.Printf("Reading from the %s files\n",cpu)
+	}
+	sim := read_sim( cpu + "_io.log")
+	mame:=read_mame( cpu + ".tr")
+	k:=0
+	for k=0; k <len(sim); {
+		if !sim[k].Eq(mame[k]) && k+1 < len(sim) && sim[k+1].Eq(mame[k]) {
+			// swap them
+			aux := sim[k]
+			sim[k] = sim[k+1]
+			sim[k+1] = aux
+		}
+		if !sim[k].Eq(mame[k]) {
+			fmt.Printf("Split ways\n")
+			fmt.Printf("\tSIM:  %04X %02X %t @ %d\n", sim[k].addr, sim[k].data, sim[k].write, sim[k].line )
+			fmt.Printf("\tMAME: %04X %02X %t @ %d\n", mame[k].addr, mame[k].data, mame[k].write, mame[k].line )
+			fmt.Printf("\nContext\n")
+			for i:=k-4;i<len(sim) && i<k+4 && i>0;i++ {
+				fmt.Printf("\tSIM:  %04X %02X %t @ %d", sim[i].addr, sim[i].data, sim[i].write, sim[i].line )
+				if(i==k) {
+					fmt.Print("  *")
+				}
+				fmt.Print("\n")
+			}
+			fmt.Println("=============")
+			for i:=k-4;i<len(mame) && i<k+4 && i>0;i++ {
+				fmt.Printf("\tMAME:  %04X %02X %t @ %d", mame[i].addr, mame[i].data, mame[i].write, mame[i].line )
+				if(i==k) {
+					fmt.Print("  *")
+				}
+				fmt.Print("\n")
+			}
+			break
+		}
+		k++
+	}
+	fmt.Printf("%d matches\n",k)
+}

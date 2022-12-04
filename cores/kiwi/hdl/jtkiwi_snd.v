@@ -42,7 +42,9 @@ module jtkiwi_snd(
     output     [12:0]   ram_addr,
     output     [ 7:0]   ram_din,
     output              ram_we,
+    output reg          ram_cs,
     input      [ 7:0]   ram_dout,
+    input               mshramen,
 
     // DIP switches
     input               dip_pause,
@@ -65,7 +67,7 @@ wire [ 7:0] fm_dout, dout;
 reg  [ 1:0] bank;
 wire [15:0] A;
 wire [ 9:0] psg_snd;
-reg         ram_cs, bank_cs, fm_cs, cab_cs,
+reg         bank_cs, fm_cs, cab_cs,
             mcu_rst, comb_rstn=0;
 wire signed [15:0] fm_snd;
 wire        mem_acc;
@@ -75,10 +77,10 @@ wire shared_rd = ram_cs && !A[0] && !rd_n;
 wire shared_wr = ram_cs && !A[0] && !wr_n;
 `endif
 
-assign mem_acc  = ~mreq_n &rfsh_n;
+assign mem_acc  = ~mreq_n & rfsh_n;
 assign ram_din  = dout;
 assign ram_we   = ram_cs & ~wr_n;
-assign ram_addr = `ifdef SIMULATION !ram_cs ? 13'd0 : `endif A[12:0];
+assign ram_addr = A[12:0];
 
 assign irq_ack = /*!m1_n &&*/ !iorq_n; // The original PCB just uses iorq_n,
     // the orthodox way to do it is to use m1_n too
@@ -123,7 +125,7 @@ always @(posedge clk) begin
         2: cab_dout <= { 4'hf, coin_input, 1'b1 /*tilt*/, service };
         // 3: cab_dout <= { 7'h7f, ~coin_input[0] };
         // 4: cab_dout <= { 7'h7f, ~coin_input[1] };
-        default: cab_dout <= 8'hff;
+        default: cab_dout <= 8'h00;
     endcase
     din <= rom_cs ? rom_data :
            ram_cs ? ram_dout :
@@ -133,7 +135,7 @@ end
 
 `ifndef VERILATOR
 `ifdef SIMULATION
-    integer fdebug=0, line_cnt=0;
+    integer fdebug=0, line_cnt=0, rstl=0;
 
     initial begin
         if( fdebug==0 )
@@ -143,7 +145,12 @@ end
     always @(posedge clk) begin
         if( rst ) begin
             line_cnt <= 0;
+            if(rstl) begin
+                $fdisplay(fdebug,"RESET");
+                rstl <= 0;
+            end
         end else if(cen6) begin
+            rstl <= 1;
             if( ram_cs ) line_cnt <= line_cnt+1;
             if( ram_cs &&  wr_n ) $fdisplay(fdebug,"%04X -> %02X - %d", A, ram_dout, line_cnt );
             if( ram_cs && !wr_n ) $fdisplay(fdebug,"%04X <- %02X - %d", A, dout, line_cnt );
@@ -190,7 +197,7 @@ jtframe_z80_devwait u_gamecpu(
     .dout     ( dout           ),
     .rom_cs   ( rom_cs         ),
     .rom_ok   ( rom_ok         ),
-    .dev_busy ( 1'b0           ) // TODO: add bus contention
+    .dev_busy ( mshramen & ram_cs )
 );
 
 `ifndef VERILATOR_KEEP_JT03
