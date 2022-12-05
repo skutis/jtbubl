@@ -5,6 +5,7 @@ import(
 	"fmt"
 	"os"
 	"regexp"
+	"strconv"
 )
 
 type Access struct {
@@ -84,10 +85,11 @@ func main() {
 		cpu = os.Args[1]
 		fmt.Printf("Reading from the %s files\n",cpu)
 	}
-	sim := read_sim( cpu + "_io.log")
+	sim := read_sim( cpu + ".log")
 	mame:=read_mame( cpu + ".tr")
 	k:=0
 	last_swap := false
+	line_check:
 	for k=0; k <len(sim); {
 		if !sim[k].Eq(mame[k]) && k+1 < len(sim) && sim[k+1].Eq(mame[k]) && !last_swap {
 			// swap them
@@ -99,6 +101,14 @@ func main() {
 			last_swap = false
 		}
 		if !sim[k].Eq(mame[k]) {
+			for j := 2; j<len(os.Args); j++ {
+				n, err :=strconv.Atoi(os.Args[j])
+				if err == nil && n==sim[k].line {
+					fmt.Printf("Ignoring mismatched line %d\n", sim[k].line )
+					k++
+					continue line_check
+				}
+			}
 			fmt.Printf("Split ways\n")
 			fmt.Printf("\tSIM:  %04X %02X %t @ %d\n", sim[k].addr, sim[k].data, sim[k].write, sim[k].line )
 			fmt.Printf("\tMAME: %04X %02X %t @ %d\n", mame[k].addr, mame[k].data, mame[k].write, mame[k].line )
@@ -122,5 +132,5 @@ func main() {
 		}
 		k++
 	}
-	fmt.Printf("%d matches\n",k)
+	fmt.Printf("%d matches of %d lines\n",k, len(sim))
 }
