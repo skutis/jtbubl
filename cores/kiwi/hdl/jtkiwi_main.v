@@ -106,6 +106,17 @@ always @(posedge clk, posedge rst) begin
     end
 end
 
+`ifdef SIMULATION
+    integer line_cnt=1;
+
+    always @(negedge ram_cs, posedge rst) begin
+        if( rst )
+            line_cnt <= 1;
+        else
+            line_cnt <= line_cnt+1;
+    end
+`endif
+
 jtframe_ff u_irq(
     .clk    ( clk       ),
     .rst    ( rst       ),
@@ -147,38 +158,6 @@ jtframe_z80_devwait u_gamecpu(
     .rom_ok   ( rom_ok ),
     .dev_busy ( sshramen & ram_cs )
 );
-
-`ifdef SIMULATION
-    integer fdebug=0, line_cnt=0;
-
-`ifndef VERILATOR
-    initial begin
-        if( fdebug==0 )
-            fdebug=$fopen("main_io.log","w");
-    end
-`endif
-
-    always @(posedge clk) begin
-        if( rst ) begin
-            line_cnt <= 0;
-        end else if(cen6 && !sshramen) begin
-            if( ram_cs ) line_cnt <= line_cnt+1;
-`ifndef VERILATOR
-            if( ram_cs &&  cpu_rnw ) $fdisplay(fdebug,"%04X -> %02X - %d", A, ram_dout, line_cnt );
-            if( ram_cs && !cpu_rnw ) $fdisplay(fdebug,"%04X <- %02X - %d", A, dout, line_cnt );
-`else
-            if( ram_cs &&  cpu_rnw ) $display("M%04X -> %02X", A, ram_dout );
-            if( ram_cs && !cpu_rnw ) $display("M%04X <- %02X", A, dout );
-`endif
-        `ifdef NOINT
-            if ( A==16'h206 && !m1_n ) begin
-                $display("Reached main loop");
-                $finish;
-            end
-        `endif
-        end
-    end
-`endif
 
 // first come, first served
 always @(posedge clk, posedge rst) begin

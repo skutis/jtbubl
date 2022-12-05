@@ -130,44 +130,14 @@ always @(posedge clk) begin
 end
 
 `ifdef SIMULATION
-    integer fdebug=0, line_cnt=1, rstl=0;
-    reg ram_csl, wr_nl;
+    integer line_cnt=1;
 
-    wire is_wrn = wr_n & wr_nl;
-    wire cs_ok = ram_cs & ~ram_csl;
-`ifndef VERILATOR
-    initial begin
-        if( fdebug==0 )
-            fdebug=$fopen("sub_io.log","w");
-    end
-`endif
-    always @(posedge clk) begin
-        if( rst ) begin
+    always @(negedge ram_cs, posedge rst) begin
+        if( rst )
             line_cnt <= 1;
-`ifndef VERILATOR
-            if(rstl) begin
-                $fdisplay(fdebug,"RESET");
-                rstl <= 0;
-            end
-`endif
-        end else begin
-            rstl <= 1;
-            ram_csl <= ram_cs;
-            wr_nl <= wr_n;
-            if( ~ram_cs & ram_csl ) line_cnt <= line_cnt+1;
-`ifndef VERILATOR
-            if( cs_ok &&  is_wrn ) $fdisplay(fdebug,"%04X -> %02X - %d", A, ram_dout, line_cnt );
-            if( cs_ok && !is_wrn ) $fdisplay(fdebug,"%04X <- %02X - %d", A, dout, line_cnt );
-        end
+        else
+            line_cnt <= line_cnt+1;
     end
-`else
-        end
-    end
-    always @(posedge ram_cs) begin
-        if(  wr_n ) $display("S%04X -> %02X", A, ram_dout );
-        if( !wr_n ) $display("S%04X <- %02X", A, dout );
-    end
-`endif
 `endif
 
 jtframe_ff u_irq(

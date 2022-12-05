@@ -87,12 +87,16 @@ func main() {
 	sim := read_sim( cpu + "_io.log")
 	mame:=read_mame( cpu + ".tr")
 	k:=0
+	last_swap := false
 	for k=0; k <len(sim); {
-		if !sim[k].Eq(mame[k]) && k+1 < len(sim) && sim[k+1].Eq(mame[k]) {
+		if !sim[k].Eq(mame[k]) && k+1 < len(sim) && sim[k+1].Eq(mame[k]) && !last_swap {
 			// swap them
 			aux := sim[k]
 			sim[k] = sim[k+1]
 			sim[k+1] = aux
+			last_swap = true
+		} else {
+			last_swap = false
 		}
 		if !sim[k].Eq(mame[k]) {
 			fmt.Printf("Split ways\n")
