@@ -134,6 +134,7 @@ end
     reg ram_csl, wr_nl;
 
     wire is_wrn = wr_n & wr_nl;
+    wire cs_ok = ram_cs & ~ram_csl;
 `ifndef VERILATOR
     initial begin
         if( fdebug==0 )
@@ -149,20 +150,24 @@ end
                 rstl <= 0;
             end
 `endif
-        end else if(cen6 && !mshramen) begin
+        end else begin
             rstl <= 1;
             ram_csl <= ram_cs;
             wr_nl <= wr_n;
             if( ~ram_cs & ram_csl ) line_cnt <= line_cnt+1;
 `ifndef VERILATOR
-            if( ram_cs &&  is_wrn ) $fdisplay(fdebug,"%04X -> %02X - %d", A, ram_dout, line_cnt );
-            if( ram_cs && !is_wrn ) $fdisplay(fdebug,"%04X <- %02X - %d", A, dout, line_cnt );
-`else
-            if( ram_cs &&  is_wrn ) $display("S%04X -> %02X", A, ram_dout );
-            if( ram_cs && !is_wrn ) $display("S%04X <- %02X", A, dout );
-`endif
+            if( cs_ok &&  is_wrn ) $fdisplay(fdebug,"%04X -> %02X - %d", A, ram_dout, line_cnt );
+            if( cs_ok && !is_wrn ) $fdisplay(fdebug,"%04X <- %02X - %d", A, dout, line_cnt );
         end
     end
+`else
+        end
+    end
+    always @(posedge ram_cs) begin
+        if(  wr_n ) $display("S%04X -> %02X", A, ram_dout );
+        if( !wr_n ) $display("S%04X <- %02X", A, dout );
+    end
+`endif
 `endif
 
 jtframe_ff u_irq(
