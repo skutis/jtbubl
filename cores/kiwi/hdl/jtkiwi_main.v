@@ -166,6 +166,9 @@ jtframe_z80_devwait u_gamecpu(
 `ifndef VERILATOR
             if( ram_cs &&  cpu_rnw ) $fdisplay(fdebug,"%04X -> %02X - %d", A, ram_dout, line_cnt );
             if( ram_cs && !cpu_rnw ) $fdisplay(fdebug,"%04X <- %02X - %d", A, dout, line_cnt );
+`else
+            if( ram_cs &&  cpu_rnw ) $display("M%04X -> %02X", A, ram_dout );
+            if( ram_cs && !cpu_rnw ) $display("M%04X <- %02X", A, dout );
 `endif
         `ifdef NOINT
             if ( A==16'h206 && !m1_n ) begin

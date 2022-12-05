@@ -17,6 +17,14 @@ func (a *Access)Eq( b Access) bool {
 	return a.data==b.data && a.addr==b.addr && a.write==b.write
 }
 
+func (a *Access)Dump() string {
+	dir := "rd"
+	if a.write {
+		dir = "wr"
+	}
+	return fmt.Sprintf("%04X %02X %s @ %d", a.addr, a.data, dir, a.line )
+}
+
 func read_sim( fname string ) []Access {
 	fin, _ := os.Open(fname)
 	defer fin.Close()
@@ -37,6 +45,8 @@ func read_sim( fname string ) []Access {
 		fmt.Sscanf( sc.Text(), "%x %s %x", &acc.addr, &dir, &acc.data )
 		if dir == "<-" {
 			acc.write = true
+		} else if dir != "->" {
+			fmt.Println("Wrong sim file: ", sc.Text())
 		}
 		acc.line = line
 		y = append( y, acc )
@@ -90,7 +100,7 @@ func main() {
 			fmt.Printf("\tMAME: %04X %02X %t @ %d\n", mame[k].addr, mame[k].data, mame[k].write, mame[k].line )
 			fmt.Printf("\nContext\n")
 			for i:=k-4;i<len(sim) && i<k+4 && i>0;i++ {
-				fmt.Printf("\tSIM:  %04X %02X %t @ %d", sim[i].addr, sim[i].data, sim[i].write, sim[i].line )
+				fmt.Printf("\tSIM:  %s", sim[i].Dump() )
 				if(i==k) {
 					fmt.Print("  *")
 				}
@@ -98,7 +108,7 @@ func main() {
 			}
 			fmt.Println("=============")
 			for i:=k-4;i<len(mame) && i<k+4 && i>0;i++ {
-				fmt.Printf("\tMAME:  %04X %02X %t @ %d", mame[i].addr, mame[i].data, mame[i].write, mame[i].line )
+				fmt.Printf("\tMAME:  %s", mame[i].Dump() )
 				if(i==k) {
 					fmt.Print("  *")
 				}

@@ -130,18 +130,19 @@ always @(posedge clk) begin
 end
 
 `ifdef SIMULATION
-    integer fdebug=0, line_cnt=0, rstl=0;
+    integer fdebug=0, line_cnt=1, rstl=0;
+    reg ram_csl, wr_nl;
 
+    wire is_wrn = wr_n & wr_nl;
 `ifndef VERILATOR
     initial begin
         if( fdebug==0 )
             fdebug=$fopen("sub_io.log","w");
     end
 `endif
-
     always @(posedge clk) begin
         if( rst ) begin
-            line_cnt <= 0;
+            line_cnt <= 1;
 `ifndef VERILATOR
             if(rstl) begin
                 $fdisplay(fdebug,"RESET");
@@ -150,10 +151,15 @@ end
 `endif
         end else if(cen6 && !mshramen) begin
             rstl <= 1;
-            if( ram_cs ) line_cnt <= line_cnt+1;
+            ram_csl <= ram_cs;
+            wr_nl <= wr_n;
+            if( ~ram_cs & ram_csl ) line_cnt <= line_cnt+1;
 `ifndef VERILATOR
-            if( ram_cs &&  wr_n ) $fdisplay(fdebug,"%04X -> %02X - %d", A, ram_dout, line_cnt );
-            if( ram_cs && !wr_n ) $fdisplay(fdebug,"%04X <- %02X - %d", A, dout, line_cnt );
+            if( ram_cs &&  is_wrn ) $fdisplay(fdebug,"%04X -> %02X - %d", A, ram_dout, line_cnt );
+            if( ram_cs && !is_wrn ) $fdisplay(fdebug,"%04X <- %02X - %d", A, dout, line_cnt );
+`else
+            if( ram_cs &&  is_wrn ) $display("S%04X -> %02X", A, ram_dout );
+            if( ram_cs && !is_wrn ) $display("S%04X <- %02X", A, dout );
 `endif
         end
     end

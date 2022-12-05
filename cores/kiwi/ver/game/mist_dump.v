@@ -46,7 +46,35 @@ module mist_dump(
             $dumpvars(1,UUT.u_game.u_game.u_main);
             $dumpvars(1,UUT.u_game.u_game.u_sound);
             $dumpvars(1,UUT.u_game.u_game.u_main.u_gamecpu.u_cpu.u_cpu.i_tv80_core.PC);
+            $dumpvars(1,UUT.u_game.u_game.u_main.u_gamecpu.u_cpu.u_cpu.i_tv80_core.ACC);
+            $dumpvars(1,UUT.u_game.u_game.u_main.u_gamecpu.u_cpu.u_cpu.i_tv80_core.Ap);
+            $dumpvars(1,UUT.u_game.u_game.u_main.u_gamecpu.u_cpu.u_cpu.i_tv80_core.SP);
+            $dumpvars(1,UUT.u_game.u_game.u_main.u_gamecpu.u_cpu.u_cpu.i_tv80_core.F);
+            $dumpvars(1,UUT.u_game.u_game.u_main.u_gamecpu.u_cpu.u_cpu.i_tv80_core.Fp);
+            $dumpvars(1,UUT.u_game.u_game.u_main.u_gamecpu.u_cpu.u_cpu.i_tv80_core.Alternate);
+            $dumpvars(1,UUT.u_game.u_game.u_main.u_gamecpu.u_cpu.u_cpu.i_tv80_core.i_reg.B);
+            $dumpvars(1,UUT.u_game.u_game.u_main.u_gamecpu.u_cpu.u_cpu.i_tv80_core.i_reg.C);
+            $dumpvars(1,UUT.u_game.u_game.u_main.u_gamecpu.u_cpu.u_cpu.i_tv80_core.i_reg.D);
+            $dumpvars(1,UUT.u_game.u_game.u_main.u_gamecpu.u_cpu.u_cpu.i_tv80_core.i_reg.E);
+            $dumpvars(1,UUT.u_game.u_game.u_main.u_gamecpu.u_cpu.u_cpu.i_tv80_core.i_reg.H);
+            $dumpvars(1,UUT.u_game.u_game.u_main.u_gamecpu.u_cpu.u_cpu.i_tv80_core.i_reg.L);
+            $dumpvars(1,UUT.u_game.u_game.u_main.u_gamecpu.u_cpu.u_cpu.i_tv80_core.i_reg.IX);
+            $dumpvars(1,UUT.u_game.u_game.u_main.u_gamecpu.u_cpu.u_cpu.i_tv80_core.i_reg.IY);
             $dumpvars(1,UUT.u_game.u_game.u_sound.u_gamecpu.u_cpu.u_cpu.i_tv80_core.PC);
+            $dumpvars(1,UUT.u_game.u_game.u_sound.u_gamecpu.u_cpu.u_cpu.i_tv80_core.ACC);
+            $dumpvars(1,UUT.u_game.u_game.u_sound.u_gamecpu.u_cpu.u_cpu.i_tv80_core.Ap);
+            $dumpvars(1,UUT.u_game.u_game.u_sound.u_gamecpu.u_cpu.u_cpu.i_tv80_core.SP);
+            $dumpvars(1,UUT.u_game.u_game.u_sound.u_gamecpu.u_cpu.u_cpu.i_tv80_core.F);
+            $dumpvars(1,UUT.u_game.u_game.u_sound.u_gamecpu.u_cpu.u_cpu.i_tv80_core.Fp);
+            $dumpvars(1,UUT.u_game.u_game.u_sound.u_gamecpu.u_cpu.u_cpu.i_tv80_core.Alternate);
+            $dumpvars(1,UUT.u_game.u_game.u_sound.u_gamecpu.u_cpu.u_cpu.i_tv80_core.i_reg.B);
+            $dumpvars(1,UUT.u_game.u_game.u_sound.u_gamecpu.u_cpu.u_cpu.i_tv80_core.i_reg.C);
+            $dumpvars(1,UUT.u_game.u_game.u_sound.u_gamecpu.u_cpu.u_cpu.i_tv80_core.i_reg.D);
+            $dumpvars(1,UUT.u_game.u_game.u_sound.u_gamecpu.u_cpu.u_cpu.i_tv80_core.i_reg.E);
+            $dumpvars(1,UUT.u_game.u_game.u_sound.u_gamecpu.u_cpu.u_cpu.i_tv80_core.i_reg.H);
+            $dumpvars(1,UUT.u_game.u_game.u_sound.u_gamecpu.u_cpu.u_cpu.i_tv80_core.i_reg.L);
+            $dumpvars(1,UUT.u_game.u_game.u_sound.u_gamecpu.u_cpu.u_cpu.i_tv80_core.i_reg.IX);
+            $dumpvars(1,UUT.u_game.u_game.u_sound.u_gamecpu.u_cpu.u_cpu.i_tv80_core.i_reg.IY);
 
             $dumpvars(1,mist_test.frame_cnt);
         `endif
