@@ -25,6 +25,7 @@ module jtkiwi_main(
     // Video devices
     output reg          vram_cs,
     output reg          vctrl_cs,
+    output reg          vflag_cs,
     output reg          pal_cs,
     input      [ 7:0]   pal_dout,
     input      [ 7:0]   vram_dout,
@@ -83,16 +84,17 @@ always @(posedge clk) begin
     rom_cs   <= mem_acc && A[15:12]  < 4'hc;
     vram_cs  <= mem_acc && A[15:13] == 3'b110; // C,D
     ram_cs   <= mem_acc && A[15:12] == 4'he; // A[12:0] used in Insector X (?)
-    vctrl_cs <= mem_acc && A[15:12] == 4'hf && A[11:8]<=4; // internal RAM and config registers
-    bank_cs  <= mem_acc && A[15: 8] == 8'hf6 && !wr_n;
-    pal_cs   <= mem_acc && A[15:12] == 4'hf && A[11:10]==2'b10;
+    vctrl_cs <= mem_acc && A[15:10] == 6'b1111_00; // internal RAM and config registers
+    vflag_cs <= mem_acc && A[15: 9] == 7'b1111_010 && !wr_n; // config registers
+    bank_cs  <= mem_acc && A[15: 9] == 7'b1111_011 && !wr_n; // f6xx/f7xx
+    pal_cs   <= mem_acc && A[15:11] == 5'h1f;
 end
 
 always @* begin
     obj_vram_en = mem_acc && (
-            ( A[13:9]==5'b01111 && (!A[15] || !A[14])) ||
-            ( A[11:9]==3'b011 )
-        );
+       (A[15:11]==5'b11110 && !A[9]) ||
+       A[15:10]==6'b111100 ||
+       A[15:13]==3'b110 );
     dev_busy = (sshramen & ram_cs) || (obj_vram_en && hcnt[1:0]!=3);
 end
 

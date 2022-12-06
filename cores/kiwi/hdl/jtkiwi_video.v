@@ -41,6 +41,7 @@ module jtkiwi_video(
     input      [ 7:0]   cpu_dout,
     input               vram_cs,
     input               vctrl_cs,
+    input               vflag_cs,
     output     [ 7:0]   vram_dout,
     // SDRAM interface
     output     [19:2]   scr_addr,
@@ -117,6 +118,7 @@ jtkiwi_gfx u_gfx(
     // CPU interface
     .vram_cs    ( vram_cs        ),
     .vctrl_cs   ( vctrl_cs       ),
+    .vflag_cs   ( vflag_cs       ),
     .cpu_din    ( vram_dout      ),
     .cpu_addr   ( cpu_addr       ),
     .cpu_rnw    ( cpu_rnw        ),

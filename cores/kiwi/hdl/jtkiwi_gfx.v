@@ -43,6 +43,7 @@ module jtkiwi_gfx(
     input      [ 7:0]   cpu_dout,
     input               vram_cs,
     input               vctrl_cs,
+    input               vflag_cs,
     output     [ 7:0]   cpu_din,
 
     // SDRAM interface
@@ -72,7 +73,7 @@ reg  [ 7:0] attr, xpos, ypos;
 reg  [ 7:0] cfg[0:3], flag;
 reg         scan_cen, done, dr_start, dr_busy,
             match, xflip, yflip,
-            yram_cs, cfg_cs, flag_cs;
+            yram_cs, cfg_cs;
 reg  [ 2:0] st;
 reg  [13:0] code;
 reg  [ 1:0] cen_cnt;
@@ -104,11 +105,9 @@ assign cpu_din  = yram_cs ? yram_dout :
 always @* begin
     yram_cs = 0;
     cfg_cs  = 0;
-    flag_cs = 0;
-    if( vctrl_cs ) case( cpu_addr[11:8] )
+    if( vctrl_cs ) case( cpu_addr[9:8] )
         0,1,2: yram_cs = 1;
         3: cfg_cs  = 1;
-        4: flag_cs = 1;
         default:;
     endcase
 end
@@ -140,7 +139,7 @@ always @(posedge clk, posedge rst) begin
 `endif
     begin
         if( cfg_cs  ) cfg[ cpu_addr[1:0] ] <= cpu_dout;
-        if( flag_cs ) flag <= cpu_dout;
+        if( vflag_cs ) flag <= cpu_dout;
     end
 end
 

@@ -28,7 +28,7 @@ wire [12:0] shr_addr, cpu_addr;
 wire        cen6, cen3, cen1p5;
 
 wire        vram_cs,  pal_cs, flip;
-wire        cpu_rnw, vctrl_cs;
+wire        cpu_rnw, vctrl_cs, vflag_cs;
 
 assign  dip_flip   = flip;
 always @* debug_view = main_st;
@@ -81,6 +81,7 @@ jtkiwi_main u_main(
 
     .vctrl_cs       ( vctrl_cs      ),
     .vram_cs        ( vram_cs       ),
+    .vflag_cs       ( vflag_cs      ),
     .vram_dout      ( vram_dout     ),
 
     .pal_cs         ( pal_cs        ),
@@ -113,6 +114,7 @@ jtkiwi_video u_video(
 
     .vram_cs        ( vram_cs       ),
     .vctrl_cs       ( vctrl_cs      ),
+    .vflag_cs       ( vflag_cs      ),
     .vram_dout      ( vram_dout     ),
 
     .pal_cs         ( pal_cs        ),
