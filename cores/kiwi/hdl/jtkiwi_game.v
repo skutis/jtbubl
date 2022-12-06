@@ -23,6 +23,7 @@ module jtkiwi_game(
 wire        sub_rnw, shr_cs, mshramen, snd_rstn;
 wire [ 7:0] shr_din, shr_dout, main_st,
             vram_dout, pal_dout, cpu_dout;
+wire [ 8:0] hdump;
 wire [12:0] shr_addr, cpu_addr;
 wire        cen6, cen3, cen1p5;
 
@@ -56,6 +57,7 @@ jtkiwi_main u_main(
     .cen6           ( cen6          ),
 
     .LVBL           ( LVBL          ),
+    .hcnt           ( hdump         ),
     // Main CPU ROM
     .rom_addr       ( main_addr     ),
     .rom_cs         ( main_cs       ),
@@ -99,6 +101,7 @@ jtkiwi_video u_video(
     .HS             ( HS            ),
     .VS             ( VS            ),
     .flip           ( flip          ),
+    .hdump          ( hdump         ),
     // PROMs
     // .prom_we        ( prom_we       ),
     // .prog_addr      ( prog_addr[7:0]),

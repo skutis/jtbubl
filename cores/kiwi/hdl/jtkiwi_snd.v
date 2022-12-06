@@ -61,7 +61,7 @@ localparam [7:0] PSG_GAIN = 8'h10,
                  FM_GAIN  = 8'h10;
 
 wire        irq_ack, mreq_n, m1_n, iorq_n, rd_n, wr_n,
-            fmint_n, int_n, rfsh_n;
+            fmint_n, int_n, cpu_cen, rfsh_n;
 reg  [ 7:0] din, cab_dout;
 wire [ 7:0] fm_dout, dout;
 reg  [ 1:0] bank;
@@ -81,7 +81,7 @@ wire shared_wr = ram_cs && !A[0] && !wr_n;
 assign mem_acc  = ~mreq_n & rfsh_n;
 assign ram_din  = dout;
 assign ram_addr = A[12:0];
-assign cpu_rnw  = wr_n;
+assign cpu_rnw  = wr_n | ~cpu_cen;
 
 assign irq_ack = /*!m1_n &&*/ !iorq_n; // The original PCB just uses iorq_n,
     // the orthodox way to do it is to use m1_n too
@@ -167,7 +167,7 @@ jtframe_z80_devwait u_gamecpu(
     .rst_n    ( comb_rstn      ),
     .clk      ( clk            ),
     .cen      ( cen6           ),
-    .cpu_cen  (                ),
+    .cpu_cen  ( cpu_cen        ),
 `ifdef NOINT
     .int_n    ( 1'b1           ),
     .nmi_n    ( 1'b1           ),

@@ -28,6 +28,7 @@ module jtkiwi_video(
     output              HS,
     output              VS,
     output              flip,
+    output     [ 8:0]   hdump,
     // PROMs
     // input      [ 7:0]   prog_addr,
     // input      [ 3:0]   prog_data,
@@ -60,7 +61,7 @@ module jtkiwi_video(
     input      [ 7:0]   debug_bus
 );
 
-wire [ 8:0] vrender, vrender1, vdump, hdump;
+wire [ 8:0] vrender, vrender1, vdump;
 wire [ 8:0] scr_pxl, obj_pxl;
 
 jtframe_frac_cen #(.WC(4),.W(2)) u_cen48(

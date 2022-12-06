@@ -28,6 +28,7 @@ module jtkiwi_main(
     output reg          pal_cs,
     input      [ 7:0]   pal_dout,
     input      [ 7:0]   vram_dout,
+    input      [ 8:0]   hcnt,
 
     output     [12:0]   cpu_addr,
     output     [ 7:0]   cpu_dout,
@@ -56,15 +57,15 @@ module jtkiwi_main(
 );
 `ifndef NOMAIN
 wire        irq_ack, mreq_n, m1_n, iorq_n, rd_n, wr_n,
-            rfsh_n, int_n, ram_we;
+            rfsh_n, int_n, ram_we, cpu_cen;
 reg  [ 7:0] din;
 wire [ 7:0] dout, ram_dout;
 reg  [ 2:0] bank;
 wire [15:0] A;
-reg         ram_cs, bank_cs, sshramen;
+reg         ram_cs, bank_cs, sshramen, dev_busy;
 wire        mem_acc;
 
-assign cpu_rnw  = wr_n;
+assign cpu_rnw  = wr_n | ~cpu_cen;
 assign cpu_addr = A[12:0];
 assign cpu_dout = dout;
 assign irq_ack  = /*!m1_n &&*/ !iorq_n; // The original PCB just uses iorq_n,
@@ -85,6 +86,10 @@ always @(posedge clk) begin
     vctrl_cs <= mem_acc && A[15:12] == 4'hf && A[11:8]<=4; // internal RAM and config registers
     bank_cs  <= mem_acc && A[15: 8] == 8'hf6 && !wr_n;
     pal_cs   <= mem_acc && A[15:12] == 4'hf && A[11:10]==2'b10;
+end
+
+always @* begin
+    dev_busy = (sshramen & ram_cs) || ((vram_cs || vctrl_cs ) && hcnt[1:0]!=3);
 end
 
 always @(posedge clk) begin
@@ -135,7 +140,7 @@ jtframe_z80_devwait u_gamecpu(
     .rst_n    ( ~rst   ),
     .clk      ( clk    ),
     .cen      ( cen6   ),
-    .cpu_cen  (        ),
+    .cpu_cen  ( cpu_cen),
 `ifdef NOINT
     .int_n    ( 1'b1   ),
 `else
@@ -156,7 +161,7 @@ jtframe_z80_devwait u_gamecpu(
     .dout     ( dout   ),
     .rom_cs   ( rom_cs ),
     .rom_ok   ( rom_ok ),
-    .dev_busy ( sshramen & ram_cs )
+    .dev_busy ( dev_busy )
 );
 
 // first come, first served
