@@ -54,6 +54,7 @@ module jtkiwi_main(
     input               rom_ok,
     input      [ 7:0]   rom_data,
     // Debug
+    input      [ 7:0]   debug_bus,
     output     [ 7:0]   st_dout
 );
 `ifndef NOMAIN
@@ -95,7 +96,7 @@ always @* begin
        (A[15:11]==5'b11110 && !A[9]) ||
        A[15:10]==6'b111100 ||
        A[15:13]==3'b110 );
-    dev_busy = (sshramen & ram_cs) || (obj_vram_en && hcnt[1:0]!=3);
+    dev_busy = (sshramen & ram_cs) || (obj_vram_en && hcnt[1:0]!=0);
 end
 
 always @(posedge clk) begin

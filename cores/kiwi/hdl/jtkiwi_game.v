@@ -87,6 +87,7 @@ jtkiwi_main u_main(
     .pal_cs         ( pal_cs        ),
     .pal_dout       ( pal_dout      ),
     .dip_pause      ( dip_pause     ),
+    .debug_bus      ( debug_bus     ),
     .st_dout        ( main_st       )
 );
 
