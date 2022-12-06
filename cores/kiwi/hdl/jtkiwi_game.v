@@ -44,16 +44,16 @@ always @* debug_view = main_st;
 // end
 
 jtframe_frac_cen #(.WC(4),.W(3)) u_cen24(
-    .clk    ( clk24     ),    // 24 MHz
+    .clk    ( clk       ),    // 24 MHz
     .n      ( 4'd1      ),
-    .m      ( 4'd4      ),
+    .m      ( 4'd8      ),
     .cen    ( { cen1p5, cen3, cen6 } ),
     .cenb   (           )
 );
 
 jtkiwi_main u_main(
-    .rst            ( rst24         ),
-    .clk            ( clk24         ),        // 24 MHz
+    .rst            ( rst           ),
+    .clk            ( clk           ),
     .cen6           ( cen6          ),
 
     .LVBL           ( LVBL          ),
@@ -94,7 +94,7 @@ jtkiwi_main u_main(
 jtkiwi_video u_video(
     .rst            ( rst           ),
     .clk            ( clk           ),
-    .clk_cpu        ( clk24         ),
+    .clk_cpu        ( clk           ),
 
     .pxl2_cen       ( pxl2_cen      ),
     .pxl_cen        ( pxl_cen       ),
@@ -140,8 +140,8 @@ jtkiwi_video u_video(
 );
 
 jtkiwi_snd u_sound(
-    .rst        ( rst24         ),
-    .clk        ( clk24         ), // 24 MHz
+    .rst        ( rst           ),
+    .clk        ( clk           ),
     .snd_rstn   ( snd_rstn      ),
     .cen6       ( cen6          ),
     .cen1p5     ( cen1p5        ),

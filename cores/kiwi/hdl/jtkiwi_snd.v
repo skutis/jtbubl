@@ -167,7 +167,7 @@ jtframe_ff u_irq(
     .sigedge( ~LVBL     )
 );
 
-jtframe_z80_devwait #(.RECOVERY(0)) u_gamecpu(
+jtframe_z80_devwait #(.RECOVERY(1)) u_gamecpu(
     .rst_n    ( comb_rstn      ),
     .clk      ( clk            ),
     .cen      ( cen6           ),
