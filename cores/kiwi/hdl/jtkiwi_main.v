@@ -143,7 +143,7 @@ jtframe_ff u_irq(
 
 // To do: add dev_busy to match the wait signal
 // when accessing the VRAM
-jtframe_z80_devwait u_gamecpu(
+jtframe_z80_devwait #(.RECOVERY(0)) u_gamecpu(
     .rst_n    ( ~rst   ),
     .clk      ( clk    ),
     .cen      ( cen6   ),
