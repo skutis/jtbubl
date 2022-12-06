@@ -20,8 +20,8 @@ module jtkiwi_video(
     input               rst,
     input               clk,
     input               clk_cpu,
-    output              pxl2_cen,
-    output              pxl_cen,
+    input               pxl2_cen,
+    input               pxl_cen,
 
     output              LHBL,
     output              LVBL,
@@ -64,14 +64,6 @@ module jtkiwi_video(
 
 wire [ 8:0] vrender, vrender1, vdump;
 wire [ 8:0] scr_pxl, obj_pxl;
-
-jtframe_frac_cen #(.WC(4),.W(2)) u_cen48(
-    .clk    ( clk       ),    // 48 MHz
-    .n      ( 4'd1      ),
-    .m      ( 4'd8      ),
-    .cen    ( { pxl_cen, pxl2_cen } ),
-    .cenb   (           )
-);
 
 jtframe_vtimer #(
     .HB_START( 9'd255 ),
