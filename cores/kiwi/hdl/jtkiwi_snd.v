@@ -57,8 +57,8 @@ module jtkiwi_snd(
     output               peak
 );
 `ifndef NOSOUND
-localparam [7:0] PSG_GAIN = 8'h10,
-                 FM_GAIN  = 8'h10;
+localparam [7:0] PSG_GAIN = 8'h06,
+                 FM_GAIN  = 8'h38;
 
 wire        irq_ack, mreq_n, m1_n, iorq_n, rd_n, wr_n,
             fmint_n, int_n, cpu_cen, rfsh_n;
