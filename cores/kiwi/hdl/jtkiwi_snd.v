@@ -125,10 +125,14 @@ always @(posedge clk, negedge comb_rstn) begin
     end
 end
 
+function [6:0] swap_joy( input [6:0] j );
+    swap_joy = { j[6:4], j[2], j[3], j[0], j[1] };
+endfunction
+
 always @(posedge clk) begin
     case( A[2:0] )
-        0: cab_dout <= { start_button[0], joystick1 };
-        1: cab_dout <= { start_button[1], joystick2 };
+        0: cab_dout <= { start_button[0], swap_joy( joystick1 )};
+        1: cab_dout <= { start_button[1], swap_joy( joystick2 )};
         2: cab_dout <= { 4'hf, coin_input, 1'b1 /*tilt*/, service };
         // 3: cab_dout <= { 7'h7f, ~coin_input[0] };
         // 4: cab_dout <= { 7'h7f, ~coin_input[1] };
