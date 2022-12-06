@@ -59,7 +59,8 @@ module jtkiwi_gfx(
 
     output      [ 8:0]  scr_pxl,
     output      [ 8:0]  obj_pxl,
-    input       [ 7:0]  debug_bus
+    input       [ 7:0]  debug_bus,
+    output      [ 7:0]  st_dout
 );
 
 wire        yram_we, video_en;
@@ -101,6 +102,7 @@ assign col_cfg  = cfg[1][3:0];
 assign col_xmsb = { cfg[3], cfg[2] };
 assign cpu_din  = yram_cs ? yram_dout :
                   vram_cs ? (cpu_addr[12] ? vram_dout[15:8] : vram_dout[7:0]) : 8'h00;
+assign st_dout  = { 2'd0, col0, col_cfg };
 
 always @* begin
     yram_cs = 0;

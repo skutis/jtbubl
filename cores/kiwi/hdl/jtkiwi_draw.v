@@ -68,7 +68,7 @@ assign pxl_in   = hflipx ?
 assign rom_addr = { code[12:0], ysubf[3], rom_lsb^SWAP_HALVES, ysubf[2:0] };
 assign { hflip, vflip } = attr[15:14]^{1'b0,flip};
 assign pal = attr[13:9];
-assign buf_we   = busy;
+assign buf_we   = busy & ~cnt[3];
 
 jtframe_sort u_sort(
     .debug_bus  ( debug_bus ),

@@ -60,7 +60,7 @@ reg  [ 8:0] xscr;
 wire [ 8:0] vf;
 reg  [ 1:0] st;
 reg         dr_draw;
-reg  [15:0] code, dr_code, dr_attr;
+reg  [15:0] code, dr_code, dr_attr, nx_attr;
 wire        dr_busy;
 wire [ 8:0] buf_din, buf_addr;
 wire        buf_we;
@@ -98,13 +98,16 @@ always @(posedge clk, posedge rst) begin
             st <= st + 1'd1;
             case( st )
                 0: yscr <= col_data;
-                1: xscr <= { col_xmsb[col_cnt[4:1]], col_data };
+                1: begin
+                    xscr <= { col_xmsb[col_cnt[4:1]], col_data };
+                    nx_attr <= tm_data;
+                end
                 2: code <= tm_data;
                 3: begin
                     if( !dr_busy )  begin
                         dr_draw <= 1;
                         dr_code <= code;
-                        dr_attr <= tm_data ^ 16'hc000;
+                        dr_attr <= nx_attr;
                         dr_xpos <= { 4'd0, col_cnt[0], 4'd0 } + xscr;
                         dr_ysub <= eff_v[3:0];
                         col_cnt <=  col_cnt + 1'd1;
@@ -138,7 +141,7 @@ jtkiwi_draw u_draw(
     .buf_addr   ( buf_addr      ),
     .buf_we     ( buf_we        ),
     .buf_din    ( buf_din       ),
-    .debug_bus  ( debug_bus     )
+    .debug_bus  ( 8'd0          )
 );
 
 // During HS the contents of the memory are cleared
