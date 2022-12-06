@@ -68,6 +68,7 @@ reg  [ 1:0] bank;
 wire [15:0] A;
 wire [ 9:0] psg_snd;
 reg         bank_cs, fm_cs, cab_cs,
+            dev_busy, fm_busy, fmcs_l,
             mcu_rst, comb_rstn=0;
 wire signed [15:0] fm_snd;
 wire        mem_acc;
@@ -92,7 +93,17 @@ always @* begin
     end
 end
 
-always @(posedge clk) comb_rstn <= snd_rstn & ~rst;
+always @* begin
+    dev_busy = mshramen & ram_cs | fm_busy;
+end
+
+always @(posedge clk) begin
+    comb_rstn <= snd_rstn & ~rst;
+    if( cen6 ) begin
+        fmcs_l <= fm_cs;
+        fm_busy <= fm_cs & ~fmcs_l;
+    end
+end
 
 always @(posedge clk) begin
     rom_cs  <= mem_acc &&  A[15:12]  < 4'ha;
@@ -178,7 +189,7 @@ jtframe_z80_devwait u_gamecpu(
     .dout     ( dout           ),
     .rom_cs   ( rom_cs         ),
     .rom_ok   ( rom_ok         ),
-    .dev_busy ( mshramen & ram_cs )
+    .dev_busy ( dev_busy       )
 );
 
 `ifndef VERILATOR_KEEP_JT03
