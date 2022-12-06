@@ -1,12 +1,16 @@
 [all]
 CORENAME=JTBUBL
 JTFRAME_BUTTONS=2
-JTFRAME_CLK24
 JTFRAME_CREDITS
 JTFRAME_WIDTH=256
 JTFRAME_HEIGHT=224
 JTFRAME_VERTICAL
 JTFRAME_OSD_VOL
+
+# The 24MHz clock could create problems because of cycle recovery
+# If something is reported, try moving up to 48MHz
+JTFRAME_CLK24
+JTFRAME_PXLCLK=6
 
 [mister]
 JTFRAME_ARX=5

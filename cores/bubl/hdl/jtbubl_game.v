@@ -21,8 +21,8 @@ module jtbubl_game(
     input           clk,
     input           rst24,
     input           clk24,
-    output          pxl2_cen,   // 12   MHz
-    output          pxl_cen,    //  6   MHz
+    input           pxl2_cen,   // 12   MHz
+    input           pxl_cen,    //  6   MHz
     output   [3:0]  red,
     output   [3:0]  green,
     output   [3:0]  blue,
@@ -235,7 +235,7 @@ assign black_n = 1;
 jtbubl_video u_video(
     .rst            ( rst           ),
     .clk            ( clk           ),
-    .clk24          ( clk24         ),
+    .clk_cpu        ( clk24         ),
     .pxl2_cen       ( pxl2_cen      ),
     .pxl_cen        ( pxl_cen       ),
     .LHBL           ( LHBL          ),

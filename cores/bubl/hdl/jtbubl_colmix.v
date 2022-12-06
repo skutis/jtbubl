@@ -18,8 +18,7 @@
 
 module jtbubl_colmix(
     input               clk,
-    input               clk24,
-    //output              pxl2_cen,
+    input               clk_cpu,
     input               pxl_cen,
     // Screen
     input               preLHBL,
@@ -54,7 +53,7 @@ assign blue     = col_out[15:12];
 assign pal_dout = !cpu_addr[0] ? pal_even : pal_odd;
 
 jtframe_dual_ram #(.aw(8),.simhexfile("pal_even.hex")) u_ram0(
-    .clk0   ( clk24        ),
+    .clk0   ( clk_cpu      ),
     .clk1   ( clk          ),
     // Port 0
     .data0  ( cpu_dout     ),
@@ -69,7 +68,7 @@ jtframe_dual_ram #(.aw(8),.simhexfile("pal_even.hex")) u_ram0(
 );
 
 jtframe_dual_ram #(.aw(8),.simhexfile("pal_odd.hex")) u_ram1(
-    .clk0   ( clk24        ),
+    .clk0   ( clk_cpu      ),
     .clk1   ( clk          ),
     // Port 0
     .data0  ( cpu_dout     ),

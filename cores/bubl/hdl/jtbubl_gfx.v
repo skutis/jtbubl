@@ -19,7 +19,7 @@
 module jtbubl_gfx(
     input               rst,
     input               clk,
-    input               clk24,
+    input               clk_cpu,
     input               pxl2_cen,
     input               pxl_cen,
     // PROMs
@@ -240,7 +240,7 @@ always @(posedge clk, posedge rst) begin
 end
 
 jtframe_dual_ram #(.aw(11),.simhexfile("vram0.hex")) u_ram0(
-    .clk0   ( clk24     ),
+    .clk0   ( clk_cpu   ),
     .clk1   ( clk       ),
     // Port 0
     .data0  ( cpu_dout  ),
@@ -255,7 +255,7 @@ jtframe_dual_ram #(.aw(11),.simhexfile("vram0.hex")) u_ram0(
 );
 
 jtframe_dual_ram #(.aw(11),.simhexfile("vram1.hex")) u_ram1(
-    .clk0   ( clk24     ),
+    .clk0   ( clk_cpu   ),
     .clk1   ( clk       ),
     // Port 0
     .data0  ( cpu_dout  ),
@@ -270,7 +270,7 @@ jtframe_dual_ram #(.aw(11),.simhexfile("vram1.hex")) u_ram1(
 );
 
 jtframe_dual_ram #(.aw(11),.simhexfile("vram2.hex")) u_ram2(
-    .clk0   ( clk24     ),
+    .clk0   ( clk_cpu     ),
     .clk1   ( clk       ),
     // Port 0
     .data0  ( cpu_dout  ),
@@ -285,7 +285,7 @@ jtframe_dual_ram #(.aw(11),.simhexfile("vram2.hex")) u_ram2(
 );
 
 jtframe_dual_ram #(.aw(11),.simhexfile("vram3.hex")) u_ram3(
-    .clk0   ( clk24     ),
+    .clk0   ( clk_cpu     ),
     .clk1   ( clk       ),
     // Port 0
     .data0  ( cpu_dout  ),
