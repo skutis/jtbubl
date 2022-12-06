@@ -154,7 +154,6 @@ jtkiwi_snd u_sound(
     .joystick2  ( joystick2     ),
     .service    ( service       ),
     // DIP switches
-    .dip_pause  ( dip_pause     ),
     .dipsw      ( dipsw[15:0]   ),
 
     // Shared RAM

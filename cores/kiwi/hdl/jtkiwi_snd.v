@@ -47,7 +47,6 @@ module jtkiwi_snd(
     input               mshramen,
 
     // DIP switches
-    input               dip_pause,
     input               service,
     input      [15:0]   dipsw,
 
@@ -164,7 +163,7 @@ jtframe_ff u_irq(
     .qn     ( int_n     ),
     .set    ( 1'b0      ),
     .clr    ( irq_ack   ),
-    .sigedge( ~LVBL & dip_pause )
+    .sigedge( ~LVBL     )
 );
 
 jtframe_z80_devwait #(.RECOVERY(1)) u_gamecpu(

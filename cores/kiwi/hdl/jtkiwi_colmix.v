@@ -45,7 +45,7 @@ wire       pal_we;
 wire       blank;
 reg        half;
 
-assign pal_addr = { half, coll };
+assign pal_addr = { coll, half };
 assign pal_we   = pal_cs & ~cpu_rnw;
 assign blank    = ~(LVBL & LHBL);
 
@@ -61,7 +61,7 @@ always @(posedge clk) begin
 `else
         { red, green, blue } <= { pal_dout[6:0], pall };
 `endif
-        half <= 0;
+        half <= 1;
         coll <= col_addr;
     end
     pall <= pal_dout;
