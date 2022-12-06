@@ -62,7 +62,7 @@ reg  [ 7:0] din;
 wire [ 7:0] dout, ram_dout;
 reg  [ 2:0] bank;
 wire [15:0] A;
-reg         ram_cs, bank_cs, sshramen, dev_busy;
+reg         ram_cs, bank_cs, sshramen, dev_busy, obj_vram_en;
 wire        mem_acc;
 
 assign cpu_rnw  = wr_n | ~cpu_cen;
@@ -89,7 +89,11 @@ always @(posedge clk) begin
 end
 
 always @* begin
-    dev_busy = (sshramen & ram_cs) || ((vram_cs || vctrl_cs ) && hcnt[1:0]!=3);
+    obj_vram_en = mem_acc && (
+            ( A[13:9]==5'b01111 && (!A[15] || !A[14])) ||
+            ( A[11:9]==3'b011 )
+        );
+    dev_busy = (sshramen & ram_cs) || (obj_vram_en && hcnt[1:0]!=3);
 end
 
 always @(posedge clk) begin
