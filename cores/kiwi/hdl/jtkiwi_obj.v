@@ -81,7 +81,7 @@ always @(posedge clk, posedge rst) begin
         dr_ysub <= 0;
     end else begin
         dr_draw <= 0;
-        if( hs || vrender>9'hf0 ) begin
+        if( hs || (vrender>9'hf0 && vrender<9'h116) ) begin
             objcnt  <= 0;
             done    <= 0;
             st      <= 0;

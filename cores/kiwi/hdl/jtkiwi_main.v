@@ -45,7 +45,6 @@ module jtkiwi_main(
     output reg          mshramen,
     output     [ 7:0]   shr_dout,
 
-    // DIP switches
     input               dip_pause,
 
     // ROM interface
@@ -138,7 +137,7 @@ jtframe_ff u_irq(
     .qn     ( int_n     ),
     .set    ( 1'b0      ),
     .clr    ( irq_ack   ),
-    .sigedge( ~LVBL     )
+    .sigedge( ~LVBL & dip_pause  )
 );
 
 // To do: add dev_busy to match the wait signal

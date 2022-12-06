@@ -164,7 +164,7 @@ jtframe_ff u_irq(
     .qn     ( int_n     ),
     .set    ( 1'b0      ),
     .clr    ( irq_ack   ),
-    .sigedge( ~LVBL     )
+    .sigedge( ~LVBL & dip_pause )
 );
 
 jtframe_z80_devwait #(.RECOVERY(1)) u_gamecpu(

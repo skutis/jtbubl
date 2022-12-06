@@ -209,7 +209,7 @@ jtkiwi_obj u_obj(
     .rom_ok     ( obj_ok    ),
     .rom_data   ( obj_data  ),
 
-    .vrender    ( vrender   ),
+    .vrender    ( vdump     ),
     .hdump      ( hdump     ),
     .pxl        ( obj_pxl   ),
     .debug_bus  ( debug_bus )
