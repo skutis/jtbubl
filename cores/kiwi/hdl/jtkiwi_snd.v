@@ -47,6 +47,7 @@ module jtkiwi_snd(
     input               mshramen,
 
     // DIP switches
+    input      [ 1:0]   fx_level,
     input               service,
     input      [15:0]   dipsw,
 
@@ -56,12 +57,11 @@ module jtkiwi_snd(
     output               peak
 );
 `ifndef NOSOUND
-localparam [7:0] PSG_GAIN = 8'h06,
-                 FM_GAIN  = 8'h38;
+localparam [7:0] FM_GAIN  = 8'h30;
 
 wire        irq_ack, mreq_n, m1_n, iorq_n, rd_n, wr_n,
             fmint_n, int_n, cpu_cen, rfsh_n;
-reg  [ 7:0] din, cab_dout;
+reg  [ 7:0] din, cab_dout, psg_gain;
 wire [ 7:0] fm_dout, dout;
 reg  [ 1:0] bank;
 wire [15:0] A;
@@ -94,6 +94,15 @@ end
 
 always @* begin
     dev_busy = mshramen & ram_cs | fm_busy;
+end
+
+always @(posedge clk) begin
+    case( fx_level )
+        2'd0: psg_gain <= 8'h03;
+        2'd1: psg_gain <= 8'h06;
+        2'd2: psg_gain <= 8'h08;
+        2'd3: psg_gain <= 8'h0a;
+    endcase
 end
 
 always @(posedge clk) begin
@@ -231,7 +240,7 @@ jtframe_mixer #(.W1(10)) u_mixer(
     .ch2    ( 16'd0        ),
     .ch3    ( 16'd0        ),
     .gain0  ( FM_GAIN      ), // YM2203
-    .gain1  ( PSG_GAIN     ), // PSG
+    .gain1  ( psg_gain     ), // PSG
     .gain2  ( 8'd0         ),
     .gain3  ( 8'd0         ),
     .mixed  ( snd          ),

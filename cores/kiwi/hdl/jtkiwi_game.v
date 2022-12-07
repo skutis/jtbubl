@@ -163,6 +163,7 @@ jtkiwi_snd u_sound(
     .rom_ok     ( sub_ok        ),
 
     // Sound output
+    .fx_level   ( dip_fxlevel   ),
     .snd        ( snd           ),
     .sample     ( sample        ),
     .peak       ( game_led      )
