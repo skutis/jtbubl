@@ -39,7 +39,7 @@ module jtkiwi_obj(
     input               rom_ok,
     input      [31:0]   rom_data,
 
-    input      [ 8:0]   vrender,
+    input      [ 8:0]   vdump,
     input      [ 8:0]   hdump,
     output     [ 8:0]   pxl,
 
@@ -64,7 +64,7 @@ wire        buf_we;
 
 assign lut_addr = { page, 1'b0, ~st[1], objcnt }; // 1 + 1 + 1 + 9 = 12
 assign y_addr   = objcnt;
-assign vf       = {9{flip}} ^ vrender;
+assign vf       = {9{flip}} ^ (vdump-9'd1);
 
 always @* begin
     ydiff = { 1'b0, vf[7:0] } - {1'b0, y_data };
@@ -85,7 +85,7 @@ always @(posedge clk, posedge rst) begin
         dr_ysub <= 0;
     end else begin
         dr_draw <= 0;
-        if( hs || (vrender>9'hf0 && vrender<9'h116) ) begin
+        if( hs || (vdump>9'hf0 && vdump<9'h116) ) begin
             objcnt  <= 9'h1ff;
             done    <= 0;
             st      <= 0;

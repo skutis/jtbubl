@@ -70,10 +70,11 @@ jtframe_vtimer #(
     .HB_START( 9'd255 ),
     .HS_START( 9'd297 ),
     .HB_END  ( 9'd383 ),
-    .V_START ( 9'd016 ),
+    .V_START ( 9'd008 ),
     .VS_START( 9'd254 ),
     .VB_START( 9'd239 ),
-    .VB_END  ( 9'd279 )
+    .VCNT_END( 9'd271 ),
+    .VB_END  ( 9'd015 )
 ) u_timer(
     .clk        ( clk        ),
     .pxl_cen    ( pxl_cen    ),
