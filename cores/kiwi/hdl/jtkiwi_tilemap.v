@@ -52,15 +52,15 @@ module jtkiwi_tilemap(
 );
 
 reg         line, done, hsl;
-reg  [ 4:0] col_cnt;
+reg  [ 4:0] col_cnt, dr_pal;
 reg  [ 3:0] dr_ysub, col_end;
 reg  [ 8:0] eff_h, eff_v, dr_xpos;
 reg  [ 7:0] yscr;
 reg  [ 8:0] xscr;
 wire [ 8:0] vf;
 reg  [ 1:0] st;
-reg         dr_draw;
-reg  [15:0] code, dr_code, dr_attr;
+reg         dr_draw, dr_hflip, dr_vflip, hflip, vflip;
+reg  [12:0] dr_code, code;
 wire        dr_busy;
 wire [ 8:0] buf_din, buf_addr;
 wire        buf_we;
@@ -77,9 +77,14 @@ end
 // Columns are 32-pixel wide
 always @(posedge clk, posedge rst) begin
     if( rst ) begin
-        col_cnt <= 0;
-        line    <= 0;
-        hsl     <= 0;
+        col_cnt  <= 0;
+        line     <= 0;
+        hsl      <= 0;
+        dr_code  <= 0;
+        dr_hflip <= 0;
+        dr_vflip <= 0;
+        dr_xpos  <= 0;
+        dr_ysub  <= 0;
     end else begin
         hsl <= hs;
         dr_draw <= 0;
@@ -89,10 +94,6 @@ always @(posedge clk, posedge rst) begin
             done    <= col_cfg==0; // don't do anything for col_cfg==0
             st      <= 0;
             dr_draw <= 0;
-            dr_code <= 0;
-            dr_attr <= 0;
-            dr_xpos <= 0;
-            dr_ysub <= 0;
             col_end <= col_cfg==1 ? 4'hf : col_cfg-4'd1;
         end else if( !done && tm_cen ) begin
             st <= st + 1'd1;
@@ -101,16 +102,21 @@ always @(posedge clk, posedge rst) begin
                 1: begin
                     xscr <= { col_xmsb[col_cnt[4:1]], col_data };
                 end
-                2: code <= tm_data;
+                2: begin
+                    { hflip, vflip } <= tm_data[15:14];
+                    code <= tm_data[12:0];
+                end
                 3: begin
                     if( !dr_busy )  begin
-                        dr_draw <= 1;
-                        dr_code <= code;
-                        dr_attr <= tm_data;
-                        dr_xpos <= { 4'd0, col_cnt[0], 4'd0 } + xscr;
-                        dr_ysub <= eff_v[3:0];
-                        col_cnt <=  col_cnt + 1'd1;
-                        done    <= col_cnt[4:1]==col_end && col_cnt[0];
+                        dr_draw  <= 1;
+                        dr_code  <= code;
+                        dr_hflip <= hflip^flip;
+                        dr_vflip <= vflip;
+                        dr_pal   <= tm_data[11+:5]; //{1'b1, tm_data[12:9] }; // some games seem to use the fifth bit too. This is probably some config setting unexplored by MAME
+                        dr_xpos  <= { 4'd0, col_cnt[0], 4'd0 } + xscr;
+                        dr_ysub  <= eff_v[3:0];
+                        col_cnt  <=  col_cnt + 1'd1;
+                        done     <= col_cnt[4:1]==col_end && col_cnt[0];
                     end else begin
                         st <= st;
                     end
@@ -127,7 +133,9 @@ jtkiwi_draw u_draw(
     .draw       ( dr_draw       ),
     .busy       ( dr_busy       ),
     .code       ( dr_code       ),
-    .attr       ( dr_attr       ),
+    .pal        ( dr_pal        ),
+    .hflip      ( dr_hflip      ),
+    .vflip      ( dr_vflip      ),
     .xpos       ( dr_xpos       ),
     .ysub       ( dr_ysub       ),
     .flip       ( flip          ),

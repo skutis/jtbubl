@@ -48,14 +48,16 @@ module jtkiwi_obj(
 
 reg         done;
 reg  [ 8:0] objcnt;
-reg  [ 4:0] pal;
+reg  [ 4:0] pal, dr_pal;
 reg  [ 3:0] dr_ysub, ysub;
 reg  [ 8:0] ydiff, dr_xpos;
 reg  [ 8:0] xpos;
 wire [ 8:0] vf;
 reg  [ 1:0] st;
-reg         dr_draw, match, vflip, hflip;
-reg  [15:0] code, dr_code, dr_attr;
+reg         dr_draw, dr_hflip, dr_vflip,
+            match, vflip, hflip;
+reg  [15:0] code;
+reg  [12:0] dr_code;
 wire        dr_busy;
 wire [ 8:0] buf_din, buf_addr;
 wire        buf_we;
@@ -76,7 +78,9 @@ always @(posedge clk, posedge rst) begin
         objcnt  <= 0;
         dr_draw <= 0;
         dr_code <= 0;
-        dr_attr <= 0;
+        dr_pal  <= 0;
+        dr_hflip<= 0;
+        dr_vflip<= 0;
         dr_xpos <= 0;
         dr_ysub <= 0;
     end else begin
@@ -86,10 +90,6 @@ always @(posedge clk, posedge rst) begin
             done    <= 0;
             st      <= 0;
             dr_draw <= 0;
-            dr_code <= 0;
-            dr_attr <= 0;
-            dr_xpos <= 0;
-            dr_ysub <= 0;
         end else if( !done && lut_cen ) begin
             st <= st + 1'd1;
             case( st )
@@ -105,9 +105,11 @@ always @(posedge clk, posedge rst) begin
                 2: { hflip, vflip, code[13:0] } <= lut_data;
                 3: begin
                     if( !dr_busy )  begin
-                        dr_draw <= 1;
-                        dr_code <= code;
-                        dr_attr <= { hflip, vflip, pal, 9'd0 };
+                        dr_draw  <= 1;
+                        dr_code  <= code[12:0];
+                        dr_hflip <= hflip;
+                        dr_vflip <= vflip;
+                        dr_pal   <= pal;
                         dr_xpos <= xpos;
                         dr_ysub <= ysub;
                         objcnt <=  objcnt - 1'd1;
@@ -128,7 +130,9 @@ jtkiwi_draw #(.SWAP_HALVES(1'b1)) u_draw (
     .draw       ( dr_draw       ),
     .busy       ( dr_busy       ),
     .code       ( dr_code       ),
-    .attr       ( dr_attr       ),
+    .pal        ( dr_pal        ),
+    .hflip      ( dr_hflip      ),
+    .vflip      ( dr_vflip      ),
     .xpos       ( dr_xpos       ),
     .ysub       ( dr_ysub       ),
     .flip       ( flip          ),

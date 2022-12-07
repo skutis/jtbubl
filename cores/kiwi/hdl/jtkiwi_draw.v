@@ -26,11 +26,14 @@ module jtkiwi_draw(
 
     input               draw,
     output reg          busy,
-    input      [15:0]   code,
-    input      [15:0]   attr,
+    input      [12:0]   code,
     input      [ 8:0]   xpos,
     input      [ 3:0]   ysub,
     input               flip,
+
+    input               hflip,
+    input               vflip,
+    input      [ 4:0]   pal,
 
     output     [19:2]   rom_addr,
     output reg          rom_cs,
@@ -51,12 +54,11 @@ parameter SWAP_HALVES = 1'b0;
 reg  [31:0] pxl_data;
 reg         rom_lsb;
 reg  [ 3:0] cnt;
-wire [ 4:0] pal;
 wire [ 3:0] ysubf, pxl_sort, pxl_in;
-wire        hflip, vflip, hflipx;
+wire        hflipx;
 
 assign hflipx   = hflip ^ flip;
-assign ysubf    = ysub^{4{~vflip}};
+assign ysubf    = ysub^{4{~vflip^flip}};
 assign buf_din  = { pal, pxl_sort };
 assign pxl_in   = hflipx ?
     { pxl_data[23], pxl_data[ 7], pxl_data[31], pxl_data[15] } :
@@ -65,9 +67,7 @@ assign pxl_in   = hflipx ?
     // { pxl_data[15], pxl_data[31], pxl_data[ 7], pxl_data[23] } :
     // { pxl_data[ 8], pxl_data[24], pxl_data[ 0], pxl_data[16] } };
 
-assign rom_addr = { code[12:0], ysubf[3], rom_lsb^SWAP_HALVES, ysubf[2:0] };
-assign { hflip, vflip } = attr[15:14]^{1'b0,flip};
-assign pal = attr[13:9];
+assign rom_addr = { code, ysubf[3], rom_lsb^SWAP_HALVES, ysubf[2:0] };
 assign buf_we   = busy & ~cnt[3];
 
 jtframe_sort u_sort(
