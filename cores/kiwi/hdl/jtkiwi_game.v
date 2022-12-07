@@ -147,6 +147,7 @@ jtkiwi_snd u_sound(
     .service    ( service       ),
     // DIP switches
     .dipsw      ( dipsw[15:0]   ),
+    .dip_pause  ( dip_pause     ),
 
     // Shared RAM
     .ram_addr   ( shr_addr      ),

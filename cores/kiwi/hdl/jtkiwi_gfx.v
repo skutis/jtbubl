@@ -79,7 +79,6 @@ reg  [ 2:0] st;
 reg  [13:0] code;
 reg  [ 1:0] cen_cnt;
 wire        tm_page;
-wire        obj_page;
 wire [15:0] vram_dout, code_dout, col_xmsb;
 wire [ 3:0] col_cfg;
 wire [ 1:0] col0;
@@ -97,7 +96,7 @@ assign flip     = cfg[0][6]; // only flip y?
 assign video_en = cfg[0][4]; // uncertain
 assign col0     = cfg[0][1:0]; // start column in the tilemap VRAM
 assign tm_page  = cfg[1][6];
-assign obj_page = cfg[1][5];
+// assign obj_page = cfg[1][5]; // ?
 assign col_cfg  = cfg[1][3:0];
 assign col_xmsb = { cfg[3], cfg[2] };
 assign cpu_din  = yram_cs ? yram_dout :
@@ -197,7 +196,7 @@ jtkiwi_obj u_obj(
 
     .hs         ( hs        ),
     .flip       ( ~flip     ), // the inversion is not consistent with the tilemap. I have to check that
-    .page       ( obj_page  ),
+    .page       ( tm_page   ),
 
     .lut_addr   ( lut_addr  ),
     .lut_data   ( code_dout ),

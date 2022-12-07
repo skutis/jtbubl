@@ -47,6 +47,7 @@ module jtkiwi_snd(
     input               mshramen,
 
     // DIP switches
+    input               dip_pause,
     input      [ 1:0]   fx_level,
     input               service,
     input      [15:0]   dipsw,
@@ -138,14 +139,18 @@ function [6:0] swap_joy( input [6:0] j );
 endfunction
 
 always @(posedge clk) begin
-    case( A[2:0] )
-        0: cab_dout <= { start_button[0], swap_joy( joystick1 )};
-        1: cab_dout <= { start_button[1], swap_joy( joystick2 )};
-        2: cab_dout <= { 4'hf, coin_input[0], coin_input[1], 1'b1 /*tilt*/, service };
-        // 3: cab_dout <= { 7'h7f, ~coin_input[0] };
-        // 4: cab_dout <= { 7'h7f, ~coin_input[1] };
-        default: cab_dout <= 8'h00;
-    endcase
+    if( !dip_pause )
+        cab_dout <= 8'hff; // do not let inputs disturb the pause
+    else begin
+        case( A[2:0] )
+            0: cab_dout <= { start_button[0], swap_joy( joystick1 )};
+            1: cab_dout <= { start_button[1], swap_joy( joystick2 )};
+            2: cab_dout <= { 4'hf, coin_input[0], coin_input[1], 1'b1 /*tilt*/, service };
+            // 3: cab_dout <= { 7'h7f, ~coin_input[0] };
+            // 4: cab_dout <= { 7'h7f, ~coin_input[1] };
+            default: cab_dout <= 8'h00;
+        endcase
+    end
     din <= rom_cs ? rom_data :
            ram_cs ? ram_dout :
            fm_cs  ? fm_dout  :
