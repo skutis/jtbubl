@@ -152,7 +152,8 @@ jtkiwi_colmix u_colmix(
     .obj_pxl    ( obj_pxl        ),
     .red        ( red            ),
     .green      ( green          ),
-    .blue       ( blue           )
+    .blue       ( blue           ),
+    .gfx_en     ( gfx_en         )
 );
 
 endmodule

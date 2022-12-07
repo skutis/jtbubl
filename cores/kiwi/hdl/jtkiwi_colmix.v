@@ -32,6 +32,7 @@ module jtkiwi_colmix(
     output [7:0] cpu_din,
     input        pal_cs,
 
+    input      [3:0] gfx_en,
     output reg [4:0] red,
     output reg [4:0] green,
     output reg [4:0] blue
@@ -43,14 +44,17 @@ reg  [7:0] pall;
 reg  [8:0] coll, col_addr;
 wire       pal_we;
 wire       blank;
-reg        half;
+reg        half, obj_sel;
 
 assign pal_addr = { coll, half };
 assign pal_we   = pal_cs & ~cpu_rnw;
 assign blank    = ~(LVBL & LHBL);
 
 always @* begin
-    col_addr = obj_pxl[3:0] != 4'h0 ? obj_pxl : scr_pxl; // simple priority for now.
+    obj_sel = obj_pxl[3:0] != 4'h0;
+    if( !gfx_en[0] ) obj_sel = 1;
+    if( !gfx_en[3] ) obj_sel = 0;
+    col_addr = obj_sel ? obj_pxl : scr_pxl; // simple priority for now.
 end
 
 always @(posedge clk) begin
