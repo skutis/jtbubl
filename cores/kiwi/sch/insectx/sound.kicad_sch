@@ -6,7 +6,7 @@
 
   (title_block
     (title "Insector X - P0-056A")
-    (date "2022-12-02")
+    (date "2022-12-06")
     (company "Ulf Skutnabba, twitter: @skutis77")
   )
 
@@ -1337,7 +1337,6 @@
       )
     )
   )
-
 
   (junction (at 199.39 96.52) (diameter 0) (color 0 0 0 0)
     (uuid 0466ea65-fe62-413b-9b8e-429461b48ae8)
