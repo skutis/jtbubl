@@ -82,7 +82,7 @@ always @(posedge clk, posedge rst) begin
     end else begin
         dr_draw <= 0;
         if( hs || (vrender>9'hf0 && vrender<9'h116) ) begin
-            objcnt  <= 0;
+            objcnt  <= 9'h1ff;
             done    <= 0;
             st      <= 0;
             dr_draw <= 0;
@@ -96,9 +96,9 @@ always @(posedge clk, posedge rst) begin
                 0: begin
                     ysub <= ydiff[3:0];
                     if( !match ) begin
-                        objcnt <= objcnt + 1'd1;
+                        objcnt <= objcnt - 1'd1;
                         st     <= 0;
-                        done   <= &objcnt;
+                        done   <= objcnt==0;
                     end
                 end
                 1: { pal, code[15:14], xpos } <= lut_data;
@@ -110,8 +110,8 @@ always @(posedge clk, posedge rst) begin
                         dr_attr <= { hflip, vflip, pal, 9'd0 };
                         dr_xpos <= xpos;
                         dr_ysub <= ysub;
-                        objcnt <=  objcnt + 1'd1;
-                        done    <= &objcnt;
+                        objcnt <=  objcnt - 1'd1;
+                        done    <= objcnt==0;
                     end else begin
                         st <= st;
                     end

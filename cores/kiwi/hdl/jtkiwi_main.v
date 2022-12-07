@@ -209,13 +209,16 @@ jtframe_dual_ram #(.aw(13),.dumpfile("mainmem")) u_comm(
         rom_cs   = 0;
         rom_addr = 0;
         vram_cs  = 0;
+        vflag_cs = 0;
         vctrl_cs = 0;
         pal_cs   = 0;
         snd_rstn = 0;
+        mshramen = 0;
     end
     assign cpu_rnw  = 1;
     assign cpu_addr = 1;
     assign cpu_dout = 0;
     assign shr_dout = 0;
+    assign st_dout  = 0;
 `endif
 endmodule
