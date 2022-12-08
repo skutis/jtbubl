@@ -33,15 +33,16 @@ module jtkiwi_colmix(
     input        pal_cs,
 
     input      [3:0] gfx_en,
-    output reg [4:0] red,
-    output reg [4:0] green,
-    output reg [4:0] blue
+    output     [4:0] red,
+    output     [4:0] green,
+    output     [4:0] blue
 );
 
 wire [7:0] pal_dout;
 wire [9:0] pal_addr;
 reg  [7:0] pall;
 reg  [8:0] coll, col_addr;
+reg  [14:0] rgb;
 wire       pal_we;
 wire       blank;
 reg        half, obj_sel;
@@ -49,6 +50,7 @@ reg        half, obj_sel;
 assign pal_addr = { coll, half };
 assign pal_we   = pal_cs & ~cpu_rnw;
 assign blank    = ~(LVBL & LHBL);
+assign {red,green,blue} = {15{~blank}} & rgb;
 
 always @* begin
     obj_sel = obj_pxl[3:0] != 4'h0;
@@ -61,15 +63,14 @@ always @(posedge clk) begin
     half <= ~half;
     if( pxl_cen ) begin
 `ifdef GRAY
-        { red, green, blue } <= ~{3{ {coll[3:0]}, 1'b0 } };
+        rgb <= ~{3{ {coll[3:0]}, 1'b0 } };
 `else
-        { red, green, blue } <= { pal_dout[6:0], pall };
+        rgb <= { pal_dout[6:0], pall };
 `endif
         half <= 1;
         coll <= col_addr;
     end
     pall <= pal_dout;
-    if( blank ) {red,green,blue} <= 0;
 end
 
 // Palette RAM X1-007 chip

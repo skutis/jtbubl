@@ -67,9 +67,10 @@ wire [ 8:0] vrender, vrender1, vdump;
 wire [ 8:0] scr_pxl, obj_pxl;
 
 jtframe_vtimer #(
-    .HB_START( 9'd255 ),
+    .HB_START( 9'd257 ),
     .HS_START( 9'd297 ),
-    .HB_END  ( 9'd383 ),
+    .HCNT_END( 9'd383 ),
+    .HB_END  ( 9'd1   ),
     .V_START ( 9'd008 ),
     .VS_START( 9'd254 ),
     .VB_START( 9'd239 ),
