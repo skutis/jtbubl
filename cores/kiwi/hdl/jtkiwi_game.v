@@ -145,6 +145,7 @@ jtkiwi_snd u_sound(
     .joystick1  ( joystick1     ),
     .joystick2  ( joystick2     ),
     .service    ( service       ),
+    .tilt       ( tilt          ),
     // DIP switches
     .dipsw      ( dipsw[15:0]   ),
     .dip_pause  ( dip_pause     ),
