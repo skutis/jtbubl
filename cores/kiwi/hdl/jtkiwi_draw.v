@@ -55,12 +55,10 @@ reg  [31:0] pxl_data;
 reg         rom_lsb;
 reg  [ 3:0] cnt;
 wire [ 3:0] ysubf, pxl_sort, pxl_in;
-wire        hflipx;
 
-assign hflipx   = hflip ^ flip;
-assign ysubf    = ysub^{4{~vflip^flip}};
+assign ysubf    = ysub^{4{vflip}};
 assign buf_din  = { pal, pxl_sort };
-assign pxl_in   = hflipx ?
+assign pxl_in   = hflip ?
     { pxl_data[23], pxl_data[ 7], pxl_data[31], pxl_data[15] } :
     { pxl_data[16], pxl_data[ 0], pxl_data[24], pxl_data[ 8] };
 
@@ -105,7 +103,7 @@ always @(posedge clk, posedge rst) begin
             if( !cnt[3] ) begin
                 cnt      <= cnt+1'd1;
                 buf_addr <= buf_addr+1'd1;
-                pxl_data <= hflipx ? pxl_data << 1 : pxl_data >> 1;
+                pxl_data <= hflip ? pxl_data << 1 : pxl_data >> 1;
                 rom_lsb  <= ~hflip;
                 if( cnt[2:0]==7 && !rom_cs ) busy <= 0;
             end

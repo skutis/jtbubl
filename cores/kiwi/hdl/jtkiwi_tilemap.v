@@ -67,7 +67,7 @@ wire        buf_we;
 
 assign tm_addr  = { page, 1'b1, st[0], eff_h[8:5], eff_v[7:4], eff_h[4] }; // 1 + 1 + 1 + 4 + 5 = 12
 assign col_addr = { col_cnt[4:1], 1'd0, st[0], 2'd0 };
-assign vf       = {9{flip}} ^ vrender;
+assign vf       = {9{~flip}} ^ vrender;
 
 always @* begin
     eff_v = vf + { 1'b0, yscr };
@@ -126,7 +126,7 @@ always @(posedge clk, posedge rst) begin
     end
 end
 
-jtkiwi_draw u_draw(
+jtkiwi_draw #(.SWAP_HALVES(1'b1)) u_draw(
     .rst        ( rst           ),
     .clk        ( clk           ),
 

@@ -92,7 +92,7 @@ wire [7:0] cfg0 = cfg[0], cfg1 = cfg[1], cfg2 = cfg[2], cfg3 = cfg[3];
 
 assign vram_we  = {2{vram_cs  & ~cpu_rnw}} & { cpu_addr[12], ~cpu_addr[12] };
 assign yram_we  = yram_cs & ~cpu_rnw;
-assign flip     = cfg[0][6]; // only flip y?
+assign flip     = ~cfg[0][6]; // only flip y?
 assign video_en = cfg[0][4]; // uncertain
 assign col0     = cfg[0][1:0]; // start column in the tilemap VRAM
 assign tm_page  = cfg[1][6];
@@ -101,7 +101,7 @@ assign col_cfg  = cfg[1][3:0];
 assign col_xmsb = { cfg[3], cfg[2] };
 assign cpu_din  = yram_cs ? yram_dout :
                   vram_cs ? (cpu_addr[12] ? vram_dout[15:8] : vram_dout[7:0]) : 8'h00;
-assign st_dout  = { 2'd0, col0, col_cfg };
+assign st_dout  = { flip, 1'd0, col0, col_cfg };
 
 always @* begin
     yram_cs = 0;
@@ -195,7 +195,7 @@ jtkiwi_obj u_obj(
     .pxl_cen    ( pxl_cen   ),
 
     .hs         ( hs        ),
-    .flip       ( ~flip     ), // the inversion is not consistent with the tilemap. I have to check that
+    .flip       ( flip      ),
     .page       ( tm_page   ),
 
     .lut_addr   ( lut_addr  ),

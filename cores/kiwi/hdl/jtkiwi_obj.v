@@ -107,11 +107,11 @@ always @(posedge clk, posedge rst) begin
                     if( !dr_busy )  begin
                         dr_draw  <= 1;
                         dr_code  <= code[12:0];
-                        dr_hflip <= hflip;
+                        dr_hflip <= hflip^flip;
                         dr_vflip <= vflip;
                         dr_pal   <= pal;
                         dr_xpos <= xpos;
-                        dr_ysub <= ysub;
+                        dr_ysub <= ~ysub;
                         objcnt <=  objcnt - 1'd1;
                         done    <= objcnt==0;
                     end else begin
@@ -156,7 +156,7 @@ jtframe_obj_buffer #(
     .FLIP_OFFSET(9'h100)
 ) u_linebuf(
     .clk    ( clk       ),
-    .flip   ( flip      ),
+    .flip   ( 1'b0      ),
     .LHBL   ( ~hs       ),
     // New line writting
     .we     ( buf_we    ),
