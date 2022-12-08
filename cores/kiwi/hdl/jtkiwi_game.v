@@ -30,8 +30,8 @@ wire        cen6, cen3, cen1p5;
 wire        vram_cs,  pal_cs, flip;
 wire        cpu_rnw, vctrl_cs, vflag_cs;
 
-assign  dip_flip   = flip;
-always @* debug_view = gfx_st;
+assign dip_flip   = flip;
+assign debug_view = gfx_st;
 // main_st;
 
 jtframe_frac_cen #(.WC(4),.W(3)) u_cen24(
