@@ -8,7 +8,37 @@ beta = true
 
 [parse]
 sourcefile="tnzs.cpp"
-# skip = { bootlegs=true, setnames = [ "kikcubic", "kikcubicb", "buccanrs", "buccanrsa", "buccanrsb" ] }
+skip = { setnames = [
+"arknoid2",
+"arknoid2j",
+"arknoid2u",
+"chukatai",
+"chukataij",
+"chukataija",
+"chukataiu",
+"drtoppel",
+"drtoppelj",
+"drtoppelu",
+"extrmatn",
+"extrmatnj",
+"extrmatnu",
+"extrmatnur",
+"jpopnics",
+"kabukiz",
+"kabukizj",
+"kageki",
+"kagekih",
+"kagekij",
+"kagekiu",
+"plumppop",
+"tnzs",
+"tnzsj",
+"tnzsjo",
+"tnzso",
+"tnzsoa",
+"tnzsop",
+"tnzsuo"
+ ] }
 
 [buttons]
 core=$JTFRAME_BUTTONS
