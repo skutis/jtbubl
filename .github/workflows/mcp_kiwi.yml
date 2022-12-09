@@ -1,12 +1,12 @@
 
-name: bubl for mcp
+name: kiwi for mcp
 
 on:
   push:
     branches:
       - build
       - mcp
-      - build_bubl
+      - build_kiwi
 
   workflow_dispatch:
 
@@ -35,4 +35,4 @@ jobs:
         with:
           access_token: ${{ github.token }}
       - name: compile for mcp
-        run: /docked_build.sh bubl -mcp  
+        run: /docked_build.sh kiwi -mcp  

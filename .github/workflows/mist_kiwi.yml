@@ -1,12 +1,8 @@
 
-name: bubl for mcp
+name: kiwi for mist
 
 on:
   push:
-    branches:
-      - build
-      - mcp
-      - build_bubl
 
   workflow_dispatch:
 
@@ -15,7 +11,7 @@ on:
 
 jobs:
 
-  mcp_compilation:
+  mist_compilation:
 
     env:
       FTPUSER: ${{ secrets.FTPUSER }}
@@ -34,5 +30,5 @@ jobs:
         uses: styfle/cancel-workflow-action@0.9.0
         with:
           access_token: ${{ github.token }}
-      - name: compile for mcp
-        run: /docked_build.sh bubl -mcp  
+      - name: compile for mist
+        run: /docked_build.sh kiwi -mist  

@@ -1,11 +1,11 @@
 
-name: bubl for mcp
+name: bubl for pocket
 
 on:
   push:
     branches:
       - build
-      - mcp
+      - pocket
       - build_bubl
 
   workflow_dispatch:
@@ -15,7 +15,7 @@ on:
 
 jobs:
 
-  mcp_compilation:
+  pocket_compilation:
 
     env:
       FTPUSER: ${{ secrets.FTPUSER }}
@@ -34,5 +34,5 @@ jobs:
         uses: styfle/cancel-workflow-action@0.9.0
         with:
           access_token: ${{ github.token }}
-      - name: compile for mcp
-        run: /docked_build.sh bubl -mcp  
+      - name: compile for pocket
+        run: /docked_build.sh bubl -pocket  

@@ -1,12 +1,12 @@
 
-name: bubl for mcp
+name: kiwi for neptuno
 
 on:
   push:
     branches:
       - build
-      - mcp
-      - build_bubl
+      - neptuno
+      - build_kiwi
 
   workflow_dispatch:
 
@@ -15,7 +15,7 @@ on:
 
 jobs:
 
-  mcp_compilation:
+  neptuno_compilation:
 
     env:
       FTPUSER: ${{ secrets.FTPUSER }}
@@ -34,5 +34,5 @@ jobs:
         uses: styfle/cancel-workflow-action@0.9.0
         with:
           access_token: ${{ github.token }}
-      - name: compile for mcp
-        run: /docked_build.sh bubl -mcp  
+      - name: compile for neptuno
+        run: /docked_build.sh kiwi -neptuno  
