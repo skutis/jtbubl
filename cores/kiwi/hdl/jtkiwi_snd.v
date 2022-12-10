@@ -24,6 +24,12 @@ module jtkiwi_snd(
 
     input               LVBL,
 
+    // MCU
+    input               mcu_en,
+    input      [10:0]   prog_addr,  // 2kB
+    input      [ 7:0]   prog_data,
+    input               prom_we,
+
     // Cabinet inputs
     input      [ 1:0]   start_button,
     input      [ 1:0]   coin_input,
@@ -59,20 +65,20 @@ module jtkiwi_snd(
     output               peak
 );
 `ifndef NOSOUND
-localparam [7:0] FM_GAIN  = 8'h30;
+localparam [7:0] FM_GAIN = 8'h30;
 
 wire        irq_ack, mreq_n, m1_n, iorq_n, rd_n, wr_n,
             fmint_n, int_n, cpu_cen, rfsh_n;
-reg  [ 7:0] din, cab_dout, psg_gain;
-wire [ 7:0] fm_dout, dout;
+reg  [ 7:0] din, cab_dout, psg_gain, p1_din;
+wire [ 7:0] fm_dout, dout, p2_din, p2_dout, mcu_dout;
 reg  [ 1:0] bank;
 wire [15:0] A;
 wire [ 9:0] psg_snd;
-reg         bank_cs, fm_cs, cab_cs,
+reg         bank_cs, fm_cs, cab_cs, mcu_cs,
             dev_busy, fm_busy, fmcs_l,
-            mcu_rst, comb_rstn=0;
+            mcu_rstn, comb_rstn=0;
 wire signed [15:0] fm_snd;
-wire        mem_acc;
+wire        mem_acc, mcu_we, mcu_comb_rst;
 
 `ifdef SIMULATION
 wire shared_rd = ram_cs && !A[0] && !rd_n;
@@ -83,6 +89,9 @@ assign mem_acc  = ~mreq_n & rfsh_n;
 assign ram_din  = dout;
 assign ram_addr = A[12:0];
 assign cpu_rnw  = wr_n | ~cpu_cen;
+assign mcu_we   = mcu_cs & ~wr_n;
+assign mcu_comb_rst = ~(mcu_rstn & comb_rstn);
+assign p2_din   = { 6'h3f, tilt, service };
 
 assign irq_ack = /*!m1_n &&*/ !iorq_n; // The original PCB just uses iorq_n,
     // the orthodox way to do it is to use m1_n too
@@ -119,18 +128,19 @@ always @(posedge clk) begin
     rom_cs  <= mem_acc &&  A[15:12]  < 4'ha;
     bank_cs <= mem_acc &&  A[15:12] == 4'ha; // this cleans the watchdog counter - not implemented
     fm_cs   <= mem_acc &&  A[15:12] == 4'hb;
-    cab_cs  <= mem_acc &&  A[15:12] == 4'hc;
+    cab_cs  <= mem_acc &&  A[15:12] == 4'hc && !mcu_en;
+    mcu_cs  <= mem_acc &&  A[15:12] == 4'hc &&  mcu_en;
     ram_cs  <= mem_acc && (A[15:12] == 4'hd || A[15:12] == 4'he);
 end
 
 always @(posedge clk, negedge comb_rstn) begin
     if( !comb_rstn ) begin
-        bank    <= 0;
-        mcu_rst <= 0;
+        bank     <= 0;
+        mcu_rstn <= 0;
     end else begin
         if( bank_cs ) begin
-            bank    <= dout[1:0];
-            mcu_rst <= dout[2];
+            bank     <= dout[1:0];
+            mcu_rstn <= dout[4];
         end
     end
 end
@@ -155,7 +165,17 @@ always @(posedge clk) begin
     din <= rom_cs ? rom_data :
            ram_cs ? ram_dout :
            fm_cs  ? fm_dout  :
+           mcu_cs ? mcu_dout :
            cab_cs ? cab_dout : 8'h00;
+end
+
+
+always @(posedge clk) begin
+    case( p2_dout[2:0] )
+        0: p1_din <= { start_button[0], swap_joy( joystick1 )};
+        1: p1_din <= { start_button[1], swap_joy( joystick2 )};
+        2: p1_din <= { 6'h3f, tilt, service };
+    endcase
 end
 
 `ifdef SIMULATION
@@ -209,6 +229,38 @@ jtframe_z80_devwait #(.RECOVERY(1)) u_gamecpu(
     .rom_ok   ( rom_ok         ),
     .dev_busy ( dev_busy       )
 );
+
+`ifndef NOMCU
+jtframe_i8742 u_mcu(
+    .rst        ( mcu_comb_rst ),
+    .clk        ( clk        ),
+    .cen        ( cen1p5     ),
+
+    // CPU communication
+    .a0         ( A[0]       ),
+    .we         ( mcu_we     ),
+    .din        ( dout       ),
+    .dout       ( mcu_dout   ),
+
+    // Ports
+    .p1_din     ( p1_din     ),
+    .p2_din     ( p2_din     ),
+    .p1_dout    (            ),
+    .p2_dout    ( p2_dout    ),
+
+    // Test pins (used in the assembler TEST instruction)
+    .t0_din     (coin_input[0]),
+    .t1_din     (coin_input[1]),
+    .t0_dout    (            ),
+
+    .prog_addr  ( prog_addr  ),
+    .prog_data  ( prog_data  ),
+    .prom_we    ( prom_we    )
+);
+`else
+    assign p2_dout  = 0;
+    assign mcu_dout = 8'hff;
+`endif
 
 `ifndef VERILATOR_KEEP_JT03
 /* verilator tracing_off */

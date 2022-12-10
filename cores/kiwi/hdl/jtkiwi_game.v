@@ -29,10 +29,20 @@ wire        cen6, cen3, cen1p5;
 
 wire        vram_cs,  pal_cs, flip;
 wire        cpu_rnw, vctrl_cs, vflag_cs;
+reg         mcu_en=0, colprom_en=0,
+            colprom_we, mcuprom_we;
 
 assign dip_flip   = flip;
 assign debug_view = gfx_st;
-// main_st;
+assign colprom_we = prom_we && ioctl_addr[15:10]==0;
+assign mcuprom_we = prom_we && ioctl_addr >= `MCU_START;
+
+always @(posedge clk) begin
+    if( prog_we && ioctl_addr==4 ) begin
+        mcu_en     <= prog_data != 8'h77; // 77 for Insector X
+        colprom_en <= prog_data == 8'hc; // 0C for Extermination
+    end
+end
 
 jtframe_frac_cen #(.WC(4),.W(3)) u_cen24(
     .clk    ( clk       ),    // 24 MHz
@@ -49,6 +59,7 @@ jtkiwi_main u_main(
 
     .LVBL           ( LVBL          ),
     .hcnt           ( hdump         ),
+    .colprom_en     ( colprom_en    ),
     // Main CPU ROM
     .rom_addr       ( main_addr     ),
     .rom_cs         ( main_cs       ),
@@ -96,9 +107,10 @@ jtkiwi_video u_video(
     .flip           ( flip          ),
     .hdump          ( hdump         ),
     // PROMs
-    // .prom_we        ( prom_we       ),
-    // .prog_addr      ( prog_addr[7:0]),
-    // .prog_data      ( prog_data[3:0]),
+    .prom_we        ( colprom_we    ),
+    .prog_addr      ( prog_addr[9:0]),
+    .prog_data      ( prog_data     ),
+    .colprom_en     ( colprom_en    ),
     // GFX - CPU interface
     .cpu_rnw        ( cpu_rnw       ),
     .cpu_addr       ( cpu_addr      ),
@@ -157,6 +169,12 @@ jtkiwi_snd u_sound(
     .cpu_rnw    ( sub_rnw       ),
     .ram_cs     ( shr_cs        ),
     .mshramen   ( mshramen      ),
+
+    // MCU
+    .mcu_en     ( mcu_en        ),
+    .prog_addr  ( prog_addr[10:0]),
+    .prog_data  ( prog_data     ),
+    .prom_we    ( mcuprom_we    ),
 
     // ROM
     .rom_addr   ( sub_addr      ),

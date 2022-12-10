@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# jtsim will not overwrite the jtsim_vhdl.f file
+export KEEP_JTSIM_VHDL=1
+
+# The MCU gets out of reset at frame 19
+
 # Use cpsnap.sh to copy MAME scenes to a new folder
 
 ARG=
@@ -11,7 +16,7 @@ while [ $# -gt 0 ]; do
     case $1 in
         -s) shift
             SCENE=$1
-            ARG="$ARG -d NOMAIN -nosnd -video 2"
+            ARG="$ARG -d NOMAIN -d NOMCU -nosnd -video 2"
             ;;
         *) ARG="$ARG $1";;
     esac

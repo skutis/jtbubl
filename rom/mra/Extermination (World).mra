@@ -49,12 +49,13 @@
             <part name="b06-04.4a" crc="3697ace4" map="10"/>
         </interleave>
         <part repeat="0x180000"> FF</part>
-        <!-- mcu - starts at 0x250000 -->
-        <part name="b06__14.1g" crc="28907072"/>
-        <!-- proms - starts at 0x250800 -->
+        <!-- proms - starts at 0x250000 -->
         <part name="b06-09.15f" crc="f388b361"/>
         <part name="b06-08.17f" crc="10c9aac3"/>
-        <!-- Total 0x250C00 bytes - 2371 kBytes -->
+        <part repeat="0xC00"> FF</part>
+        <!-- mcu - starts at 0x251000 -->
+        <part name="b06__14.1g" crc="28907072"/>
+        <!-- Total 0x251800 bytes - 2374 kBytes -->
     </rom>
     <rom index="17" zip="jtbeta.zip" md5="None">
         <part name="beta.bin"/>

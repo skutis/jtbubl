@@ -30,9 +30,10 @@ module jtkiwi_video(
     output              flip,
     output     [ 8:0]   hdump,
     // PROMs
-    // input      [ 7:0]   prog_addr,
-    // input      [ 3:0]   prog_data,
-    // input               prom_we,
+    input      [ 9:0]   prog_addr,
+    input      [ 7:0]   prog_data,
+    input               prom_we,
+    input               colprom_en,
     // CPU      interface
     input               pal_cs,
     output     [ 7:0]   pal_dout,
@@ -148,6 +149,11 @@ jtkiwi_colmix u_colmix(
     .cpu_dout   ( cpu_dout       ),
     .cpu_din    ( pal_dout       ),
     .pal_cs     ( pal_cs         ),
+    // PROMs
+    .prog_addr  ( prog_addr      ),
+    .prog_data  ( prog_data      ),
+    .prom_we    ( prom_we        ),
+    .colprom_en ( colprom_en     ),
     // Colour output
     .scr_pxl    ( scr_pxl        ),
     .obj_pxl    ( obj_pxl        ),

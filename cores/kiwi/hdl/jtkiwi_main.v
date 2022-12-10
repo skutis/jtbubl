@@ -21,6 +21,7 @@ module jtkiwi_main(
     input               clk,
     input               cen6,
     input               LVBL,
+    input               colprom_en,
 
     // Video devices
     output reg          vram_cs,
@@ -87,7 +88,7 @@ always @(posedge clk) begin
     vctrl_cs <= mem_acc && A[15:10] == 6'b1111_00; // internal RAM and config registers
     vflag_cs <= mem_acc && A[15: 9] == 7'b1111_010 && !wr_n; // config registers
     bank_cs  <= mem_acc && A[15: 9] == 7'b1111_011 && !wr_n; // f6xx/f7xx
-    pal_cs   <= mem_acc && A[15:11] == 5'h1f;
+    pal_cs   <= mem_acc && A[15:11] == 5'h1f && !colprom_en;
 end
 
 always @* begin

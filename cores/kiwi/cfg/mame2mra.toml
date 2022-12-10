@@ -9,6 +9,11 @@ beta = true
 [parse]
 sourcefile="tnzs.cpp"
 skip = { setnames = [
+# "extrmatn",
+# "extrmatnj",
+# "extrmatnu",
+# "extrmatnur",
+
 "arknoid2",
 "arknoid2j",
 "arknoid2u",
@@ -19,10 +24,6 @@ skip = { setnames = [
 "drtoppel",
 "drtoppelj",
 "drtoppelu",
-"extrmatn",
-"extrmatnj",
-"extrmatnu",
-"extrmatnur",
 "jpopnics",
 "kabukiz",
 "kabukizj",
@@ -55,14 +56,14 @@ regions = [
     { name="audiocpu", start=$JTFRAME_BA2_START },
     { name="samples", start=$PCM_START },
     { name="gfx1", start=$JTFRAME_BA3_START, width=16, No_offset=true },
-    { name="mcu", start=$MCU_START, No_offset=true   },
     { name="proms", start=$JTFRAME_PROM_START, No_offset=true },
+    { name="mcu", start=$MCU_START, No_offset=true   },
     { name="pal", skip=true },
 ]
 
 order = [
     "maincpu", "sub", "audiocpu", "samples",
-    "gfx1", "mcu", "proms"
+    "gfx1", "proms", "mcu"
 ]
 
 
