@@ -23,6 +23,8 @@ module jtkiwi_snd(
     input               cen1p5,
 
     input               LVBL,
+    input               fm_en,
+    input               psg_en,
 
     // MCU
     input               mcu_en,
@@ -69,7 +71,7 @@ localparam [7:0] FM_GAIN = 8'h30;
 
 wire        irq_ack, mreq_n, m1_n, iorq_n, rd_n, wr_n,
             fmint_n, int_n, cpu_cen, rfsh_n;
-reg  [ 7:0] din, cab_dout, psg_gain, p1_din;
+reg  [ 7:0] din, cab_dout, psg_gain, fm_gain, p1_din;
 wire [ 7:0] fm_dout, dout, p2_din, p2_dout, mcu_dout;
 reg  [ 1:0] bank;
 wire [15:0] A;
@@ -114,6 +116,8 @@ always @(posedge clk) begin
         2'd2: psg_gain <= 8'h08;
         2'd3: psg_gain <= 8'h0a;
     endcase
+    if( !psg_en ) psg_gain <= 0;
+    fm_gain <= fm_en ? FM_GAIN : 8'h0;
 end
 
 always @(posedge clk) begin
@@ -297,7 +301,7 @@ jtframe_mixer #(.W1(10)) u_mixer(
     .ch1    ( psg_snd      ),
     .ch2    ( 16'd0        ),
     .ch3    ( 16'd0        ),
-    .gain0  ( FM_GAIN      ), // YM2203
+    .gain0  ( fm_gain      ), // YM2203
     .gain1  ( psg_gain     ), // PSG
     .gain2  ( 8'd0         ),
     .gain3  ( 8'd0         ),

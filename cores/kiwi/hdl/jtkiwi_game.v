@@ -28,9 +28,9 @@ wire [12:0] shr_addr, cpu_addr;
 wire        cen6, cen3, cen1p5;
 
 wire        vram_cs,  pal_cs, flip;
-wire        cpu_rnw, vctrl_cs, vflag_cs;
-reg         mcu_en=0, colprom_en=0,
+wire        cpu_rnw, vctrl_cs, vflag_cs,
             colprom_we, mcuprom_we;
+reg         mcu_en=0, colprom_en=0;
 
 assign dip_flip   = flip;
 assign debug_view = gfx_st;
@@ -150,6 +150,8 @@ jtkiwi_snd u_sound(
     .cen6       ( cen6          ),
     .cen1p5     ( cen1p5        ),
     .LVBL       ( LVBL          ),
+    .fm_en      ( enable_fm     ),
+    .psg_en     ( enable_psg    ),
 
     // cabinet I/O
     .start_button( start_button ),
