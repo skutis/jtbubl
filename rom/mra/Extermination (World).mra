@@ -40,13 +40,11 @@
         <part name="b06-19.4e" crc="8de43ed9"/>
         <part repeat="0x20000"> FF</part>
         <!-- gfx1 - starts at 0x50000 -->
-        <interleave output="16">
-            <part name="b06-01.13a" crc="d2afbf7e" map="01"/>
-            <part name="b06-02.10a" crc="e0c2757a" map="10"/>
-        </interleave>
-        <interleave output="16">
-            <part name="b06-03.7a" crc="ee80ab9d" map="01"/>
-            <part name="b06-04.4a" crc="3697ace4" map="10"/>
+        <interleave output="32">
+            <part name="b06-01.13a" crc="d2afbf7e" map="0001"/>
+            <part name="b06-02.10a" crc="e0c2757a" map="0010"/>
+            <part name="b06-03.7a" crc="ee80ab9d" map="0100"/>
+            <part name="b06-04.4a" crc="3697ace4" map="1000"/>
         </interleave>
         <part repeat="0x180000"> FF</part>
         <!-- proms - starts at 0x250000 -->
