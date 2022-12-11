@@ -35,6 +35,9 @@ jtframe:
       # - jtframe_rom.yaml
       - jtframe_dwnld.v
       - jtframe_gatecen.v
+  - from: sound
+    get:
+      - jtframe_dcrm.v
   - from: cpu
     get:
       # Z80

@@ -21,7 +21,7 @@ module jtkiwi_game(
 );
 
 wire        sub_rnw, shr_cs, mshramen, snd_rstn;
-wire [ 7:0] shr_din, shr_dout, main_st, gfx_st,
+wire [ 7:0] shr_din, shr_dout, main_st, gfx_st, snd_st,
             vram_dout, pal_dout, cpu_dout;
 wire [ 8:0] hdump;
 wire [12:0] shr_addr, cpu_addr;
@@ -33,9 +33,12 @@ wire        cpu_rnw, vctrl_cs, vflag_cs,
 reg         colprom_en=0, kabuki=0, kageki=0, mcu_en=0;
 
 assign dip_flip   = ~flip;
-assign debug_view = debug_bus[1:0]==0 ? { kageki, kabuki, colprom_en, mcu_en } : gfx_st;
+assign debug_view = st_addr[7:6]==0 ? { 4'd0, kageki, kabuki, colprom_en, mcu_en } :
+                    st_addr[7:6]==1 ? main_st :
+                    st_addr[7:6]==2 ? gfx_st  : snd_st;
 assign colprom_we = prom_we && ioctl_addr[15:10]==0;
 assign mcuprom_we = prom_we && ioctl_addr >= `MCU_START;
+assign st_dout    = debug_view;
 
 always @(posedge clk) begin
     if( prog_we && header && prog_addr==0 ) begin
@@ -92,6 +95,7 @@ jtkiwi_main u_main(
     .st_dout        ( main_st       )
 );
 
+/* verilator tracing_off */
 jtkiwi_video u_video(
     .rst            ( rst           ),
     .clk            ( clk           ),
@@ -141,6 +145,8 @@ jtkiwi_video u_video(
     .debug_bus      ( debug_bus     ),
     .st_dout        ( gfx_st        )
 );
+/* verilator tracing_on */
+
 
 jtkiwi_snd u_sound(
     .rst        ( rst           ),
@@ -155,6 +161,12 @@ jtkiwi_snd u_sound(
     // Game variations
     .kabuki     ( kabuki        ),
     .kageki     ( kageki        ),
+
+    // PCM
+    .pcm_addr   ( pcm_addr      ),
+    .pcm_data   ( pcm_data      ),
+    .pcm_ok     ( pcm_ok        ),
+    .pcm_cs     ( pcm_cs        ),
 
     // cabinet I/O
     .start_button( start_button ),
@@ -191,7 +203,10 @@ jtkiwi_snd u_sound(
     .fx_level   ( dip_fxlevel   ),
     .snd        ( snd           ),
     .sample     ( sample        ),
-    .peak       ( game_led      )
+    .peak       ( game_led      ),
+    // Debug
+    .st_addr    ( st_addr       ),
+    .st_dout    ( snd_st        )
 );
 
 endmodule

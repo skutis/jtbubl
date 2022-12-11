@@ -48,6 +48,12 @@ module jtkiwi_snd(
 
     // Sub CPU (sound)
     input               snd_rstn,
+
+    // PCM (Kageki)
+    output reg [15:0]   pcm_addr,
+    input      [ 7:0]   pcm_data,
+    input               pcm_ok,
+    output              pcm_cs,
     //      access to RAM
     output     [12:0]   ram_addr,
     output     [ 7:0]   ram_din,
@@ -66,14 +72,17 @@ module jtkiwi_snd(
     // Sound output
     output signed [15:0] snd,
     output               sample,
-    output               peak
+    output               peak,
+    // Debug
+    input      [ 7:0]   st_addr,
+    output reg [ 7:0]   st_dout
 );
 `ifndef NOSOUND
 localparam [7:0] FM_GAIN = 8'h30;
 
 wire        irq_ack, mreq_n, m1_n, iorq_n, rd_n, wr_n,
             fmint_n, int_n, cpu_cen, rfsh_n;
-reg  [ 7:0] din, cab_dout, psg_gain, fm_gain, p1_din, porta_din;
+reg  [ 7:0] din, cab_dout, psg_gain, fm_gain, pcm_gain, p1_din, porta_din;
 wire [ 7:0] fm_dout, dout, p2_din, p2_dout, mcu_dout, portb_dout;
 reg  [ 1:0] bank;
 wire [15:0] A;
@@ -96,6 +105,7 @@ assign cpu_rnw  = wr_n | ~cpu_cen;
 assign mcu_we   = mcu_cs & ~wr_n;
 assign mcu_comb_rst = ~(mcu_rstn & comb_rstn);
 assign p2_din   = { 6'h3f, tilt, service };
+assign pcm_cs   = kageki;
 
 assign irq_ack = /*!m1_n &&*/ !iorq_n; // The original PCB just uses iorq_n,
     // the orthodox way to do it is to use m1_n too
@@ -119,7 +129,8 @@ always @(posedge clk) begin
         2'd3: psg_gain <= 8'h0a;
     endcase
     if( !psg_en ) psg_gain <= 0;
-    fm_gain <= fm_en ? FM_GAIN : 8'h0;
+    pcm_gain <= kageki ? 8'h08 : 8'h0;
+    fm_gain  <= fm_en ? FM_GAIN : 8'h0;
 end
 
 always @(posedge clk) begin
@@ -177,7 +188,6 @@ always @(posedge clk) begin
            cab_cs ? cab_dout : 8'h00;
 end
 
-
 always @(posedge clk) begin
     case( p2_dout[2:0] )
         0: p1_din <= { start_button[0], swap_joy( joystick1 )};
@@ -185,6 +195,82 @@ always @(posedge clk) begin
         2: p1_din <= { 6'h3f, tilt, service };
     endcase
 end
+
+// Kageki's PCM
+reg  [7:0] pcm_lsb, pcm_re;
+wire [7:0] pcm_dcrm;
+reg  [1:0] pcm_st;
+reg  [2:0] pcm_cnt;
+reg        pcm_cen, sample_l, pb7l;
+
+always @(posedge clk, negedge comb_rstn) begin
+    if( !comb_rstn ) begin
+        pcm_cnt  <= 1;
+        pcm_cen  <= 0;
+        sample_l <= 0;
+    end else begin
+        sample_l <= sample;
+        pcm_cen  <= 0;
+        if( sample && !sample_l ) begin
+            pcm_cnt <= { pcm_cnt[1:0], pcm_cnt[2] };
+            pcm_cen <= pcm_cnt[2];
+        end
+    end
+end
+
+always @* begin
+    case( st_addr[1:0] )
+        0: st_dout = { pcm_st, portb_dout[5:0] };
+        1: st_dout = pcm_addr[15:8];
+        2: st_dout = pcm_gain;
+        3: st_dout = pcm_re;
+        default: st_dout = 0;
+    endcase
+end
+
+always @(posedge clk, negedge comb_rstn) begin
+    if( !comb_rstn ) begin
+        pcm_st   <= 0;
+        pcm_addr <= 0;
+        pcm_re   <= 0;
+        pb7l     <= 0;
+    end else begin
+        pb7l <= portb_dout[7];
+        if( pcm_cen && pcm_ok ) begin
+            case( pcm_st )
+                default:;
+                1: begin
+                    pcm_lsb     <= pcm_data;
+                    pcm_addr[0] <= 1;
+                    pcm_st      <= 2;
+                end
+                2: begin
+                    pcm_addr <= { pcm_data, pcm_lsb };
+                    pcm_st   <= 3;
+                end
+                3: begin
+                    if( pcm_data == 0 || (&pcm_addr) ) begin
+                        pcm_st  <= 0;
+                    end
+                    pcm_re   <= pcm_data;
+                    pcm_addr <= pcm_addr + 1'd1;
+                end
+            endcase
+        end
+        if( portb_dout[7] && !pb7l ) begin
+            pcm_st   <= 1;
+            pcm_addr <= { 9'd0, portb_dout[5:0], 1'b0 } + 16'h90;
+        end
+    end
+end
+
+jtframe_dcrm u_dcrm(
+    .rst        ( rst       ),
+    .clk        ( clk       ),
+    .sample     ( pcm_cen   ),
+    .din        ( pcm_re    ),
+    .dout       ( pcm_dcrm  )
+);
 
 `ifdef SIMULATION
     integer line_cnt=1;
@@ -273,10 +359,10 @@ jtframe_z80_devwait #(.RECOVERY(1)) u_gamecpu(
 always @(posedge clk) begin
     if( kageki ) begin
         case( portb_dout[1:0] )
-            0: porta_din <= { dipsw[4+8], dipsw[0+8], dipsw[4], dipsw[0] };
-            2: porta_din <= { dipsw[5+8], dipsw[1+8], dipsw[5], dipsw[1] };
-            1: porta_din <= { dipsw[6+8], dipsw[2+8], dipsw[6], dipsw[2] };
-            3: porta_din <= { dipsw[7+8], dipsw[3+8], dipsw[7], dipsw[3] };
+            0: porta_din <= { 4'd0, dipsw[4+8], dipsw[0+8], dipsw[4], dipsw[0] };
+            2: porta_din <= { 4'd0, dipsw[5+8], dipsw[1+8], dipsw[5], dipsw[1] };
+            1: porta_din <= { 4'd0, dipsw[6+8], dipsw[2+8], dipsw[6], dipsw[2] };
+            3: porta_din <= { 4'd0, dipsw[7+8], dipsw[3+8], dipsw[7], dipsw[3] };
         endcase
     end else porta_din <= dipsw[7:0];
 end
@@ -310,17 +396,17 @@ jt03 u_2203(
     .debug_view (            )
 );
 
-jtframe_mixer #(.W1(10)) u_mixer(
+jtframe_mixer #(.W1(10),.W2(8)) u_mixer(
     .rst    ( rst          ),
     .clk    ( clk          ),
     .cen    ( cen1p5       ),
     .ch0    ( fm_snd       ),
     .ch1    ( psg_snd      ),
-    .ch2    ( 16'd0        ),
+    .ch2    ( pcm_dcrm     ),
     .ch3    ( 16'd0        ),
     .gain0  ( fm_gain      ), // YM2203
     .gain1  ( psg_gain     ), // PSG
-    .gain2  ( 8'd0         ),
+    .gain2  ( pcm_gain     ),
     .gain3  ( 8'd0         ),
     .mixed  ( snd          ),
     .peak   ( peak         )

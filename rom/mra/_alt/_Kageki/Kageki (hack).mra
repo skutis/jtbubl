@@ -76,5 +76,5 @@
         <dip name="Difficulty" bits="8,9" ids="Hardest,Hard,Easy,Medium"/>
         <dip name="Allow Continue" bits="15" ids="No,Yes"/>
     </switches>
-    <buttons names="button 1,button 2,-,Start,Coin,Core credits" default="Y,X,B,Start,Select,-" count="2"/>
+    <buttons names="Left jab,Right hook,-,Start,Coin,Core credits" default="Y,X,B,Start,Select,-" count="2"/>
 </misterromdescription>
