@@ -145,7 +145,7 @@ jtkiwi_draw #(.SWAP_HALVES(1'b1)) u_draw (
     .buf_addr   ( buf_addr      ),
     .buf_we     ( buf_we        ),
     .buf_din    ( buf_din       ),
-    .debug_bus  ( 8'd0          )
+    .debug_bus  ( debug_bus     )
 );
 
 // During HS the contents of the memory are cleared

@@ -45,16 +45,16 @@
         <part name="b35-15.98g" crc="e6212a0f"/>
         <!-- gfx1 - starts at 0x50000 -->
         <interleave output="32">
-            <part name="b35__01.13a" crc="01d83a69" map="0001"/>
-            <part name="b35__03.10a" crc="3cb68797" map="0010"/>
-            <part name="b35__05.7a" crc="a4e20c08" map="0100"/>
-            <part name="b35__07.4a" crc="1b4af049" map="1000"/>
+            <part name="b35__05.7a" crc="a4e20c08" map="0001"/>
+            <part name="b35__01.13a" crc="01d83a69" map="0010"/>
+            <part name="b35__07.4a" crc="1b4af049" map="0100"/>
+            <part name="b35__03.10a" crc="3cb68797" map="1000"/>
         </interleave>
         <interleave output="32">
-            <part name="b35__02.12a" crc="d8af47ac" map="0001"/>
-            <part name="b35__04.8a" crc="71c03f91" map="0010"/>
-            <part name="b35__06.5a" crc="3f8ab658" map="0100"/>
-            <part name="b35__08.2a" crc="deb2268c" map="1000"/>
+            <part name="b35__06.5a" crc="3f8ab658" map="0001"/>
+            <part name="b35__02.12a" crc="d8af47ac" map="0010"/>
+            <part name="b35__08.2a" crc="deb2268c" map="0100"/>
+            <part name="b35__04.8a" crc="71c03f91" map="1000"/>
         </interleave>
         <!-- Total 0x150000 bytes - 1344 kBytes -->
     </rom>
