@@ -54,7 +54,8 @@ skip = { setnames = [
 
 [buttons]
 core=$JTFRAME_BUTTONS
-Names = [ { machine="insectx", names="Fire,Warp"} ]
+Names = [ { machine="insectx", names="Fire,Warp"},
+          { machine="kageki", names="Light,Strong"} ]
 
 [dipsw]
 bitcnt = 16
