@@ -28,6 +28,8 @@ module jtkiwi_snd(
 
     // MCU
     input               mcu_en,
+    input               kabuki,
+    input               kageki,
     input      [10:0]   prog_addr,  // 2kB
     input      [ 7:0]   prog_data,
     input               prom_we,
@@ -71,8 +73,8 @@ localparam [7:0] FM_GAIN = 8'h30;
 
 wire        irq_ack, mreq_n, m1_n, iorq_n, rd_n, wr_n,
             fmint_n, int_n, cpu_cen, rfsh_n;
-reg  [ 7:0] din, cab_dout, psg_gain, fm_gain, p1_din;
-wire [ 7:0] fm_dout, dout, p2_din, p2_dout, mcu_dout;
+reg  [ 7:0] din, cab_dout, psg_gain, fm_gain, p1_din, porta_din;
+wire [ 7:0] fm_dout, dout, p2_din, p2_dout, mcu_dout, portb_dout;
 reg  [ 1:0] bank;
 wire [15:0] A;
 wire [ 9:0] psg_snd;
@@ -234,37 +236,48 @@ jtframe_z80_devwait #(.RECOVERY(1)) u_gamecpu(
     .dev_busy ( dev_busy       )
 );
 
-`ifndef NOMCU
-jtframe_i8742 u_mcu(
-    .rst        ( mcu_comb_rst ),
-    .clk        ( clk        ),
-    .cen        ( cen1p5     ),
+// `ifndef NOMCU
+// jtframe_i8742 u_mcu(
+//     .rst        ( mcu_comb_rst ),
+//     .clk        ( clk        ),
+//     .cen        ( cen6       ),
 
-    // CPU communication
-    .a0         ( A[0]       ),
-    .we         ( mcu_we     ),
-    .din        ( dout       ),
-    .dout       ( mcu_dout   ),
+//     // CPU communication
+//     .a0         ( A[0]       ),
+//     .we         ( mcu_we     ),
+//     .din        ( dout       ),
+//     .dout       ( mcu_dout   ),
 
-    // Ports
-    .p1_din     ( p1_din     ),
-    .p2_din     ( p2_din     ),
-    .p1_dout    (            ),
-    .p2_dout    ( p2_dout    ),
+//     // Ports
+//     .p1_din     ( p1_din     ),
+//     .p2_din     ( p2_din     ),
+//     .p1_dout    (            ),
+//     .p2_dout    ( p2_dout    ),
 
-    // Test pins (used in the assembler TEST instruction)
-    .t0_din     (coin_input[0]),
-    .t1_din     (coin_input[1]),
-    .t0_dout    (            ),
+//     // Test pins (used in the assembler TEST instruction)
+//     .t0_din     (coin_input[0]),
+//     .t1_din     (coin_input[1]),
+//     .t0_dout    (            ),
 
-    .prog_addr  ( prog_addr  ),
-    .prog_data  ( prog_data  ),
-    .prom_we    ( prom_we    )
-);
-`else
+//     .prog_addr  ( prog_addr  ),
+//     .prog_data  ( prog_data  ),
+//     .prom_we    ( prom_we    )
+// );
+// `else
     assign p2_dout  = 0;
     assign mcu_dout = 8'hff;
-`endif
+// `endif
+
+always @(posedge clk) begin
+    if( kageki ) begin
+        case( portb_dout[1:0] )
+            0: porta_din <= { dipsw[4+8], dipsw[0+8], dipsw[4], dipsw[0] };
+            2: porta_din <= { dipsw[5+8], dipsw[1+8], dipsw[5], dipsw[1] };
+            1: porta_din <= { dipsw[6+8], dipsw[2+8], dipsw[6], dipsw[2] };
+            3: porta_din <= { dipsw[7+8], dipsw[3+8], dipsw[7], dipsw[3] };
+        endcase
+    end else porta_din <= dipsw[7:0];
+end
 
 `ifndef VERILATOR_KEEP_JT03
 /* verilator tracing_off */
@@ -283,8 +296,10 @@ jt03 u_2203(
     .snd_sample ( sample     ),
     .irq_n      ( fmint_n    ),
     // IO ports
-    .IOA_in     ( dipsw[ 7:0]),
+    .IOA_in     ( porta_din  ),
     .IOB_in     ( dipsw[15:8]),
+    .IOA_out    (            ),
+    .IOB_out    ( portb_dout ),
     // unused outputs
     .psg_A      (            ),
     .psg_B      (            ),

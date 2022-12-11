@@ -72,7 +72,7 @@ assign cpu_addr = A[12:0];
 assign cpu_dout = dout;
 assign irq_ack  = /*!m1_n &&*/ !iorq_n; // The original PCB just uses iorq_n,
     // the orthodox way to do it is to use m1_n too
-assign ram_we   = ram_cs & ~wr_n;
+assign ram_we   = mshramen & ~wr_n;
 assign rom_addr = { A[15] ? bank : {2'd0, A[14]}, A[13:0] };
 assign st_dout  = { 3'd0, ~snd_rstn, 1'd0, bank };
 assign mem_acc  = ~mreq_n & rfsh_n;
@@ -194,7 +194,7 @@ jtframe_dual_ram #(.aw(13),.dumpfile("mainmem")) u_comm(
     // Main CPU
     .addr0  ( A[12:0]    ),
     .data0  ( dout       ),
-    .we0    ( mshramen & ~wr_n ),
+    .we0    ( ram_we     ),
     .q0     ( ram_dout   ),
     // MCU
     .addr1  ( shr_addr   ),

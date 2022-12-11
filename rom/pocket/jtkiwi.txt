@@ -5,12 +5,16 @@ The following arcade titles are compatible with this core. Generate
 the required .rom file using the mra tool (read below).
 Place the *.rom files in Assets/jtkiwi/common
 
-Extermination (World) --> extrmatn.rom
-Extermination (Japan) --> extrmtnj.rom
-Extermination (US, World Games) --> extrmtnu.rom
-Extermination (US, Romstar) --> extrmnur.rom
 Insector X (World) --> insectx.rom
 Insector X (Japan) --> insectxj.rom
+Kabuki-Z (World) --> kabukiz.rom
+Kabuki-Z (Japan) --> kabukizj.rom
+Kageki (World) --> kageki.rom
+Kageki (hack) --> kagekih.rom
+Kageki (Japan) --> kagekij.rom
+Kageki (US) --> kagekiu.rom
+The NewZealand Story (World, new version) (P0-043A PCB) --> tnzs.rom
+The NewZealand Story (Japan, new version) (P0-043A PCB) --> tnzsj.rom
 
 These files are generated using the mra tool in:
 https://github.com/sebdel/mra-tools-c/tree/master/release

@@ -25,7 +25,6 @@ module mist_dump(
 );
 
 `ifdef DUMP
-`ifndef NCVERILOG // iVerilog:
     initial begin
         `ifdef IVERILOG
             $dumpfile("test.lxt");
@@ -44,43 +43,14 @@ module mist_dump(
             $dumpvars(0,mist_test);
         `else
             $display("Dumping selected signals");
-            `ifndef NOMAIN
-                $dumpvars(1,mist_test.UUT.u_game.u_main);
-            `endif
             `ifndef NOSOUND
-                $dumpvars(1,mist_test.UUT.u_game.u_sound);
-            `endif
-            $dumpvars(1,mist_test.UUT.u_game.u_sdram);
-            $dumpvars(1,mist_test.UUT.u_game.u_sdram.u_dwnld);
-            `ifndef NOVIDEO
-                $dumpvars(1,mist_test.UUT.u_game.u_video);
+                $dumpvars(1,mist_test.UUT.u_game.u_game.u_sound);
+                $dumpvars(0,mist_test.UUT.u_game.u_game.u_sound.u_mcu);
             `endif
             $dumpvars(1,mist_test.frame_cnt);
         `endif
         $dumpon;
     end
-`else // NCVERILOG
-    `ifdef DUMP_START
-    always @(negedge VGA_VS) if( frame_cnt==`DUMP_START ) begin
-    `else
-    initial begin
-    `endif
-        $shm_open("test.shm");
-        `ifdef DEEPDUMP
-            $display("NC Verilog: will dump all signals");
-            $shm_probe(mist_test,"AS");
-        `else
-            $display("NC Verilog: will dump selected signals");
-            $shm_probe(frame_cnt);
-            $shm_probe(UUT.u_game,"A");
-            $shm_probe(UUT.u_game.u_main,"A");
-            $shm_probe(UUT.u_game.u_sdram,"A");
-            $shm_probe(UUT.u_game.u_sdram.u_dwnld,"A");
-            // $shm_probe(UUT.u_game.u_sound,"A");
-            // $shm_probe(UUT.u_game.u_video,"A");
-        `endif
-    end
-`endif
 `endif
 
 endmodule // mist_dump

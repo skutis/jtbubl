@@ -30,17 +30,16 @@ wire        cen6, cen3, cen1p5;
 wire        vram_cs,  pal_cs, flip;
 wire        cpu_rnw, vctrl_cs, vflag_cs,
             colprom_we, mcuprom_we;
-reg         mcu_en=0, colprom_en=0;
+reg         colprom_en=0, kabuki=0, kageki=0, mcu_en=0;
 
-assign dip_flip   = flip;
-assign debug_view = gfx_st;
+assign dip_flip   = ~flip;
+assign debug_view = debug_bus[1:0]==0 ? { kageki, kabuki, colprom_en, mcu_en } : gfx_st;
 assign colprom_we = prom_we && ioctl_addr[15:10]==0;
 assign mcuprom_we = prom_we && ioctl_addr >= `MCU_START;
 
 always @(posedge clk) begin
-    if( prog_we && ioctl_addr==4 ) begin
-        mcu_en     <= prog_data != 8'h77; // 77 for Insector X
-        colprom_en <= prog_data == 8'hc; // 0C for Extermination
+    if( prog_we && header && prog_addr==0 ) begin
+        { kageki, kabuki, colprom_en, mcu_en } <= prog_data[3:0];
     end
 end
 
@@ -152,6 +151,10 @@ jtkiwi_snd u_sound(
     .LVBL       ( LVBL          ),
     .fm_en      ( enable_fm     ),
     .psg_en     ( enable_psg    ),
+
+    // Game variations
+    .kabuki     ( kabuki        ),
+    .kageki     ( kageki        ),
 
     // cabinet I/O
     .start_button( start_button ),

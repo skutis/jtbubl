@@ -40,8 +40,9 @@ jtframe:
       # Z80
       - jtframe_z80.yaml
       # MCU
-      - jtframe_i8742.v
-      - t48/t48.yaml
+      # - jtframe_i8742.v
+      # - t48/t48.yaml
+      # - t48.v
   - from: sound
     get:
       - jtframe_mixer.v

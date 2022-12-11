@@ -10,3 +10,6 @@
 [submodule "modules/jtkicad"]
 	path = modules/jtkicad
 	url = https://github.com/jotego/jtkicad.git
+[submodule "modules/jt8742"]
+	path = modules/jt8742
+	url = https://github.com/jotego/jt8742.git
