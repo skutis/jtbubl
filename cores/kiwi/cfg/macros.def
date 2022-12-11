@@ -4,8 +4,9 @@ JTFRAME_BUTTONS=3
 JTFRAME_CREDITS
 JTFRAME_HEADER=2
 
-# Extermination is a vertical game
+# Extermination, Kageki, etc. are vertical games
 JTFRAME_VERTICAL
+JTFRAME_CREDITS_HIDEVERT
 
 # ROM loading
 JTFRAME_BA1_START=0x20000
