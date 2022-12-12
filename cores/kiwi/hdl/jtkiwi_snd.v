@@ -231,7 +231,7 @@ always @(posedge clk, negedge comb_rstn) begin
     if( !comb_rstn ) begin
         pcm_st   <= 0;
         pcm_addr <= 0;
-        pcm_re   <= 0;
+        pcm_re   <= 8'h80;
         pb7l     <= 0;
     end else begin
         pb7l <= portb_dout[7];
@@ -249,7 +249,8 @@ always @(posedge clk, negedge comb_rstn) begin
                 end
                 3: begin
                     if( pcm_data == 0 || (&pcm_addr) ) begin
-                        pcm_st  <= 0;
+                        pcm_st <= 0;
+                        pcm_re <= 8'h80;
                     end else begin
                         // the 0 value is not part of the sample.
                         // pcm_re will keep the last valid value
