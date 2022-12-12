@@ -78,7 +78,6 @@ module jtkiwi_snd(
     output reg [ 7:0]   st_dout
 );
 `ifndef NOSOUND
-localparam [7:0] FM_GAIN = 8'h30;
 
 wire        irq_ack, mreq_n, m1_n, iorq_n, rd_n, wr_n,
             fmint_n, int_n, cpu_cen, rfsh_n;
@@ -129,8 +128,8 @@ always @(posedge clk) begin
         2'd3: psg_gain <= 8'h0a;
     endcase
     if( !psg_en ) psg_gain <= 0;
-    pcm_gain <= kageki ? 8'h08 : 8'h0;
-    fm_gain  <= fm_en ? FM_GAIN : 8'h0;
+    pcm_gain <= kageki ? 8'h0A : 8'h0;
+    fm_gain  <= !fm_en ? 8'h0 : kageki ? 8'h20 : 8'h30;
 end
 
 always @(posedge clk) begin
@@ -251,8 +250,12 @@ always @(posedge clk, negedge comb_rstn) begin
                 3: begin
                     if( pcm_data == 0 || (&pcm_addr) ) begin
                         pcm_st  <= 0;
+                    end else begin
+                        // the 0 value is not part of the sample.
+                        // pcm_re will keep the last valid value
+                        // this prevents noise at the start and end of samples
+                        pcm_re   <= pcm_data;
                     end
-                    pcm_re   <= pcm_data;
                     pcm_addr <= pcm_addr + 1'd1;
                 end
             endcase
