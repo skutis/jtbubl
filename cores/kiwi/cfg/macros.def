@@ -34,3 +34,8 @@ JTFRAME_PXLCLK=6
 [mister]
 JTFRAME_ARX=5
 JTFRAME_ARY=4
+
+[mist|sidi]
+# The OSD seems to get broken. Some firmware problem?
+-JTFRAME_OSD_SND_EN
+-JTFRAME_OSD_VOL
