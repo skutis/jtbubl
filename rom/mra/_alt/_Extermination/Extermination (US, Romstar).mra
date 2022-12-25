@@ -33,13 +33,15 @@
     <region>World</region>
     <mraauthor>jotego</mraauthor>
     <rom index="0" zip="extrmatnur.zip|extrmatn.zip" md5="None">
-        <!-- maincpu - starts at 0x0 -->
+        <part>
+            03 00 </part>
+        <!-- maincpu - starts at 0x0 - length 0x20000 (17 bits) -->
         <part name="b06-15.11c" crc="4b3ee597"/>
         <part name="b06-16.9c" crc="86175ea4"/>
-        <!-- sub - starts at 0x20000 -->
+        <!-- sub - starts at 0x20000 - length 0x30000 (18 bits) -->
         <part name="b06-17.4e" crc="744f2c84"/>
         <part repeat="0x20000"> FF</part>
-        <!-- gfx1 - starts at 0x50000 -->
+        <!-- gfx1 - starts at 0x50000 - length 0x200000 (21 bits) -->
         <interleave output="32">
             <part name="b06-01.13a" crc="d2afbf7e" map="0001"/>
             <part name="b06-02.10a" crc="e0c2757a" map="0010"/>
@@ -47,11 +49,11 @@
             <part name="b06-04.4a" crc="3697ace4" map="1000"/>
         </interleave>
         <part repeat="0x180000"> FF</part>
-        <!-- proms - starts at 0x250000 -->
+        <!-- proms - starts at 0x250000 - length 0x1000 (12 bits) -->
         <part name="b06-09.15f" crc="f388b361"/>
         <part name="b06-08.17f" crc="10c9aac3"/>
         <part repeat="0xC00"> FF</part>
-        <!-- mcu - starts at 0x251000 -->
+        <!-- mcu - starts at 0x251000 - length 0x800 (11 bits) -->
         <part name="b06__14.1g" crc="28907072"/>
         <!-- Total 0x251800 bytes - 2374 kBytes -->
     </rom>

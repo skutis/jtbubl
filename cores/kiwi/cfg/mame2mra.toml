@@ -10,10 +10,10 @@ beta = true
 sourcefile="tnzs.cpp"
 skip = { setnames = [
 # MCU not supported
-"extrmatn",
-"extrmatnj",
-"extrmatnu",
-"extrmatnur",
+# "extrmatn",
+# "extrmatnj",
+# "extrmatnu",
+# "extrmatnur",
 
 "arknoid2",
 "arknoid2j",

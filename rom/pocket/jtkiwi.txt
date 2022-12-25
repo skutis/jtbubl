@@ -5,6 +5,10 @@ The following arcade titles are compatible with this core. Generate
 the required .rom file using the mra tool (read below).
 Place the *.rom files in Assets/jtkiwi/common
 
+Extermination (World) --> extrmatn.rom
+Extermination (Japan) --> extrmtnj.rom
+Extermination (US, World Games) --> extrmtnu.rom
+Extermination (US, Romstar) --> extrmnur.rom
 Insector X (World) --> insectx.rom
 Insector X (Japan) --> insectxj.rom
 Kabuki-Z (World) --> kabukiz.rom

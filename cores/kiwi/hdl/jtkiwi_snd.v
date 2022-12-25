@@ -101,7 +101,6 @@ assign mem_acc  = ~mreq_n & rfsh_n;
 assign ram_din  = dout;
 assign ram_addr = A[12:0];
 assign cpu_rnw  = wr_n | ~cpu_cen;
-assign mcu_we   = mcu_cs & ~wr_n;
 assign mcu_comb_rst = ~(mcu_rstn & comb_rstn);
 assign p2_din   = { 6'h3f, tilt, service };
 assign pcm_cs   = kageki;
@@ -328,37 +327,38 @@ jtframe_z80_devwait #(.RECOVERY(1)) u_gamecpu(
     .dev_busy ( dev_busy       )
 );
 
-// `ifndef NOMCU
-// jtframe_i8742 u_mcu(
-//     .rst        ( mcu_comb_rst ),
-//     .clk        ( clk        ),
-//     .cen        ( cen6       ),
+`ifndef NOMCU
+jtframe_i8742 u_mcu(
+    .rst        ( mcu_comb_rst ),
+    .clk        ( clk        ),
+    .cen        ( cen6       ),
 
-//     // CPU communication
-//     .a0         ( A[0]       ),
-//     .we         ( mcu_we     ),
-//     .din        ( dout       ),
-//     .dout       ( mcu_dout   ),
+    // CPU communication
+    .a0         ( A[0]       ),
+    .cs_n       ( ~mcu_cs    ),
+    .cpu_rdn    ( rd_n       ),
+    .cpu_wrn    ( wr_n       ),
+    .din        ( dout       ),
+    .dout       ( mcu_dout   ),
 
-//     // Ports
-//     .p1_din     ( p1_din     ),
-//     .p2_din     ( p2_din     ),
-//     .p1_dout    (            ),
-//     .p2_dout    ( p2_dout    ),
+    // Ports
+    .p1_din     ( p1_din     ),
+    .p2_din     ( p2_din     ),
+    .p1_dout    (            ),
+    .p2_dout    ( p2_dout    ),
 
-//     // Test pins (used in the assembler TEST instruction)
-//     .t0_din     (coin_input[0]),
-//     .t1_din     (coin_input[1]),
-//     .t0_dout    (            ),
+    // Test pins (used in the assembler TEST instruction)
+    .t0_din     (coin_input[0]),
+    .t1_din     (coin_input[1]),
 
-//     .prog_addr  ( prog_addr  ),
-//     .prog_data  ( prog_data  ),
-//     .prom_we    ( prom_we    )
-// );
-// `else
+    .prog_addr  ( prog_addr  ),
+    .prog_data  ( prog_data  ),
+    .prom_we    ( prom_we    )
+);
+`else
     assign p2_dout  = 0;
     assign mcu_dout = 8'hff;
-// `endif
+`endif
 
 always @(posedge clk) begin
     if( kageki ) begin
