@@ -35,13 +35,13 @@
     <rom index="0" zip="kabukizj.zip|kabukiz.zip" md5="None">
         <part>
             04 00 </part>
-        <!-- maincpu - starts at 0x0 -->
+        <!-- maincpu - starts at 0x0 - length 0x20000 (17 bits) -->
         <part name="b50-05.u1" crc="9cccb129"/>
-        <!-- sub - starts at 0x20000 -->
+        <!-- sub - starts at 0x20000 - length 0x10000 (16 bits) -->
         <part name="b50-06.u3" crc="45650aab"/>
-        <!-- audiocpu - starts at 0x30000 -->
+        <!-- audiocpu - starts at 0x30000 - length 0x20000 (17 bits) -->
         <part name="b50-07.u34" crc="bf7fc2ed"/>
-        <!-- gfx1 - starts at 0x50000 -->
+        <!-- gfx1 - starts at 0x50000 - length 0x200000 (21 bits) -->
         <interleave output="32">
             <part name="b50-04.u35" crc="04829aa9" map="0001"/>
             <part name="b50-03.u39" crc="31489a4c" map="0010"/>

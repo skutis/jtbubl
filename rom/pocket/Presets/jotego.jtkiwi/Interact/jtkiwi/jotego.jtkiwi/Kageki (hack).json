@@ -9,6 +9,7 @@
 				"enabled": false,
 				"persist": false,
 				"address": "0xFF000000",
+				"defaultval": 0,
 				"value": 0
 			},
 			{
@@ -29,6 +30,7 @@
 				"enabled": true,
 				"persist": true,
 				"address": "0xfa000000",
+				"defaultval": 0,
 				"value": 0,
 				"value_off": 2,
 				"mask": "0xFFFFFFFD"
@@ -40,6 +42,7 @@
 				"enabled": true,
 				"persist": true,
 				"address": "0xfa000000",
+				"defaultval": 0,
 				"value": 0,
 				"value_off": 4,
 				"mask": "0xFFFFFFFB"
@@ -51,6 +54,7 @@
 				"enabled": true,
 				"persist": true,
 				"address": "0xfa000000",
+				"defaultval": 1,
 				"value": 8,
 				"mask": "0xFFFFFFF7"
 			},
@@ -144,23 +148,13 @@
 			{
 				"name": "Allow Continue",
 				"id": 8,
-				"type": "list",
+				"type": "check",
 				"enabled": true,
 				"persist": true,
 				"address": "0xfa000000",
 				"defaultval": 1,
-				"value": 0,
-				"mask": "0xFFFF7FFF",
-				"options": [
-					{
-						"name": "No",
-						"value": "0x0"
-					},
-					{
-						"name": "Yes",
-						"value": "0x8000"
-					}
-				]
+				"value": 32768,
+				"mask": "0xFFFF7FFF"
 			},
 			{
 				"name": "Default",

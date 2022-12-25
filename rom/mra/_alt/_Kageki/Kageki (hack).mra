@@ -35,15 +35,15 @@
     <rom index="0" zip="kagekih.zip|kageki.zip" md5="None">
         <part>
             08 00 </part>
-        <!-- maincpu - starts at 0x0 -->
+        <!-- maincpu - starts at 0x0 - length 0x20000 (17 bits) -->
         <part name="b35_16.11c" crc="1cf67603"/>
         <part name="b35-10.9c" crc="b150457d"/>
-        <!-- sub - starts at 0x20000 -->
+        <!-- sub - starts at 0x20000 - length 0x20000 (17 bits) -->
         <part name="b35-11.43e" crc="64d093fc"/>
         <part repeat="0x10000"> FF</part>
-        <!-- samples - starts at 0x40000 -->
+        <!-- samples - starts at 0x40000 - length 0x10000 (16 bits) -->
         <part name="b35-12.98g" crc="184409f1"/>
-        <!-- gfx1 - starts at 0x50000 -->
+        <!-- gfx1 - starts at 0x50000 - length 0x100000 (20 bits) -->
         <interleave output="32">
             <part name="b35-05.7a" crc="a4e20c08" map="0001"/>
             <part name="b35-01.13a" crc="01d83a69" map="0010"/>

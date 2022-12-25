@@ -35,12 +35,12 @@
     <rom index="0" zip="insectxj.zip|insectx.zip" md5="None">
         <part>
             00 00 </part>
-        <!-- maincpu - starts at 0x0 -->
+        <!-- maincpu - starts at 0x0 - length 0x20000 (17 bits) -->
         <part name="b97__03.u32" crc="18eef387"/>
-        <!-- sub - starts at 0x20000 -->
+        <!-- sub - starts at 0x20000 - length 0x30000 (18 bits) -->
         <part name="b97__04.u38" crc="dc4549e5"/>
         <part repeat="0x20000"> FF</part>
-        <!-- gfx1 - starts at 0x50000 -->
+        <!-- gfx1 - starts at 0x50000 - length 0x100000 (20 bits) -->
         <interleave output="16">
             <part name="b97__01.u1" crc="d00294b1" map="01"/>
             <part name="b97__02.u2" crc="db5a7434" map="10"/>
