@@ -151,11 +151,15 @@ end
 always @(posedge clk, negedge comb_rstn) begin
     if( !comb_rstn ) begin
         bank     <= 0;
-        mcu_rstn <= 0;
+        mcu_rstn <= 1;
     end else begin
         if( bank_cs ) begin
             bank     <= dout[1:0];
             mcu_rstn <= dout[4];
+`ifdef SIMULATION
+            if( !mcu_rstn && dout[4] ) $display("MCU reset released");
+            if( mcu_rstn && !dout[4] ) $display("MCU reset");
+`endif
         end
     end
 end
