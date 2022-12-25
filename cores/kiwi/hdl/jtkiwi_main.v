@@ -114,6 +114,10 @@ always @(posedge clk, posedge rst) begin
         if( bank_cs ) begin
             bank <= dout[2:0];
             snd_rstn <= dout[4];
+`ifdef SIMULATION
+            if( !snd_rstn && dout[4] ) $display("Sound CPU reset released");
+            if( snd_rstn && !dout[4] ) $display("Sound CPU reset");
+`endif
         end
     end
 end

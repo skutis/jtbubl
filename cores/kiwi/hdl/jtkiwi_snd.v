@@ -164,17 +164,13 @@ always @(posedge clk, negedge comb_rstn) begin
     end
 end
 
-function [6:0] swap_joy( input [6:0] j );
-    swap_joy = { j[6:4], j[2], j[3], j[0], j[1] };
-endfunction
-
 always @(posedge clk) begin
     if( !dip_pause )
         cab_dout <= 8'hff; // do not let inputs disturb the pause
     else begin
         case( A[2:0] )
-            0: cab_dout <= { start_button[0], swap_joy( joystick1 )};
-            1: cab_dout <= { start_button[1], swap_joy( joystick2 )};
+            0: cab_dout <= { start_button[0], joystick1 };
+            1: cab_dout <= { start_button[1], joystick2 };
             2: cab_dout <= kageki ?
                 { 2'h3, coin_input[1], coin_input[0], 2'h3, tilt, service } :
                 { 4'hf, coin_input[0], coin_input[1],       tilt, service };
@@ -192,8 +188,8 @@ end
 
 always @(posedge clk) begin
     case( p2_dout[2:0] )
-        0: p1_din <= { start_button[0], swap_joy( joystick1 )};
-        1: p1_din <= { start_button[1], swap_joy( joystick2 )};
+        0: p1_din <= { start_button[0], joystick1 };
+        1: p1_din <= { start_button[1], joystick2 };
         2: p1_din <= { 6'h3f, tilt, service };
     endcase
 end

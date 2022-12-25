@@ -455,8 +455,8 @@ always @(posedge clk24) begin
         case( mcu_bus[1:0] )
             2'd0: p3_in <= dipsw_a;
             2'd1: p3_in <= dipsw_b;
-            2'd2: p3_in <= {1'b1, start_button[0], joystick1[4], joystick1[5], joystick1[3:2], joystick1[0], joystick1[1] };
-            2'd3: p3_in <= {1'b1, start_button[1], joystick2[4], joystick2[5], joystick2[3:2], joystick2[0], joystick2[1] };
+            2'd2: p3_in <= {1'b1, start_button[0], joystick1[4], joystick1[5], joystick1[3:0] };
+            2'd3: p3_in <= {1'b1, start_button[1], joystick2[4], joystick2[5], joystick2[3:0] };
         endcase // mcu_bus[1:0]
     end
 end
@@ -467,8 +467,8 @@ always @(posedge clk24) begin
         3'd3: cab_dout <= dipsw_a;
         3'd4: cab_dout <= dipsw_b;
         3'd5: cab_dout <= {2'b11, 2'b11 /* MCU related */, coin_input, service, 1'b1 };
-        3'd6: cab_dout <= {1'b1, start_button[0], joystick1[4], joystick1[5], joystick1[3:2], joystick1[0], joystick1[1] };
-        3'd7: cab_dout <= {1'b1, start_button[1], joystick2[4], joystick2[5], joystick2[3:2], joystick2[0], joystick2[1] };
+        3'd6: cab_dout <= {1'b1, start_button[0], joystick1[4], joystick1[5], joystick1[3:0] };
+        3'd7: cab_dout <= {1'b1, start_button[1], joystick2[4], joystick2[5], joystick2[3:0] };
         default: cab_dout <= 8'hff;
     endcase
 end
