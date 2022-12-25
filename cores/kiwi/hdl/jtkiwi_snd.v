@@ -82,7 +82,7 @@ module jtkiwi_snd(
 wire        irq_ack, mreq_n, m1_n, iorq_n, rd_n, wr_n,
             fmint_n, int_n, cpu_cen, rfsh_n;
 reg  [ 7:0] din, cab_dout, psg_gain, fm_gain, pcm_gain, p1_din, porta_din;
-wire [ 7:0] fm_dout, dout, p2_din, p2_dout, mcu_dout, portb_dout;
+wire [ 7:0] fm_dout, dout, p2_din, p2_dout, mcu_dout, mcu_st, portb_dout;
 reg  [ 1:0] bank;
 wire [15:0] A;
 wire [ 9:0] psg_snd;
@@ -188,9 +188,10 @@ end
 
 always @(posedge clk) begin
     case( p2_dout[2:0] )
-        0: p1_din <= { start_button[0], joystick1 };
-        1: p1_din <= { start_button[1], joystick2 };
-        2: p1_din <= { 6'h3f, tilt, service };
+        3'h0: p1_din <= { start_button[0], joystick1 };
+        3'h1: p1_din <= { start_button[1], joystick2 };
+        3'h2: p1_din <= { 6'h3f, tilt, service };
+        default: p1_din <= 8'hff;
     endcase
 end
 
@@ -216,13 +217,17 @@ always @(posedge clk, negedge comb_rstn) begin
     end
 end
 
-always @* begin
-    case( st_addr[1:0] )
-        0: st_dout = { pcm_st, portb_dout[5:0] };
-        1: st_dout = pcm_addr[15:8];
-        2: st_dout = pcm_gain;
-        3: st_dout = pcm_re;
-        default: st_dout = 0;
+always @(posedge clk) begin
+    case( st_addr[5:4] )
+        0: st_dout <= { 3'd0, mcu_en, 3'd0, mcu_comb_rst };
+        1: st_dout <= mcu_st;
+        2: case( st_addr[1:0])
+            0: st_dout <= { pcm_st, portb_dout[5:0] };
+            1: st_dout <= pcm_addr[15:8];
+            2: st_dout <= pcm_gain;
+            3: st_dout <= pcm_re;
+        endcase
+        default: st_dout <= 0;
     endcase
 end
 
@@ -353,7 +358,11 @@ jtframe_i8742 u_mcu(
 
     .prog_addr  ( prog_addr  ),
     .prog_data  ( prog_data  ),
-    .prom_we    ( prom_we    )
+    .prom_we    ( prom_we    ),
+
+    // Debug
+    .st_addr    ( st_addr    ),
+    .st_dout    ( mcu_st     )
 );
 `else
     assign p2_dout  = 0;

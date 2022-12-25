@@ -9,37 +9,37 @@ beta = true
 [parse]
 sourcefile="tnzs.cpp"
 skip = { setnames = [
-# MCU not supported
+# i8742 MCU
 # "extrmatn",
 # "extrmatnj",
 # "extrmatnu",
 # "extrmatnur",
+# "drtoppel",
+# "drtoppelj",
+# "drtoppelu",
+# "chukatai",
+# "chukataij",
+# "chukataija",
+# "chukataiu",
+# "tnzso",
+# "tnzsjo",
+# "tnzsuo",
+# "tnzsoa",
+# "tnzsop",
+# "plumppop",
 
+# No MCU dump
 "arknoid2",
 "arknoid2j",
 "arknoid2u",
-"chukatai",
-"chukataij",
-"chukataija",
-"chukataiu",
-"drtoppel",
-"drtoppelj",
-"drtoppelu",
+
+# Graphics
 # "kabukiz",
 # "kabukizj",
-# "kageki",
-# "kagekih",
-# "kagekij",
-# "kagekiu",
-"plumppop",
 
-# "tnzs",
-# "tnzsj",
-"tnzsjo",
-"tnzso",
-"tnzsoa",
-"tnzsop",
-"tnzsuo",
+# Three Z80
+"tnzs",
+"tnzsj",
 # Korean hack on mostly unrelated hardware
 "jpopnics",
  ] }

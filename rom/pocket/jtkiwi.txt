@@ -5,6 +5,13 @@ The following arcade titles are compatible with this core. Generate
 the required .rom file using the mra tool (read below).
 Place the *.rom files in Assets/jtkiwi/common
 
+Chuka Taisen (World) (P0-028-A PCB) --> chukatai.rom
+Chuka Taisen (Japan) (P0-028-A PCB) --> chukaaij.rom
+Chuka Taisen (Japan) (P0-025-A PCB) --> chukaija.rom
+Chuka Taisen (US) (P0-028-A PCB) --> chukaaiu.rom
+Dr. Toppel's Adventure (World) --> drtoppel.rom
+Dr. Toppel's Tankentai (Japan) --> drtopelj.rom
+Dr. Toppel's Adventure (US) --> drtopelu.rom
 Extermination (World) --> extrmatn.rom
 Extermination (Japan) --> extrmtnj.rom
 Extermination (US, World Games) --> extrmtnu.rom
@@ -17,8 +24,12 @@ Kageki (World) --> kageki.rom
 Kageki (hack) --> kagekih.rom
 Kageki (Japan) --> kagekij.rom
 Kageki (US) --> kagekiu.rom
-The NewZealand Story (World, new version) (P0-043A PCB) --> tnzs.rom
-The NewZealand Story (Japan, new version) (P0-043A PCB) --> tnzsj.rom
+Plump Pop (Japan) --> plumppop.rom
+The NewZealand Story (Japan, old version) (P0-041A PCB) --> tnzsjo.rom
+The NewZealand Story (World, old version) (P0-041A PCB) --> tnzso.rom
+The NewZealand Story (World, unknown version) (P0-041A PCB) --> tnzsoa.rom
+The NewZealand Story (World, prototype) (P0-041-1 PCB) --> tnzsop.rom
+The NewZealand Story (US, old version) (P0-041A PCB) --> tnzsuo.rom
 
 
 These files are generated using the mra tool in:
