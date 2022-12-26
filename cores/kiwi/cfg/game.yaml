@@ -45,6 +45,7 @@ jtframe:
       # MCU
       - jtframe_i8742.v
       - t48/upi41.yaml
+      # - t48/upi41_core.v
       # - t48.v
   - from: sound
     get:
