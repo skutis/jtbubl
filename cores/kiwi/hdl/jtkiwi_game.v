@@ -32,7 +32,7 @@ wire        cpu_rnw, vctrl_cs, vflag_cs,
             colprom_we, mcuprom_we;
 reg         colprom_en=0, kabuki=0, kageki=0, mcu_en=0;
 
-assign dip_flip   = ~flip;
+assign dip_flip   = flip;
 assign debug_view = st_addr[7:6]==0 ? { 4'd0, kageki, kabuki, colprom_en, mcu_en } :
                     st_addr[7:6]==1 ? main_st :
                     st_addr[7:6]==2 ? gfx_st  : snd_st;

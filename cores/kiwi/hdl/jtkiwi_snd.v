@@ -188,8 +188,8 @@ end
 
 always @(posedge clk) begin
     case( p2_dout[2:0] )
-        3'h0: p1_din <= { start_button[0], joystick1 };
-        3'h1: p1_din <= { start_button[1], joystick2 };
+        3'h4: p1_din <= { start_button[0], joystick1 };
+        3'h5: p1_din <= { start_button[1], joystick2 };
         3'h2: p1_din <= { 6'h3f, tilt, service };
         default: p1_din <= 8'hff;
     endcase
@@ -227,7 +227,12 @@ always @(posedge clk) begin
             2: st_dout <= pcm_gain;
             3: st_dout <= pcm_re;
         endcase
-        default: st_dout <= 0;
+        3: case( st_addr[1:0] )
+            0: st_dout <= p1_din;
+            1: st_dout <= p2_din;
+            3: st_dout <= p2_dout;
+            default: st_dout <= 0;
+        endcase
     endcase
 end
 
