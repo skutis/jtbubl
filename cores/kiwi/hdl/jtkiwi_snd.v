@@ -353,8 +353,8 @@ jtframe_i8742 u_mcu(
     .p2_dout    ( p2_dout    ),
 
     // Test pins (used in the assembler TEST instruction)
-    .t0_din     (coin_input[0]),
-    .t1_din     (coin_input[1]),
+    .t0_din     (~coin_input[0]),
+    .t1_din     (~coin_input[1]),
 
     .prog_addr  ( prog_addr  ),
     .prog_data  ( prog_data  ),
