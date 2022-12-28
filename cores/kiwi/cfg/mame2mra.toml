@@ -14,19 +14,21 @@ skip = { setnames = [
 # "extrmatnj",
 # "extrmatnu",
 # "extrmatnur",
-# "drtoppel",
-# "drtoppelj",
-# "drtoppelu",
-# "chukatai",
-# "chukataij",
-# "chukataija",
-# "chukataiu",
-# "tnzso",
-# "tnzsjo",
-# "tnzsuo",
-# "tnzsoa",
-# "tnzsop",
-# "plumppop",
+
+# Not ready yet
+"drtoppel",
+"drtoppelj",
+"drtoppelu",
+"chukatai",
+"chukataij",
+"chukataija",
+"chukataiu",
+"tnzso",
+"tnzsjo",
+"tnzsuo",
+"tnzsoa",
+"tnzsop",
+"plumppop",
 
 # No MCU dump
 "arknoid2",
@@ -34,8 +36,8 @@ skip = { setnames = [
 "arknoid2u",
 
 # Graphics
-# "kabukiz",
-# "kabukizj",
+"kabukiz",
+"kabukizj",
 
 # Three Z80
 "tnzs",
