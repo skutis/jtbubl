@@ -33,11 +33,11 @@ The cores have been developed by combining information in the MAME drivers with 
 
 Schematics have been extracted from PCB and are available in the several sch folders. Schematic are drawn using KiCAD 5.
 
-PCB                    |  sch location          | Author
------------------------|------------------------|----------
-Extermination          | cores/exterm/sch       | JOTEGO (E. Triana)
-Insector X             | cores/kiwi/sch/insectx | Skutis
-The New Zealand Story  | cores/kiwi/sch/tnzs    | Skutis
+PCB                    |  sch location            | Author
+-----------------------|--------------------------|----------
+Extermination          | cores/kiwi/sch/extrmatn  | JOTEGO (E. Triana)
+Insector X             | cores/kiwi/sch/insectx   | Skutis
+The New Zealand Story  | cores/kiwi/sch/tnzs      | Skutis
 
 ## PLD Data
 
