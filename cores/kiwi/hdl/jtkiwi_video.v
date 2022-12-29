@@ -160,7 +160,8 @@ jtkiwi_colmix u_colmix(
     .red        ( red            ),
     .green      ( green          ),
     .blue       ( blue           ),
-    .gfx_en     ( gfx_en         )
+    .gfx_en     ( gfx_en         ),
+    .debug_bus  ( debug_bus      )
 );
 
 endmodule

@@ -37,10 +37,11 @@ module jtkiwi_colmix(
     input        prom_we,
     input        colprom_en,
 
-    input      [3:0] gfx_en,
-    output     [4:0] red,
-    output     [4:0] green,
-    output     [4:0] blue
+    input  [7:0] debug_bus,
+    input  [3:0] gfx_en,
+    output [4:0] red,
+    output [4:0] green,
+    output [4:0] blue
 );
 
 wire [ 7:0] pal_dout;
@@ -54,7 +55,7 @@ reg         half, obj_sel;
 // PROM variation
 wire [15:0] prom_dout;
 wire        promhi_we, promlo_we;
-
+wire [ 3:0] sort;
 
 assign pal_addr = { coll, half };
 assign pal_we   = pal_cs & ~cpu_rnw;
@@ -85,6 +86,12 @@ always @(posedge clk) begin
     pall <= pal_dout;
 end
 
+jtframe_sort u_sort(
+    .debug_bus  ( debug_bus ),
+    .busin      ( col_addr[3:0]    ),
+    .busout     ( sort  )
+);
+
 // Palette RAM X1-007 chip
 jtframe_dual_ram #(.aw(10),.simfile("pal.bin")) u_comm(
     .clk0   ( clk_cpu      ),
@@ -106,7 +113,7 @@ jtframe_prom #( .aw(9), .simfile("../../../../rom/extrmatn/b06-09.15f")) u_promh
     .clk    ( clk       ),
     .cen    ( 1'b1      ),
     .data   ( prog_data ),
-    .rd_addr( col_addr  ),
+    .rd_addr( {col_addr[8:4], sort}  ),
     .wr_addr( prog_addr[8:0]  ),
     .we     ( promhi_we ),
     .q      ( prom_dout[15:8] )
@@ -116,7 +123,7 @@ jtframe_prom #( .aw(9), .simfile("../../../../rom/extrmatn/b06-08.17f")) u_proml
     .clk    ( clk       ),
     .cen    ( 1'b1      ),
     .data   ( prog_data ),
-    .rd_addr( col_addr  ),
+    .rd_addr( {col_addr[8:4], sort}  ),
     .wr_addr( prog_addr[8:0] ),
     .we     ( promlo_we ),
     .q      ( prom_dout[7:0] )
