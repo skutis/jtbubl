@@ -34,6 +34,7 @@ skip = { setnames = [
 "arknoid2",
 "arknoid2j",
 "arknoid2u",
+"arknoid2b",
 
 # Graphics
 "kabukiz",
