@@ -27,7 +27,6 @@ skip.setnames=[
 ]
 
 [buttons]
-core=2 # max number of buttons supported by the core
 names=[
     { names="Shoot,Jump" }
 ]
@@ -43,10 +42,10 @@ extra = [
 [ROM]
 regions = [
     { name="maincpu", No_offset=true, reverse=true },
-    { name="subcpu", No_offset=true, reverse=true,   start=0x28000 },
-    { name="audiocpu", No_offset=true, reverse=true, start=0x30000 },
-    { name="mcu", No_offset=true, reverse=true,      start=0x38000 },
-    { name="gfx1", width=16, start=0x40000, regex_sort=[
+    { name="subcpu", No_offset=true, reverse=true,   start="SUB_START" },
+    { name="audiocpu", No_offset=true, reverse=true, start="SND_START" },
+    { name="mcu", No_offset=true, reverse=true,      start="MCU_START" },
+    { name="gfx1", width=16, start="GFX_START", regex_sort=[
             "12$",
             "30$",
             "13$",
@@ -59,7 +58,7 @@ regions = [
             "34$",
             "17$",
             "35$" ] },
-    { name="proms", start=0xc0000}
+    { name="proms", start="JTFRAME_PROM_START"}
 ]
 
 order = [
