@@ -59,7 +59,7 @@ mame.xml
 mem_ports.inc
 ncverilog.*
 old/*
-releases/*
+release/*
 sim
 test.cpp
 test.shm
