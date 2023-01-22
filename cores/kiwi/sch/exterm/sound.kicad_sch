@@ -5782,7 +5782,7 @@
     (effects (font (size 1.27 1.27)) (justify left))
     (uuid 1d4508a2-ac15-462b-8fca-c079f88cebe7)
   )
-  (hierarchical_label "~{RST}" (shape output) (at 355.6 62.23 0)
+  (hierarchical_label "~{MCU_RST}" (shape output) (at 355.6 62.23 0)
     (effects (font (size 1.27 1.27)) (justify left))
     (uuid 20dffd9d-bb10-44fd-bd4f-4f2406ccc3f2)
   )

@@ -1,4 +1,0 @@
-15:54:23: Impossible to get permissions for file '/home/espe/git/jtbubl/cores/exterm/sch/_autosave-exterm.kicad_sch' (error 2: No existe el archivo o el directorio)
-15:54:23: File '/home/espe/git/jtbubl/cores/exterm/sch/_autosave-exterm.kicad_sch' couldn't be renamed '/home/espe/git/jtbubl/cores/exterm/sch/exterm.kicad_sch' (error 0: Conseguido)
-15:54:23: Impossible to get permissions for file '/home/espe/git/jtbubl/cores/exterm/sch/_autosave-main.kicad_sch' (error 2: No existe el archivo o el directorio)
-15:54:23: File '/home/espe/git/jtbubl/cores/exterm/sch/_autosave-main.kicad_sch' couldn't be renamed '/home/espe/git/jtbubl/cores/exterm/sch/main.kicad_sch' (error 0: Conseguido)
