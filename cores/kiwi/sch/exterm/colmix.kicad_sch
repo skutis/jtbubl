@@ -3313,7 +3313,7 @@
     (effects (font (size 1.27 1.27)) (justify right))
     (uuid d24d3fee-c1c4-44a6-a1a7-b5ca24c9a237)
   )
-  (hierarchical_label "H1B" (shape input) (at 149.86 107.95 180)
+  (hierarchical_label "H1_BUF" (shape input) (at 149.86 107.95 180)
     (effects (font (size 1.27 1.27)) (justify right))
     (uuid d3f46421-25d9-4a4e-9a3f-e2b4f1b30c16)
   )

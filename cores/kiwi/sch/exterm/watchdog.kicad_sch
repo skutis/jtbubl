@@ -1839,7 +1839,7 @@
     (uuid f8cdafeb-119c-465b-9211-7cf1c4c30baa)
   )
 
-  (hierarchical_label "~{WATCHDOG}" (shape input) (at 87.63 100.33 180)
+  (hierarchical_label "WATCHDOG" (shape input) (at 87.63 100.33 180)
     (effects (font (size 1.27 1.27)) (justify right))
     (uuid 120d25b3-1ac1-4392-8b86-1293a81a1633)
   )
